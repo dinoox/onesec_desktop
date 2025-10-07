@@ -1,0 +1,15 @@
+# Ignore artifacts:
+node_modules
+# Ignore everything
+/*
+
+# Except these files & folders
+!/src
+!index.html
+!package.json
+!tsconfig.json
+!tsconfig.node.json
+!vite.config.ts
+!.prettierrc
+!README.md
+!eslint.config.js
