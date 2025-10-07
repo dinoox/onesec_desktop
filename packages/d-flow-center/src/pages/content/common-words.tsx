@@ -88,7 +88,7 @@ const ContestPage: React.FC = () => {
         </div>
       </div>
       <div className="flex w-full max-w-md flex-col gap-6">
-        <ItemGroup className="border border-gray-200 rounded-md">
+        <ItemGroup className="border border-border rounded-md">
           {shortKeys.map((item, index) => (
             <React.Fragment key={item.key}>
               <Item className="p-3">

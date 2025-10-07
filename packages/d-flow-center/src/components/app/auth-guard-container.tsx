@@ -17,5 +17,5 @@ export default function AuthGuardContainer({
 
   console.log('isAuthed: ', isAuthed)
 
-  return true ? children : <Navigate to="/login" replace state={pathname} />
+  return isAuthed ? children : <Navigate to="/login" replace state={pathname} />
 }

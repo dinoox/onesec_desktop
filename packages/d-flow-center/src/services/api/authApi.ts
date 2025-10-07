@@ -8,7 +8,7 @@ export const login = (params: any) => {
 }
 
 export const logout = () => {
-  return request.delete('/auth/logout')
+  return request.post('/user/logout')
 }
 
 export const refreshToken = async (refreshToken: string) => {

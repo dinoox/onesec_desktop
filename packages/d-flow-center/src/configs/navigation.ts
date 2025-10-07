@@ -1,4 +1,4 @@
-import { LucideHome, PuzzleIcon, LucideShell, UserIcon, type LucideIcon } from 'lucide-react'
+import { LucideHome, PuzzleIcon, LucideShell, Settings, type LucideIcon } from 'lucide-react'
 
 export type NavItem = {
   title: string
@@ -25,8 +25,8 @@ export const navMain: NavItem[] = [
     icon: LucideShell,
   },
   {
-    title: '用户信息',
+    title: '设置',
     url: '/content/settings',
-    icon: UserIcon,
+    icon: Settings,
   },
 ]

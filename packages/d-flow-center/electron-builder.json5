@@ -15,7 +15,14 @@
     "target": [
       "dmg"
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist",
+    "hardenedRuntime": true,
+    "extendInfo": {
+      "NSMicrophoneUsageDescription": "此应用需要访问麦克风以实现语音输入功能",
+      "NSCameraUsageDescription": "此应用需要访问摄像头以实现视频功能"
+    }
   },
   "win": {
     "target": [

@@ -13,3 +13,4 @@ node_modules
 !.prettierrc
 !README.md
 !eslint.config.js
+!/main

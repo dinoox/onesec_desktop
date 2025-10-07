@@ -1,9 +1,9 @@
-// export type AccessToken = {
-//   access_token: string
-//   refresh_token: string
-//   type: string
-//   expiresIn: number
-// }
+export type AccessToken = {
+  access_token: string
+  refresh_token: string
+  type: string
+  expiresIn: number
+}
 
 export type LoginReq = {
   credential: string

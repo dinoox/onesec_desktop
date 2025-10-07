@@ -1,39 +1,32 @@
 import { useMutation } from '@tanstack/react-query'
-import { login, logout, refreshToken } from '@/services/api/authApi'
+import { login, logout } from '@/services/api/authApi'
 import authStore from '@/store/authStore'
-import { redirect } from 'react-router'
+import { useNavigate } from 'react-router'
+import { UserConfigService } from '@/services/userConfigService.ts'
 
-export const useLoginQuery = () =>
-  useMutation({
+export const useLoginQuery = () => {
+  const navigate = useNavigate()
+  return useMutation({
     mutationFn: login,
-    onSuccess: (resp) => {
+    onSuccess: async (resp) => {
       authStore
         .getState()
         .actions.setAuthed(resp.data.user || {}, resp.data.access_token || 'token')
-      redirect('/')
 
-      //resp.success
-      // if (resp.success) {
-      //   authStore
-      //     .getState()
-      //     .actions.setAuthed(
-      //       resp.data.user,
-      //       resp.data.token.access_token,
-      //       resp.data.token.refresh_token,
-      //     )
-      //   redirect('/')
-      // } else {
-      //   toast.error(resp.message)
-      // }
+      const userConf = await UserConfigService.getConfig()
+      await UserConfigService.setConfig({ ...userConf, auth_token: resp.data.access_token })
+      navigate('/content')
     },
   })
+}
 
 export const useLogoutQuery = () =>
   useMutation({
     mutationFn: logout,
-  })
+    onSuccess: async (_) => {
+      authStore.getState().actions.logout()
 
-export const useRefreshTokenQuery = () =>
-  useMutation({
-    mutationFn: refreshToken,
+      const userConf = await UserConfigService.getConfig()
+      await UserConfigService.setConfig({ ...userConf, auth_token: null })
+    },
   })
