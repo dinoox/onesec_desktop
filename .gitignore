@@ -1,0 +1,11 @@
+.turbo
+.idea
+node_modules
+gameData
+pnpm-lock.yaml
+# OSX
+.DS_Store
+**/mongodb.zip
+**/mongo
+env/.env.local
+package-lock.json
