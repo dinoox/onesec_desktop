@@ -1,0 +1,6 @@
+:root {
+    --background: rgba(0,0,0,0);
+}
+.dark {
+    --background: var(--background);
+}

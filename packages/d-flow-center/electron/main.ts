@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import windowManager from '../main/services/window-manager.ts'
@@ -23,7 +23,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, 'public')
   : RENDERER_DIST
 
-let win: BrowserWindow | null
+let win, statusWin: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
@@ -45,6 +45,46 @@ function createWindow() {
   } else {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, 'index.html')).then()
+  }
+}
+
+function createFloatWindow() {
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const { width, height } = primaryDisplay.bounds
+
+  const floatWidth = 90
+  const floatHeight = 30
+  const x = Math.floor((width - floatWidth) / 2)
+  const y = Math.floor(height - floatHeight - 20) // 距离屏幕真正底部20px
+
+  statusWin = new BrowserWindow({
+    // show: false,
+    width: floatWidth,
+    height: floatHeight,
+    x,
+    y,
+    frame: false, // 无边框
+    alwaysOnTop: true, // 始终在最上层
+    hasShadow: false,
+    skipTaskbar: true, // 不在任务栏显示
+    resizable: false, // 不可调整大小
+    movable: true, // 可移动
+    minimizable: false, // 不可最小化
+    maximizable: false, // 不可最大化
+    closable: true, // 可关闭
+    transparent: true, // 透明背景
+    backgroundColor: '#00000000', // 完全透明的背景色
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.mjs'),
+    },
+  })
+
+  statusWin.webContents.on('did-finish-load', async () => windowManager.register(statusWin!))
+
+  if (VITE_DEV_SERVER_URL) {
+    statusWin.loadURL(`${VITE_DEV_SERVER_URL}status.html`).then()
+  } else {
+    statusWin.loadFile(path.join(RENDERER_DIST, 'status.html')).then()
   }
 }
 
@@ -81,4 +121,5 @@ app.whenReady().then(async () => {
     iconPath: path.join(__dirname, '../../assets/icon.icns'),
   })
   createWindow()
+  createFloatWindow()
 })

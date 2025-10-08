@@ -10,7 +10,7 @@ var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 var _validator, _encryptionKey, _options, _defaultValues, _isInMigration, _watcher, _watchFile, _debouncedChangeHandler, _Conf_instances, prepareOptions_fn, setupValidator_fn, captureSchemaDefaults_fn, applyDefaultValues_fn, configureSerialization_fn, resolvePath_fn, initializeStore_fn, runMigrations_fn;
-import electron, { app as app$1, ipcMain as ipcMain$1, BrowserWindow } from "electron";
+import electron, { app as app$1, ipcMain as ipcMain$1, BrowserWindow, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import require$$2$1 from "path";
@@ -2574,15 +2574,9 @@ if (isRenderer) {
 }
 var srcExports = src.exports;
 const log = /* @__PURE__ */ getDefaultExportFromCjs(srcExports);
-const _WindowManager = class _WindowManager {
+class WindowManager {
   constructor() {
     __publicField(this, "windows", /* @__PURE__ */ new Map());
-  }
-  static getInstance() {
-    if (!_WindowManager.instance) {
-      _WindowManager.instance = new _WindowManager();
-    }
-    return _WindowManager.instance;
   }
   /**
    * 注册一个窗口
@@ -2653,10 +2647,8 @@ const _WindowManager = class _WindowManager {
     });
     return successCount;
   }
-};
-__publicField(_WindowManager, "instance", null);
-let WindowManager = _WindowManager;
-const windowManager = WindowManager.getInstance();
+}
+const windowManager = new WindowManager();
 const MessageTypes = {
   START_RECORDING: "start_recording",
   STOP_RECORDING: "stop_recording",
@@ -2676,7 +2668,7 @@ const MessageTypes = {
 const DEFAULT_IPC_CHANNEL = "default_ipc_channel";
 const IPC_USER_CONFIG_GET_CHANNEL = "user_config_get_channel";
 const IPC_USER_CONFIG_SET_CHANNEL = "user_config_set_channel";
-const _UDSService = class _UDSService extends EventEmitter {
+class UDSService extends EventEmitter {
   constructor(options = {}) {
     super();
     __publicField(this, "socketPath");
@@ -2684,12 +2676,6 @@ const _UDSService = class _UDSService extends EventEmitter {
     __publicField(this, "clients", /* @__PURE__ */ new Map());
     __publicField(this, "isRunning", false);
     this.socketPath = options.socketPath || "/tmp/miaoyan_uds";
-  }
-  static getInstance() {
-    if (!_UDSService.instance) {
-      _UDSService.instance = new _UDSService();
-    }
-    return _UDSService.instance;
   }
   async start() {
     return new Promise((resolve2, reject) => {
@@ -2834,19 +2820,11 @@ const _UDSService = class _UDSService extends EventEmitter {
       log.error(`Error cleaning up socket file: ${err.message}`);
     }
   }
-};
-__publicField(_UDSService, "instance", null);
-let UDSService = _UDSService;
-UDSService.getInstance();
-const _NativeProcessManager = class _NativeProcessManager {
+}
+const udsService = new UDSService();
+class NativeProcessManager {
   constructor() {
     __publicField(this, "nativeProcess", null);
-  }
-  static getInstance() {
-    if (!_NativeProcessManager.instance) {
-      _NativeProcessManager.instance = new _NativeProcessManager();
-    }
-    return _NativeProcessManager.instance;
   }
   async start() {
     if (this.nativeProcess) {
@@ -2967,10 +2945,8 @@ const _NativeProcessManager = class _NativeProcessManager {
     }
     return appPath;
   }
-};
-__publicField(_NativeProcessManager, "instance", null);
-let NativeProcessManager = _NativeProcessManager;
-NativeProcessManager.getInstance();
+}
+const nativeProcessManager = new NativeProcessManager();
 const isObject = (value) => {
   const type2 = typeof value;
   return value !== null && (type2 === "object" || type2 === "function");
@@ -13412,21 +13388,15 @@ const USER_DEFAULT_CONFIG = {
     { mode: "command", hotkey_combination: ["fn", "Cmd⌘"] }
   ]
 };
-const _UserConfigManager = class _UserConfigManager {
+class UserConfigManager {
   constructor() {
     __publicField(this, "store");
     this.store = new ElectronStore({
       name: "config",
       defaults: USER_DEFAULT_CONFIG,
       clearInvalidConfig: true
-      // 如果配置文件损坏，自动清除并使用默认配置
+      // 配置文件损坏，自动清除并使用默认配置
     });
-  }
-  static getInstance() {
-    if (!_UserConfigManager.instance) {
-      _UserConfigManager.instance = new _UserConfigManager();
-    }
-    return _UserConfigManager.instance;
   }
   getConfig() {
     return {
@@ -13438,37 +13408,25 @@ const _UserConfigManager = class _UserConfigManager {
     this.store.set("auth_token", config.auth_token);
     this.store.set("hotkey_configs", config.hotkey_configs);
   }
-};
-__publicField(_UserConfigManager, "instance", null);
-let UserConfigManager = _UserConfigManager;
-const userConfigManager = UserConfigManager.getInstance();
-const _ProcessManager = class _ProcessManager {
+}
+const userConfigManager = new UserConfigManager();
+class ProcessManager {
   constructor() {
-    __publicField(this, "udsService", UDSService.getInstance());
-    __publicField(this, "windowManager", WindowManager.getInstance());
-    __publicField(this, "nativeProcessManager", NativeProcessManager.getInstance());
-    __publicField(this, "configManager", UserConfigManager.getInstance());
-  }
-  static getInstance() {
-    if (!_ProcessManager.instance) {
-      _ProcessManager.instance = new _ProcessManager();
-    }
-    return _ProcessManager.instance;
   }
   async initialize() {
     try {
-      await this.udsService.start();
-      await this.nativeProcessManager.start();
+      await udsService.start();
+      await nativeProcessManager.start();
       await this.setupUDSForward();
       await this.setupIPCMainHandlers();
-      this.udsService.on(MessageTypes.PERMISSION_STATUS, () => this.initNativeProcessConfig());
+      udsService.on(MessageTypes.PERMISSION_STATUS, () => this.initNativeProcessConfig());
     } catch (err) {
       log.error(err);
     }
   }
   async setupUDSForward() {
     Object.values(MessageTypes).forEach((messageType) => {
-      this.udsService.on(messageType, (_data, originalMessage) => {
+      udsService.on(messageType, (_data, originalMessage) => {
         const eventMessage = {
           id: `event_${Date.now()}`,
           type: "event",
@@ -13477,13 +13435,13 @@ const _ProcessManager = class _ProcessManager {
           data: originalMessage,
           timestamp: Date.now()
         };
-        this.windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage);
+        windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage);
       });
     });
   }
   async initNativeProcessConfig() {
-    const config = this.configManager.getConfig();
-    this.udsService.broadcast({
+    const config = userConfigManager.getConfig();
+    udsService.broadcast({
       type: MessageTypes.INIT_CONFIG,
       timestamp: Date.now(),
       data: {
@@ -13502,13 +13460,11 @@ const _ProcessManager = class _ProcessManager {
     });
   }
   async destroy() {
-    await this.udsService.stop();
-    await this.nativeProcessManager.stop();
+    await udsService.stop();
+    await nativeProcessManager.stop();
   }
-};
-__publicField(_ProcessManager, "instance", null);
-let ProcessManager = _ProcessManager;
-const processManager = ProcessManager.getInstance();
+}
+const processManager = new ProcessManager();
 app$1.commandLine.appendSwitch("--ignore-certificate-errors");
 app$1.commandLine.appendSwitch("--ignore-ssl-errors");
 app$1.commandLine.appendSwitch("--ignore-certificate-errors-spki-list");
@@ -13520,7 +13476,7 @@ const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
 const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-let win;
+let win, statusWin;
 function createWindow() {
   win = new BrowserWindow({
     width: 1200,
@@ -13538,6 +13494,51 @@ function createWindow() {
     win.loadURL(VITE_DEV_SERVER_URL).then();
   } else {
     win.loadFile(path.join(RENDERER_DIST, "index.html")).then();
+  }
+}
+function createFloatWindow() {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.bounds;
+  const floatWidth = 90;
+  const floatHeight = 30;
+  const x = Math.floor((width - floatWidth) / 2);
+  const y = Math.floor(height - floatHeight - 20);
+  statusWin = new BrowserWindow({
+    // show: false,
+    width: floatWidth,
+    height: floatHeight,
+    x,
+    y,
+    frame: false,
+    // 无边框
+    alwaysOnTop: true,
+    // 始终在最上层
+    hasShadow: false,
+    skipTaskbar: true,
+    // 不在任务栏显示
+    resizable: false,
+    // 不可调整大小
+    movable: true,
+    // 可移动
+    minimizable: false,
+    // 不可最小化
+    maximizable: false,
+    // 不可最大化
+    closable: true,
+    // 可关闭
+    transparent: true,
+    // 透明背景
+    backgroundColor: "#00000000",
+    // 完全透明的背景色
+    webPreferences: {
+      preload: path.join(__dirname$1, "preload.mjs")
+    }
+  });
+  statusWin.webContents.on("did-finish-load", async () => windowManager.register(statusWin));
+  if (VITE_DEV_SERVER_URL) {
+    statusWin.loadURL(`${VITE_DEV_SERVER_URL}status.html`).then();
+  } else {
+    statusWin.loadFile(path.join(RENDERER_DIST, "status.html")).then();
   }
 }
 app$1.on("window-all-closed", () => {
@@ -13565,6 +13566,7 @@ app$1.whenReady().then(async () => {
     iconPath: path.join(__dirname$1, "../../assets/icon.icns")
   });
   createWindow();
+  createFloatWindow();
 });
 export {
   MAIN_DIST,
