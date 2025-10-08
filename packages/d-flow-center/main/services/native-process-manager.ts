@@ -4,17 +4,10 @@ import { spawn, ChildProcess } from 'child_process'
 import path from 'path'
 import fs from 'fs'
 
-export class NativeProcessManager {
+class NativeProcessManager {
   private nativeProcess: ChildProcess | null = null
-  private static instance: NativeProcessManager | null = null
 
-  private constructor() {}
-  static getInstance(): NativeProcessManager {
-    if (!NativeProcessManager.instance) {
-      NativeProcessManager.instance = new NativeProcessManager()
-    }
-    return NativeProcessManager.instance
-  }
+  constructor() {}
 
   async start(): Promise<void> {
     if (this.nativeProcess) {
@@ -157,4 +150,4 @@ export class NativeProcessManager {
   }
 }
 
-export const nativeProcessManager = NativeProcessManager.getInstance()
+export default new NativeProcessManager()

@@ -2,23 +2,15 @@ import Store from 'electron-store'
 import { GlobalConfig } from '../types/message'
 import { StoreSchema, USER_DEFAULT_CONFIG } from '../types/config.ts'
 
-export class UserConfigManager {
-  private static instance: UserConfigManager | null = null
+class UserConfigManager {
   private store: Store<StoreSchema>
 
-  private constructor() {
+  constructor() {
     this.store = new Store<StoreSchema>({
       name: 'config',
       defaults: USER_DEFAULT_CONFIG,
-      clearInvalidConfig: true, // 如果配置文件损坏，自动清除并使用默认配置
+      clearInvalidConfig: true, // 配置文件损坏，自动清除并使用默认配置
     })
-  }
-
-  static getInstance(): UserConfigManager {
-    if (!UserConfigManager.instance) {
-      UserConfigManager.instance = new UserConfigManager()
-    }
-    return UserConfigManager.instance
   }
 
   getConfig(): GlobalConfig {
@@ -34,4 +26,4 @@ export class UserConfigManager {
   }
 }
 
-export const userConfigManager = UserConfigManager.getInstance()
+export default new UserConfigManager()

@@ -1,8 +1,8 @@
 import { app, BrowserWindow } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { windowManager } from '../main/services/window-manager.ts'
-import { processManager } from '../main/communications/process-manager.ts'
+import windowManager from '../main/services/window-manager.ts'
+import processManager from '../main/communications/process-manager.ts'
 
 // 禁用HTTPS证书验证（仅用于开发环境或自签名证书）
 app.commandLine.appendSwitch('--ignore-certificate-errors')

@@ -14,20 +14,12 @@ import log from 'electron-log'
  * UDS (Unix Domain Socket) 服务
  * 实现秒言 Electron 主进程与 Native 进程之间的 UDS 通信协议
  */
-export class UDSService extends EventEmitter {
-  private static instance: UDSService | null = null
+class UDSService extends EventEmitter {
   private readonly socketPath: string
   private server: net.Server | null = null
   private clients: Map<string, ClientInfo> = new Map()
 
   private isRunning = false
-
-  static getInstance(): UDSService {
-    if (!UDSService.instance) {
-      UDSService.instance = new UDSService()
-    }
-    return UDSService.instance
-  }
 
   constructor(options: UdsServiceOptions = {}) {
     super()
@@ -214,4 +206,5 @@ export class UDSService extends EventEmitter {
     }
   }
 }
-export const udsService = UDSService.getInstance()
+
+export default new UDSService()

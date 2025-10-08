@@ -1,18 +1,10 @@
 import log from 'electron-log'
 import { BrowserWindow } from 'electron'
 
-export class WindowManager {
-  private static instance: WindowManager | null = null
+class WindowManager {
   private windows: Map<number, BrowserWindow> = new Map()
 
-  private constructor() {}
-
-  static getInstance(): WindowManager {
-    if (!WindowManager.instance) {
-      WindowManager.instance = new WindowManager()
-    }
-    return WindowManager.instance
-  }
+  constructor() {}
 
   /**
    * 注册一个窗口
@@ -97,4 +89,4 @@ export class WindowManager {
   }
 }
 
-export const windowManager = WindowManager.getInstance()
+export default new WindowManager()

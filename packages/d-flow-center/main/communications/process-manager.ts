@@ -1,7 +1,7 @@
 import log from 'electron-log'
-import { WindowManager } from '../services/window-manager.ts'
-import { UDSService } from './uds-service.ts'
-import { NativeProcessManager } from '../services/native-process-manager.ts'
+import windowManager from '../services/window-manager.ts'
+import udsService from './uds-service.ts'
+import nativeProcessManager from '../services/native-process-manager.ts'
 import {
   DEFAULT_IPC_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
@@ -9,7 +9,7 @@ import {
   IPCMessage,
   MessageTypes,
 } from '../types/message.ts'
-import { userConfigManager, UserConfigManager } from '../services/user-config-manager.ts'
+import userConfigManager from '../services/user-config-manager.ts'
 import { ipcMain } from 'electron'
 
 /**
@@ -17,30 +17,17 @@ import { ipcMain } from 'electron'
  * 管理 electron 主进程，渲染进程窗口、原生进程的生命周期
  * 管理进程间通信
  */
-export class ProcessManager {
-  private constructor() {}
-  private static instance: ProcessManager | null = null
-
-  private udsService: UDSService = UDSService.getInstance()
-  private windowManager: WindowManager = WindowManager.getInstance()
-  private nativeProcessManager: NativeProcessManager = NativeProcessManager.getInstance()
-  private configManager: UserConfigManager = UserConfigManager.getInstance()
-
-  static getInstance(): ProcessManager {
-    if (!ProcessManager.instance) {
-      ProcessManager.instance = new ProcessManager()
-    }
-    return ProcessManager.instance
-  }
+class ProcessManager {
+  constructor() {}
 
   async initialize() {
     try {
-      await this.udsService.start()
-      await this.nativeProcessManager.start()
+      await udsService.start()
+      await nativeProcessManager.start()
       await this.setupUDSForward()
       await this.setupIPCMainHandlers()
       // TODO: 暂时用 PERMISSION_STATUS 事件监测 Native Process 已启动
-      this.udsService.on(MessageTypes.PERMISSION_STATUS, () => this.initNativeProcessConfig())
+      udsService.on(MessageTypes.PERMISSION_STATUS, () => this.initNativeProcessConfig())
     } catch (err) {
       log.error(err)
     }
@@ -48,7 +35,7 @@ export class ProcessManager {
 
   async setupUDSForward() {
     Object.values(MessageTypes).forEach((messageType) => {
-      this.udsService.on(messageType, (_data: any, originalMessage: any) => {
+      udsService.on(messageType, (_data: any, originalMessage: any) => {
         const eventMessage: IPCMessage = {
           id: `event_${Date.now()}`,
           type: 'event',
@@ -58,15 +45,15 @@ export class ProcessManager {
           timestamp: Date.now(),
         }
 
-        this.windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage)
+        windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage)
       })
     })
   }
 
   async initNativeProcessConfig() {
-    const config = this.configManager.getConfig()
+    const config = userConfigManager.getConfig()
 
-    this.udsService.broadcast({
+    udsService.broadcast({
       type: MessageTypes.INIT_CONFIG,
       timestamp: Date.now(),
       data: {
@@ -88,9 +75,9 @@ export class ProcessManager {
   }
 
   async destroy() {
-    await this.udsService.stop()
-    await this.nativeProcessManager.stop()
+    await udsService.stop()
+    await nativeProcessManager.stop()
   }
 }
 
-export const processManager = ProcessManager.getInstance()
+export default new ProcessManager()
