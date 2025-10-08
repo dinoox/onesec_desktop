@@ -18,7 +18,6 @@ export class NativeProcessManager {
 
   async start(): Promise<void> {
     if (this.nativeProcess) {
-      log.info('MiaoyanSwift is already running')
       return
     }
 

@@ -1,7 +1,7 @@
 import log from 'electron-log'
-import { WindowManager } from '../services/WindowManager'
-import { UDSService } from './UDSService'
-import { NativeProcessManager } from '../services/NativeProcessManager.ts'
+import { WindowManager } from '../services/window-manager.ts'
+import { UDSService } from './uds-service.ts'
+import { NativeProcessManager } from '../services/native-process-manager.ts'
 import {
   DEFAULT_IPC_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
@@ -9,23 +9,23 @@ import {
   IPCMessage,
   MessageTypes,
 } from '../types/message.ts'
-import { userConfigManager, UserConfigManager } from '../services/UserConfigManager.ts'
+import { userConfigManager, UserConfigManager } from '../services/user-config-manager.ts'
 import { ipcMain } from 'electron'
 
-export class MessageBus {
-  private static instance: MessageBus | null = null
-  private windowManager: WindowManager = WindowManager.getInstance()
+export class ProcessManager {
+  private constructor() {}
+  private static instance: ProcessManager | null = null
+
   private udsService: UDSService = UDSService.getInstance()
+  private windowManager: WindowManager = WindowManager.getInstance()
   private nativeProcessManager: NativeProcessManager = NativeProcessManager.getInstance()
   private configManager: UserConfigManager = UserConfigManager.getInstance()
 
-  private constructor() {}
-
-  static getInstance(): MessageBus {
-    if (!MessageBus.instance) {
-      MessageBus.instance = new MessageBus()
+  static getInstance(): ProcessManager {
+    if (!ProcessManager.instance) {
+      ProcessManager.instance = new ProcessManager()
     }
-    return MessageBus.instance
+    return ProcessManager.instance
   }
 
   async initialize() {
@@ -88,4 +88,4 @@ export class MessageBus {
   }
 }
 
-export const messageBus = MessageBus.getInstance()
+export const processManager = ProcessManager.getInstance()
