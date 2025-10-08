@@ -12,6 +12,11 @@ import {
 import { userConfigManager, UserConfigManager } from '../services/user-config-manager.ts'
 import { ipcMain } from 'electron'
 
+/**
+ * 全局进程管理类
+ * 管理 electron 主进程，渲染进程窗口、原生进程的生命周期
+ * 管理进程间通信
+ */
 export class ProcessManager {
   private constructor() {}
   private static instance: ProcessManager | null = null

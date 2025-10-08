@@ -1,28 +1,17 @@
-import { app } from 'electron'
-import * as fs from 'fs'
-import * as path from 'path'
+import Store from 'electron-store'
 import { GlobalConfig } from '../types/message'
+import { StoreSchema, USER_DEFAULT_CONFIG } from '../types/config.ts'
 
 export class UserConfigManager {
   private static instance: UserConfigManager | null = null
-  private readonly configPath: string
-  private config: GlobalConfig
-
-  private readonly DEFAULT_CONFIG: GlobalConfig = {
-    auth_token: null,
-    hotkey_configs: [
-      {
-        mode: 'normal',
-        hotkey_combination: ['fn', 'Opt⌥'],
-      },
-      { mode: 'command', hotkey_combination: ['fn', 'Cmd⌘'] },
-    ],
-  }
+  private store: Store<StoreSchema>
 
   private constructor() {
-    const userDataPath = app.getPath('userData')
-    this.configPath = path.join(userDataPath, 'config.json')
-    this.config = this.loadConfig()
+    this.store = new Store<StoreSchema>({
+      name: 'config',
+      defaults: USER_DEFAULT_CONFIG,
+      clearInvalidConfig: true, // 如果配置文件损坏，自动清除并使用默认配置
+    })
   }
 
   static getInstance(): UserConfigManager {
@@ -33,41 +22,15 @@ export class UserConfigManager {
   }
 
   getConfig(): GlobalConfig {
-    this.config = this.loadConfig()
-    return { ...this.config }
-  }
-
-  setConfig(config: GlobalConfig) {
-    this.config = { ...config }
-    this.saveConfig(this.config)
-  }
-
-  private loadConfig(): GlobalConfig {
-    try {
-      if (fs.existsSync(this.configPath)) {
-        const data = fs.readFileSync(this.configPath, 'utf-8')
-        const config = JSON.parse(data)
-        return { ...this.DEFAULT_CONFIG, ...config }
-      } else {
-        // 文件不存在，创建默认配置
-        this.saveConfig(this.DEFAULT_CONFIG)
-        return { ...this.DEFAULT_CONFIG }
-      }
-    } catch (error) {
-      return { ...this.DEFAULT_CONFIG }
+    return {
+      auth_token: this.store.get('auth_token', USER_DEFAULT_CONFIG.auth_token),
+      hotkey_configs: this.store.get('hotkey_configs', USER_DEFAULT_CONFIG.hotkey_configs),
     }
   }
 
-  private saveConfig(config: GlobalConfig): void {
-    try {
-      const configDir = path.dirname(this.configPath)
-      if (!fs.existsSync(configDir)) {
-        fs.mkdirSync(configDir, { recursive: true })
-      }
-      fs.writeFileSync(this.configPath, JSON.stringify(config, null, 2), 'utf-8')
-    } catch (error) {
-      throw error
-    }
+  setConfig(config: GlobalConfig): void {
+    this.store.set('auth_token', config.auth_token)
+    this.store.set('hotkey_configs', config.hotkey_configs)
   }
 }
 
