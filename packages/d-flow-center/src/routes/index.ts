@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { createBrowserRouter, type RouteObject } from 'react-router'
+import { createBrowserRouter, redirect, type RouteObject } from 'react-router'
 import RootLayout from '@/components/layout/root-layout'
 import DashboardLayout from '@/components/layout/dashboard-layout'
 import { ContentRoutes } from '@/routes/content'
@@ -16,7 +16,13 @@ const router: RouteObject[] = [
     children: [
       {
         Component: DashboardLayout,
-        children: [{ index: true, Component: DashboardPage }, ...ContentRoutes],
+        children: [
+          { 
+            index: true, 
+            loader: () => redirect('/content')
+          },
+          ...ContentRoutes,
+        ],
       },
       { path: 'login', Component: LoginPage },
       { path: '*', Component: NotFoundPage },
