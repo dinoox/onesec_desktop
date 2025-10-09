@@ -74,3 +74,4 @@ export interface APIResponse {
 export const DEFAULT_IPC_CHANNEL = 'default_ipc_channel'
 export const IPC_USER_CONFIG_GET_CHANNEL = 'user_config_get_channel'
 export const IPC_USER_CONFIG_SET_CHANNEL = 'user_config_set_channel'
+export const IPC_RESIZE_STATUS_WINDOW_CHANNEL = 'resize_status_window_channel'

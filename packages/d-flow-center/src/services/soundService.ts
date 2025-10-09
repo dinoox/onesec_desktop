@@ -5,8 +5,8 @@
 
 type SoundType = 'open' | 'close' | 'notification'
 
-const MIN_VOLUME_THRESHOLD = 0.01;
-const MAX_VOLUME_THRESHOLD = 0.1;
+const MIN_VOLUME_THRESHOLD = 0.01
+const MAX_VOLUME_THRESHOLD = 0.1
 
 class SoundService {
   private audioContext: AudioContext | null = null
@@ -119,7 +119,7 @@ class SoundService {
       return 1
     }
     return (volume - MIN_VOLUME_THRESHOLD) / (MAX_VOLUME_THRESHOLD - MIN_VOLUME_THRESHOLD)
-  };
+  }
 
   async destroy() {
     if (this.audioContext) {

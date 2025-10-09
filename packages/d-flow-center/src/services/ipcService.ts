@@ -1,4 +1,9 @@
-import { DEFAULT_IPC_CHANNEL, IPCMessage, MessageType } from '../../main/types/message.ts'
+import {
+  DEFAULT_IPC_CHANNEL,
+  IPC_RESIZE_STATUS_WINDOW_CHANNEL,
+  IPCMessage,
+  MessageType,
+} from '../../main/types/message.ts'
 import useStatusStore, { Status } from '@/store/statusStore'
 import SoundService from '@/services/soundService.ts'
 
@@ -16,7 +21,7 @@ class IPCService {
   async handleIPCMessage(data: IPCMessage) {
     console.log(`[IPCService] ${JSON.stringify(data)}`)
 
-    const { setStatus, setAudioLevel } = useStatusStore.getState().actions
+    const { setMode, setStatus, setAudioLevel } = useStatusStore.getState().actions
 
     const action = data.action as MessageType
 
@@ -28,26 +33,47 @@ class IPCService {
     }
 
     if (action === 'start_recording') {
-      const recognitionMode = data.data?.recognition_mode || 'normal'
-      setStatus(recognitionMode === 'command' ? 'command' : 'speaking')
+      setStatus('speaking')
+      setMode(data.data?.data?.recognition_mode || 'normal')
       await SoundService.playStartRecording()
       return
     }
 
     if (action === 'stop_recording') {
-      setStatus(
-        useStatusStore.getState().status === 'command' ? 'command-processing' : 'processing',
-      )
+      setStatus('processing')
+      setAudioLevel(0)
       await SoundService.playStopRecording()
       return
     }
 
+    if (action === 'recording_timeout') {
+      setStatus('idle')
+      await this.resizeStatusWindow(320, 130)
+      setStatus('notification')
+      await SoundService.playNotification()
+      setTimeout(async () => {
+        setStatus('idle')
+        setTimeout(async () => {
+          await this.resizeStatusWindow(90, 30)
+        }, 2000)
+      }, 4000)
+      return
+    }
+
     if (action === 'mode_upgrade') {
-      setStatus('command')
+      setMode('command')
       return
     }
 
     setStatus('idle')
+  }
+
+  async resizeStatusWindow(width: number, height: number) {
+    try {
+      return await window.ipcRenderer.invoke(IPC_RESIZE_STATUS_WINDOW_CHANNEL, width, height)
+    } catch (err) {
+      console.error('Failed to resize status window:', err)
+    }
   }
 }
 

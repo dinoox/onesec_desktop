@@ -4,6 +4,7 @@ import udsService from './uds-service.ts'
 import nativeProcessManager from '../services/native-process-manager.ts'
 import {
   DEFAULT_IPC_CHANNEL,
+  IPC_RESIZE_STATUS_WINDOW_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_CHANNEL,
   IPCMessage,
@@ -61,6 +62,8 @@ class ProcessManager {
         hotkey_configs: config.hotkey_configs,
       },
     })
+
+    log.info(`Init Native Config: ${JSON.stringify(config)}`)
   }
 
   async setupIPCMainHandlers() {
@@ -68,9 +71,14 @@ class ProcessManager {
       return userConfigManager.getConfig()
     })
 
-    ipcMain.handle(IPC_USER_CONFIG_SET_CHANNEL, (_, config) => {
+    ipcMain.handle(IPC_USER_CONFIG_SET_CHANNEL, async (_, config) => {
       userConfigManager.setConfig(config)
+      await this.initNativeProcessConfig() //TODO: 移动该逻辑
       return { success: true }
+    })
+
+    ipcMain.handle(IPC_RESIZE_STATUS_WINDOW_CHANNEL, (_, toWidth, toHeight) => {
+      windowManager.resizeStatusWindow(toWidth, toHeight)
     })
   }
 

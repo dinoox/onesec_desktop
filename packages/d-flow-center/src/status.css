@@ -1,6 +1,16 @@
+/*:root {*/
+/*    --background: rgba(0,0,0,0);*/
+/*}*/
+/*.dark {*/
+/*    --background: var(--background);*/
+/*}*/
+
 :root {
-    --background: rgba(0,0,0,0);
+    background: rgba(0,0,0,0);
 }
-.dark {
-    --background: var(--background);
+body {
+    background: rgba(0,0,0,0);
+}
+#status-root {
+    min-height: 100vh;
 }

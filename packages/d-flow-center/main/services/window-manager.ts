@@ -1,28 +1,31 @@
 import log from 'electron-log'
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, screen } from 'electron'
 
 class WindowManager {
-  private windows: Map<number, BrowserWindow> = new Map()
+  private windows: Map<string, BrowserWindow> = new Map()
 
   constructor() {}
 
   /**
    * 注册一个窗口
+   * @param identifier
    * @param window - 要注册的 BrowserWindow 实例
    * @returns 窗口的 ID
    */
-  public register(window: BrowserWindow): number {
-    const windowId = window.id
-
-    if (this.windows.has(windowId)) {
-      return windowId
+  public register(window: BrowserWindow, identifier: string = ''): string {
+    if (!identifier) {
+      identifier = String(window.id)
     }
 
-    this.windows.set(windowId, window)
-    window.on('closed', () => this.unregister(windowId))
+    if (this.windows.has(identifier)) {
+      return identifier
+    }
 
-    log.info(`[WindowManager] Window ${windowId} registered. Total windows: ${this.windows.size}`)
-    return windowId
+    this.windows.set(identifier, window)
+    window.on('closed', () => this.unregister(identifier))
+
+    log.info(`[WindowManager] Window ${identifier} registered. Total windows: ${this.windows.size}`)
+    return identifier
   }
 
   /**
@@ -30,7 +33,7 @@ class WindowManager {
    * @param windowId - 要注销的窗口 ID
    * @returns 是否注销成功
    */
-  public unregister(windowId: number): boolean {
+  public unregister(windowId: string): boolean {
     if (!this.windows.has(windowId)) {
       return false
     }
@@ -43,7 +46,7 @@ class WindowManager {
    * @param windowId - 窗口 ID
    * @returns BrowserWindow 实例或 undefined
    */
-  public getWindow(windowId: number): BrowserWindow | undefined {
+  public getWindow(windowId: string): BrowserWindow | undefined {
     return this.windows.get(windowId)
   }
 
@@ -62,7 +65,7 @@ class WindowManager {
    * @param data - 要发送的数据
    * @returns 是否发送成功
    */
-  public sendToWindow(windowId: number, channel: string, ...data: any[]): boolean {
+  public sendToWindow(windowId: string, channel: string, ...data: any[]): boolean {
     const window = this.windows.get(windowId)
     if (!window || window.isDestroyed()) {
       return false
@@ -86,6 +89,28 @@ class WindowManager {
     })
 
     return successCount
+  }
+
+  async resizeStatusWindow(toWidth: number = 90, toHeight: number = 30) {
+    const statusWindow = this.windows.get('status')
+    if (!statusWindow) return
+
+    const point = screen.getCursorScreenPoint()
+    const { bounds, workAreaSize, workArea } = screen.getDisplayNearestPoint(point)
+
+    const winBounds = statusWindow.getBounds()
+    winBounds.width = toWidth
+    winBounds.height = toHeight
+
+    const x = bounds.x + (workAreaSize.width - winBounds.width) / 2
+    const y = workArea.y + workArea.height - winBounds.height
+
+    statusWindow.setBounds({
+      x,
+      y,
+      width: toWidth,
+      height: toHeight,
+    })
   }
 }
 

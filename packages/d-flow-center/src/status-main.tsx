@@ -6,7 +6,7 @@ import './status.css'
 import SoundService from '@/services/soundService.ts'
 import IPCService from '@/services/ipcService.ts'
 
-createRoot(document.getElementById('float-root')!).render(
+createRoot(document.getElementById('status-root')!).render(
   <StrictMode>
     <StatusApp />
   </StrictMode>,

@@ -13,7 +13,7 @@ interface AuthStore {
     setAuthed: (user: User, accessToken: string) => void
     setAccessToken: (t: string) => void
     setRefreshToken: (t: string) => void
-    logout: () => void
+    logout: () => Promise<void>
   }
 }
 

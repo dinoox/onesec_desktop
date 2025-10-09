@@ -10,7 +10,7 @@ var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 var _validator, _encryptionKey, _options, _defaultValues, _isInMigration, _watcher, _watchFile, _debouncedChangeHandler, _Conf_instances, prepareOptions_fn, setupValidator_fn, captureSchemaDefaults_fn, applyDefaultValues_fn, configureSerialization_fn, resolvePath_fn, initializeStore_fn, runMigrations_fn;
-import electron, { app as app$1, ipcMain as ipcMain$1, BrowserWindow, screen } from "electron";
+import electron, { screen, app as app$1, ipcMain as ipcMain$1, BrowserWindow } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import require$$2$1 from "path";
@@ -2580,18 +2580,21 @@ class WindowManager {
   }
   /**
    * 注册一个窗口
+   * @param identifier
    * @param window - 要注册的 BrowserWindow 实例
    * @returns 窗口的 ID
    */
-  register(window2) {
-    const windowId = window2.id;
-    if (this.windows.has(windowId)) {
-      return windowId;
+  register(window2, identifier = "") {
+    if (!identifier) {
+      identifier = String(window2.id);
     }
-    this.windows.set(windowId, window2);
-    window2.on("closed", () => this.unregister(windowId));
-    log.info(`[WindowManager] Window ${windowId} registered. Total windows: ${this.windows.size}`);
-    return windowId;
+    if (this.windows.has(identifier)) {
+      return identifier;
+    }
+    this.windows.set(identifier, window2);
+    window2.on("closed", () => this.unregister(identifier));
+    log.info(`[WindowManager] Window ${identifier} registered. Total windows: ${this.windows.size}`);
+    return identifier;
   }
   /**
    * 注销一个窗口
@@ -2647,6 +2650,23 @@ class WindowManager {
     });
     return successCount;
   }
+  async resizeStatusWindow(toWidth = 90, toHeight = 30) {
+    const statusWindow = this.windows.get("status");
+    if (!statusWindow) return;
+    const point = screen.getCursorScreenPoint();
+    const { bounds, workAreaSize, workArea } = screen.getDisplayNearestPoint(point);
+    const winBounds = statusWindow.getBounds();
+    winBounds.width = toWidth;
+    winBounds.height = toHeight;
+    const x = bounds.x + (workAreaSize.width - winBounds.width) / 2;
+    const y = workArea.y + workArea.height - winBounds.height;
+    statusWindow.setBounds({
+      x,
+      y,
+      width: toWidth,
+      height: toHeight
+    });
+  }
 }
 const windowManager = new WindowManager();
 const MessageTypes = {
@@ -2668,6 +2688,7 @@ const MessageTypes = {
 const DEFAULT_IPC_CHANNEL = "default_ipc_channel";
 const IPC_USER_CONFIG_GET_CHANNEL = "user_config_get_channel";
 const IPC_USER_CONFIG_SET_CHANNEL = "user_config_set_channel";
+const IPC_RESIZE_STATUS_WINDOW_CHANNEL = "resize_status_window_channel";
 class UDSService extends EventEmitter {
   constructor(options = {}) {
     super();
@@ -13449,14 +13470,19 @@ class ProcessManager {
         hotkey_configs: config.hotkey_configs
       }
     });
+    log.info(`Init Native Config: ${JSON.stringify(config)}`);
   }
   async setupIPCMainHandlers() {
     ipcMain$1.handle(IPC_USER_CONFIG_GET_CHANNEL, () => {
       return userConfigManager.getConfig();
     });
-    ipcMain$1.handle(IPC_USER_CONFIG_SET_CHANNEL, (_, config) => {
+    ipcMain$1.handle(IPC_USER_CONFIG_SET_CHANNEL, async (_, config) => {
       userConfigManager.setConfig(config);
+      await this.initNativeProcessConfig();
       return { success: true };
+    });
+    ipcMain$1.handle(IPC_RESIZE_STATUS_WINDOW_CHANNEL, (_, toWidth, toHeight) => {
+      windowManager.resizeStatusWindow(toWidth, toHeight);
     });
   }
   async destroy() {
@@ -13478,6 +13504,7 @@ const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
 let win, statusWin;
 function createWindow() {
+  log.info("createWindow");
   win = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -13487,8 +13514,7 @@ function createWindow() {
     }
   });
   win.webContents.on("did-finish-load", async () => {
-    windowManager.register(win);
-    await processManager.initialize();
+    windowManager.register(win, "content");
   });
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL).then();
@@ -13496,17 +13522,18 @@ function createWindow() {
     win.loadFile(path.join(RENDERER_DIST, "index.html")).then();
   }
 }
-function createFloatWindow() {
+function createStatusWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
-  const { width, height } = primaryDisplay.bounds;
-  const floatWidth = 90;
-  const floatHeight = 30;
-  const x = Math.floor((width - floatWidth) / 2);
-  const y = Math.floor(height - floatHeight - 20);
+  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+  const { workArea } = primaryDisplay;
+  const winWidth = 90;
+  const winHeight = 30;
+  const x = workArea.x + (screenWidth - winWidth) / 2;
+  const y = workArea.y + workArea.height - winHeight;
   statusWin = new BrowserWindow({
     // show: false,
-    width: floatWidth,
-    height: floatHeight,
+    width: winWidth,
+    height: winHeight,
     x,
     y,
     frame: false,
@@ -13525,16 +13552,16 @@ function createFloatWindow() {
     maximizable: false,
     // 不可最大化
     closable: true,
-    // 可关闭
     transparent: true,
-    // 透明背景
-    backgroundColor: "#00000000",
-    // 完全透明的背景色
     webPreferences: {
-      preload: path.join(__dirname$1, "preload.mjs")
+      preload: path.join(__dirname$1, "preload.mjs"),
+      backgroundThrottling: false
     }
   });
-  statusWin.webContents.on("did-finish-load", async () => windowManager.register(statusWin));
+  statusWin.webContents.on(
+    "did-finish-load",
+    async () => windowManager.register(statusWin, "status")
+  );
   if (VITE_DEV_SERVER_URL) {
     statusWin.loadURL(`${VITE_DEV_SERVER_URL}status.html`).then();
   } else {
@@ -13566,7 +13593,8 @@ app$1.whenReady().then(async () => {
     iconPath: path.join(__dirname$1, "../../assets/icon.icns")
   });
   createWindow();
-  createFloatWindow();
+  createStatusWindow();
+  await processManager.initialize();
 });
 export {
   MAIN_DIST,

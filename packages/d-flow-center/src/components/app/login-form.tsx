@@ -29,6 +29,7 @@ export function LoginForm({}: { className?: string }) {
     defaultValues: {
       phone: '',
       verification_code: '',
+      invite_code: '',
     },
   })
 
@@ -74,6 +75,19 @@ export function LoginForm({}: { className?: string }) {
                           获取验证码
                         </Button>
                       </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="invite_code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="gap-0.5">内测码</FormLabel>
+                    <FormControl>
+                      <Input placeholder="请输入内测码" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

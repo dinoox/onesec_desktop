@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import windowManager from '../main/services/window-manager.ts'
 import processManager from '../main/communications/process-manager.ts'
+import log from 'electron-log'
 
 // 禁用HTTPS证书验证（仅用于开发环境或自签名证书）
 app.commandLine.appendSwitch('--ignore-certificate-errors')
@@ -26,6 +27,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win, statusWin: BrowserWindow | null
 
 function createWindow() {
+  log.info('createWindow')
   win = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -36,8 +38,7 @@ function createWindow() {
   })
 
   win.webContents.on('did-finish-load', async () => {
-    windowManager.register(win!)
-    await processManager.initialize()
+    windowManager.register(win!, 'content')
   })
 
   if (VITE_DEV_SERVER_URL) {
@@ -48,19 +49,20 @@ function createWindow() {
   }
 }
 
-function createFloatWindow() {
+function createStatusWindow() {
   const primaryDisplay = screen.getPrimaryDisplay()
-  const { width, height } = primaryDisplay.bounds
+  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize
+  const { workArea } = primaryDisplay
 
-  const floatWidth = 90
-  const floatHeight = 30
-  const x = Math.floor((width - floatWidth) / 2)
-  const y = Math.floor(height - floatHeight - 20) // 距离屏幕真正底部20px
+  const winWidth = 90
+  const winHeight = 30
+  const x = workArea.x + (screenWidth - winWidth) / 2
+  const y = workArea.y + workArea.height - winHeight
 
   statusWin = new BrowserWindow({
     // show: false,
-    width: floatWidth,
-    height: floatHeight,
+    width: winWidth,
+    height: winHeight,
     x,
     y,
     frame: false, // 无边框
@@ -71,15 +73,17 @@ function createFloatWindow() {
     movable: true, // 可移动
     minimizable: false, // 不可最小化
     maximizable: false, // 不可最大化
-    closable: true, // 可关闭
-    transparent: true, // 透明背景
-    backgroundColor: '#00000000', // 完全透明的背景色
+    closable: true,
+    transparent: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      backgroundThrottling: false,
     },
   })
 
-  statusWin.webContents.on('did-finish-load', async () => windowManager.register(statusWin!))
+  statusWin.webContents.on('did-finish-load', async () =>
+    windowManager.register(statusWin!, 'status'),
+  )
 
   if (VITE_DEV_SERVER_URL) {
     statusWin.loadURL(`${VITE_DEV_SERVER_URL}status.html`).then()
@@ -121,5 +125,6 @@ app.whenReady().then(async () => {
     iconPath: path.join(__dirname, '../../assets/icon.icns'),
   })
   createWindow()
-  createFloatWindow()
+  createStatusWindow()
+  await processManager.initialize()
 })
