@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import windowManager from '../services/window-manager.ts'
+import windowManager, {WINDOW_STATUS_ID} from '../services/window-manager.ts'
 import udsService from './uds-service.ts'
 import nativeProcessManager from '../services/native-process-manager.ts'
 import {
@@ -76,7 +76,7 @@ class ProcessManager {
 
       //TODO: 移动登录后处理逻辑
       await this.initNativeProcessConfig()
-      windowManager.showWindow('status')
+      windowManager.showWindow(WINDOW_STATUS_ID)
     })
 
     ipcMain.handle(IPC_RESIZE_STATUS_WINDOW_CHANNEL, (_, toWidth, toHeight) => {
@@ -84,7 +84,7 @@ class ProcessManager {
     })
 
     ipcMain.handle(IPC_HIDE_STATUS_WINDOW_CHANNEL, () => {
-      windowManager.hideWindow('status')
+      windowManager.hideWindow(WINDOW_STATUS_ID)
     })
   }
 

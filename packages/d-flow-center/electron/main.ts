@@ -1,7 +1,7 @@
 import { app, BrowserWindow, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import windowManager from '../main/services/window-manager.ts'
+import windowManager, {WINDOW_CONTENT_ID, WINDOW_STATUS_ID} from '../main/services/window-manager.ts'
 import processManager from '../main/communications/process-manager.ts'
 import log from 'electron-log'
 
@@ -38,7 +38,7 @@ function createWindow() {
   })
 
   win.webContents.on('did-finish-load', async () => {
-    windowManager.register(win!, 'content')
+    windowManager.register(win!, WINDOW_CONTENT_ID)
   })
 
   if (VITE_DEV_SERVER_URL) {
@@ -82,7 +82,7 @@ function createStatusWindow() {
   })
 
   statusWin.webContents.on('did-finish-load', async () =>
-    windowManager.register(statusWin!, 'status'),
+    windowManager.register(statusWin!, WINDOW_STATUS_ID),
   )
 
   if (VITE_DEV_SERVER_URL) {

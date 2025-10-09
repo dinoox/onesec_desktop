@@ -2574,6 +2574,8 @@ if (isRenderer) {
 }
 var srcExports = src.exports;
 const log = /* @__PURE__ */ getDefaultExportFromCjs(srcExports);
+const WINDOW_STATUS_ID = "status";
+const WINDOW_CONTENT_ID = "content";
 class WindowManager {
   constructor() {
     __publicField(this, "windows", /* @__PURE__ */ new Map());
@@ -2677,7 +2679,7 @@ class WindowManager {
     return successCount;
   }
   async resizeStatusWindow(toWidth = 90, toHeight = 30) {
-    const statusWindow = this.windows.get("status");
+    const statusWindow = this.windows.get(WINDOW_STATUS_ID);
     if (!statusWindow) return;
     const point = screen.getCursorScreenPoint();
     const { bounds, workAreaSize, workArea } = screen.getDisplayNearestPoint(point);
@@ -13528,13 +13530,13 @@ class ProcessManager {
     ipcMain$1.handle(IPC_USER_CONFIG_SET_CHANNEL, async (_, config) => {
       userConfigManager.setConfig(config);
       await this.initNativeProcessConfig();
-      windowManager.showWindow("status");
+      windowManager.showWindow(WINDOW_STATUS_ID);
     });
     ipcMain$1.handle(IPC_RESIZE_STATUS_WINDOW_CHANNEL, (_, toWidth, toHeight) => {
       windowManager.resizeStatusWindow(toWidth, toHeight);
     });
     ipcMain$1.handle(IPC_HIDE_STATUS_WINDOW_CHANNEL, () => {
-      windowManager.hideWindow("status");
+      windowManager.hideWindow(WINDOW_STATUS_ID);
     });
   }
   async destroy() {
@@ -13566,7 +13568,7 @@ function createWindow() {
     }
   });
   win.webContents.on("did-finish-load", async () => {
-    windowManager.register(win, "content");
+    windowManager.register(win, WINDOW_CONTENT_ID);
   });
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL).then();
@@ -13612,7 +13614,7 @@ function createStatusWindow() {
   });
   statusWin.webContents.on(
     "did-finish-load",
-    async () => windowManager.register(statusWin, "status")
+    async () => windowManager.register(statusWin, WINDOW_STATUS_ID)
   );
   if (VITE_DEV_SERVER_URL) {
     statusWin.loadURL(`${VITE_DEV_SERVER_URL}status.html`).then();

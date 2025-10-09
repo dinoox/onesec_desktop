@@ -1,6 +1,9 @@
 import log from 'electron-log'
 import { BrowserWindow, screen } from 'electron'
 
+const WINDOW_STATUS_ID = 'status'
+const WINDOW_CONTENT_ID = 'content'
+
 class WindowManager {
   private windows: Map<string, BrowserWindow> = new Map()
 
@@ -122,7 +125,7 @@ class WindowManager {
   }
 
   async resizeStatusWindow(toWidth: number = 90, toHeight: number = 30) {
-    const statusWindow = this.windows.get('status')
+    const statusWindow = this.windows.get(WINDOW_STATUS_ID)
     if (!statusWindow) return
 
     const point = screen.getCursorScreenPoint()
@@ -145,3 +148,7 @@ class WindowManager {
 }
 
 export default new WindowManager()
+export {
+  WINDOW_STATUS_ID,
+  WINDOW_CONTENT_ID
+}
