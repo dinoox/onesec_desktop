@@ -47,16 +47,13 @@ class IPCService {
     }
 
     if (action === 'recording_timeout') {
-      setStatus('idle')
       await this.resizeStatusWindow(320, 130)
       setStatus('notification')
       await SoundService.playNotification()
-      setTimeout(async () => {
-        setStatus('idle')
-        setTimeout(async () => {
-          await this.resizeStatusWindow(90, 30)
-        }, 2000)
-      }, 4000)
+      await delay(4000);
+      setStatus('idle');
+      await delay(2000);
+      await this.resizeStatusWindow(90, 30)
       return
     }
 
@@ -82,4 +79,5 @@ class IPCService {
   }
 }
 
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 export default new IPCService()

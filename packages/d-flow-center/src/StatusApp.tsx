@@ -23,7 +23,7 @@ function StatusApp() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="app-ui-theme">
       <div
-        className="h-screen flex flex-col items-center relative"
+        className="h-screen flex flex-col items-center relative p-1"
         onClick={() => ipcService.resizeStatusWindow(320, 130)}
       >
         <div className="relative mt-auto flex flex-col items-center">
