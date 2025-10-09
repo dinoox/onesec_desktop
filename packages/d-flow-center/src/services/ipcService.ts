@@ -1,6 +1,6 @@
 import {
   DEFAULT_IPC_CHANNEL, IPC_HIDE_STATUS_WINDOW_CHANNEL,
-  IPC_RESIZE_STATUS_WINDOW_CHANNEL,
+  IPC_RESIZE_STATUS_WINDOW_CHANNEL, IPC_SHOW_STATUS_WINDOW_CHANNEL,
   IPCMessage,
   MessageType,
 } from '../../main/types/message.ts'
@@ -69,19 +69,16 @@ class IPCService {
   }
 
   async resizeStatusWindow(width: number, height: number) {
-    try {
-      return await window.ipcRenderer.invoke(IPC_RESIZE_STATUS_WINDOW_CHANNEL, width, height)
-    } catch (err) {
-      console.error('Failed to resize status window:', err)
-    }
+    return await window.ipcRenderer.invoke(IPC_RESIZE_STATUS_WINDOW_CHANNEL, width, height)
+
+  }
+
+  async showStatusWindow() {
+    return await window.ipcRenderer.invoke(IPC_SHOW_STATUS_WINDOW_CHANNEL)
   }
 
   async hideStatusWindow() {
-    try {
-      return await window.ipcRenderer.invoke(IPC_HIDE_STATUS_WINDOW_CHANNEL)
-    } catch (err) {
-      console.error('Failed to hide status window:', err)
-    }
+    return await window.ipcRenderer.invoke(IPC_HIDE_STATUS_WINDOW_CHANNEL)
   }
 }
 

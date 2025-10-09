@@ -16,6 +16,7 @@ export const useLoginQuery = () => {
 
       const userConf = await UserConfigService.getConfig()
       await UserConfigService.setConfig({ ...userConf, auth_token: resp.data.access_token })
+      await IpcService.showStatusWindow()
       navigate('/content')
     },
   })

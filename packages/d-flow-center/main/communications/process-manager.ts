@@ -4,7 +4,7 @@ import udsService from './uds-service.ts'
 import nativeProcessManager from '../services/native-process-manager.ts'
 import {
   DEFAULT_IPC_CHANNEL, IPC_HIDE_STATUS_WINDOW_CHANNEL,
-  IPC_RESIZE_STATUS_WINDOW_CHANNEL,
+  IPC_RESIZE_STATUS_WINDOW_CHANNEL, IPC_SHOW_STATUS_WINDOW_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_CHANNEL,
   IPCMessage,
@@ -28,7 +28,7 @@ class ProcessManager {
       await this.setupUDSForward()
       await this.setupIPCMainHandlers()
       // TODO: 暂时用 PERMISSION_STATUS 事件监测 Native Process 已启动
-      udsService.on(MessageTypes.PERMISSION_STATUS, () => this.initNativeProcessConfig())
+      udsService.on(MessageTypes.PERMISSION_STATUS, () => this.syncUserConfigToNativeProcess())
     } catch (err) {
       log.error(err)
     }
@@ -51,7 +51,7 @@ class ProcessManager {
     })
   }
 
-  async initNativeProcessConfig() {
+  async syncUserConfigToNativeProcess() {
     const config = userConfigManager.getConfig()
 
     udsService.broadcast({
@@ -73,14 +73,15 @@ class ProcessManager {
 
     ipcMain.handle(IPC_USER_CONFIG_SET_CHANNEL, async (_, config) => {
       userConfigManager.setConfig(config)
-
-      //TODO: 移动登录后处理逻辑
-      await this.initNativeProcessConfig()
-      windowManager.showWindow(WINDOW_STATUS_ID)
+      await this.syncUserConfigToNativeProcess()
     })
 
     ipcMain.handle(IPC_RESIZE_STATUS_WINDOW_CHANNEL, (_, toWidth, toHeight) => {
       windowManager.resizeStatusWindow(toWidth, toHeight)
+    })
+
+    ipcMain.handle(IPC_SHOW_STATUS_WINDOW_CHANNEL, () => {
+      windowManager.showWindow(WINDOW_STATUS_ID)
     })
 
     ipcMain.handle(IPC_HIDE_STATUS_WINDOW_CHANNEL, () => {
