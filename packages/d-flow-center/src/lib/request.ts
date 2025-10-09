@@ -1,6 +1,6 @@
 import queryString from 'query-string'
-import authStore from '@/store/authStore.ts'
-import { refreshToken } from '@/services/api/authApi.ts'
+import authStore from '@/store/auth-store.ts'
+import { refreshToken } from '@/services/api/auth-api.ts'
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 type Config = { cache: 'no-store' } | { cache: 'force-cache' }

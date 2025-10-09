@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Kbd, KbdGroup } from '@/components/ui/kbd.tsx'
-import ipcService from '@/services/ipcService.ts'
-import useStatusStore from '@/store/statusStore.ts'
+import ipcService from '@/services/ipc-service.ts'
+import useStatusStore from '@/store/status-store.ts'
 import { useClickOutside } from '@/hooks/use-click-outside.ts'
 import { AnimatePresence, motion } from 'framer-motion'
-import { UserConfigService } from '@/services/userConfigService.ts'
+import { UserConfigService } from '@/services/user-config-service.ts'
 import { HotkeyMode } from '../../../main/types/message.ts'
 
 const ContestPage: React.FC = () => {

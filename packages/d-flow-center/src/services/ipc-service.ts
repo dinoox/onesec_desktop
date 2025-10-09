@@ -8,8 +8,8 @@ import {
   MessageType,
   IPC_HOT_KEY_SETTING_END_CHANNEL,
 } from '../../main/types/message.ts'
-import useStatusStore, { Status } from '@/store/statusStore'
-import SoundService from '@/services/soundService.ts'
+import useStatusStore, { Status } from '@/store/status-store.ts'
+import SoundService from '@/services/sound-service.ts'
 
 class IPCService {
   constructor() {}

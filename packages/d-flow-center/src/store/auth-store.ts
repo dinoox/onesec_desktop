@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import type { User } from '@/types/user'
 import { StorageKeys } from '@/types/constants'
-import { logout } from '@/services/api/authApi'
+import { logout } from '@/services/api/auth-api.ts'
 
 interface AuthStore {
   user: User

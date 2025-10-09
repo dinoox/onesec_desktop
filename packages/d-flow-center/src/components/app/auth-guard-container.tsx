@@ -1,5 +1,5 @@
 import React from 'react'
-import useAuthStore from '@/store/authStore.ts'
+import useAuthStore from '@/store/auth-store.ts'
 import { Navigate, useLocation } from 'react-router'
 
 export default function AuthGuardContainer({

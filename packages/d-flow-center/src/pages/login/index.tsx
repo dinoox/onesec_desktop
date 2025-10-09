@@ -1,5 +1,5 @@
 import React from 'react'
-import useAuthStore from '@/store/authStore.ts'
+import useAuthStore from '@/store/auth-store.ts'
 import { Navigate } from 'react-router'
 import { LoginForm } from '@/components/app/login-form.tsx'
 

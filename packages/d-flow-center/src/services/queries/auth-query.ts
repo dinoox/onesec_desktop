@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
-import { login, logout } from '@/services/api/authApi'
-import authStore from '@/store/authStore'
+import { login, logout } from '@/services/api/auth-api.ts'
+import authStore from '@/store/auth-store.ts'
 import { useNavigate } from 'react-router'
-import { UserConfigService } from '@/services/userConfigService.ts'
-import IpcService from '@/services/ipcService.ts'
+import { UserConfigService } from '@/services/user-config-service.ts'
+import IpcService from '@/services/ipc-service.ts'
 
 export const useLoginQuery = () => {
   const navigate = useNavigate()

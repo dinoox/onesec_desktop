@@ -10,8 +10,8 @@ import {
   ItemMedia,
   ItemTitle,
 } from '@/components/ui/item'
-import useStatusStore from '@/store/statusStore'
-import ipcService from '@/services/ipcService.ts'
+import useStatusStore from '@/store/status-store.ts'
+import ipcService from '@/services/ipc-service.ts'
 
 function StatusApp() {
   const mode = useStatusStore((state) => state.mode)

@@ -1,9 +1,9 @@
 import React from 'react'
 import { Label } from '@radix-ui/react-label'
 import { Input } from '@/components/ui/input.tsx'
-import useAuthStore from '@/store/authStore'
+import useAuthStore from '@/store/auth-store.ts'
 import { Button } from '@/components/ui/button.tsx'
-import { useLogoutQuery } from '@/services/queries/authQuery.ts'
+import { useLogoutQuery } from '@/services/queries/auth-query.ts'
 import { Spinner } from '@/components/ui/spinner.tsx'
 import {
   Select,
