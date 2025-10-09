@@ -26,33 +26,37 @@ function StatusApp() {
         className="h-screen flex flex-col items-center relative"
         onClick={() => ipcService.resizeStatusWindow(320, 130)}
       >
-        <div className="relative mt-auto flex flex-col items-center gap-2 ">
+        <div className="relative mt-auto flex flex-col items-center">
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[300px] ">
-            {true && (
+            {status === 'notification' && (
               <Item variant="outline" size="sm" asChild className="cursor-pointer bg-background">
                 <a href="#">
                   <ItemMedia>
                     <OctagonAlert className="size-5" />
                   </ItemMedia>
                   <ItemContent>
-                    <ItemTitle>服务器响应超时 {status}</ItemTitle>
+                    <ItemTitle>服务器响应超时</ItemTitle>
                   </ItemContent>
                   <ItemActions></ItemActions>
                 </a>
               </Item>
             )}
           </div>
-          <div className="status relative w-7 h-7 shrink-0">
+          <div
+            className={`status relative shrink-0 transition-all duration-300 ${status === 'idle' ? 'w-5 h-5' : 'w-7 h-7'}`}
+          >
             {/* 外圈 */}
-            <div className="absolute inset-0 rounded-full bg-gray-700  border border-gray-200"></div>
+            <div
+              className={`absolute inset-0 rounded-full ${status === 'idle' ? 'bg-transparent' : 'bg-black'} border ${status === 'speaking' ? 'border-[#888888B2]' : 'border-[#FFFFFF4C]'} transition-all duration-100`}
+            ></div>
             {/* 内圈 */}
             {status === 'processing' ? (
               <Spinner
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-5 text-white`}
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-5  ${mode ===  'normal' ? 'text-ripple-green' : 'text-ripple-yellow'} transition-all duration-100`}
               />
             ) : (
               <div
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${mode === 'normal' ? 'bg-emerald-500' : 'bg-yellow-300'} transition-all duration-100`}
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${ status === 'idle' ? 'bg-[#ccc]' : mode === 'normal' ? 'bg-ripple-green' : 'bg-ripple-yellow'} transition-all duration-100`}
                 style={{
                   width: `${innerSize}%`,
                   height: `${innerSize}%`,
