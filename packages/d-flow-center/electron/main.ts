@@ -1,7 +1,10 @@
 import { app, BrowserWindow, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import windowManager, {WINDOW_CONTENT_ID, WINDOW_STATUS_ID} from '../main/services/window-manager.ts'
+import windowManager, {
+  WINDOW_CONTENT_ID,
+  WINDOW_STATUS_ID,
+} from '../main/services/window-manager.ts'
 import processManager from '../main/communications/process-manager.ts'
 import log from 'electron-log'
 

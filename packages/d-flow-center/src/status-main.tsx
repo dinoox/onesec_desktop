@@ -5,6 +5,7 @@ import './global.css'
 import './status.css'
 import SoundService from '@/services/soundService.ts'
 import IPCService from '@/services/ipcService.ts'
+import useAuthStore from '@/store/authStore.ts'
 
 createRoot(document.getElementById('status-root')!).render(
   <StrictMode>
@@ -14,3 +15,6 @@ createRoot(document.getElementById('status-root')!).render(
 
 await SoundService.initialize()
 await IPCService.initialize()
+if (useAuthStore.getState().isAuthed) {
+  await IPCService.showStatusWindow()
+}

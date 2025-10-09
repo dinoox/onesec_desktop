@@ -1,14 +1,19 @@
 import log from 'electron-log'
-import windowManager, {WINDOW_STATUS_ID} from '../services/window-manager.ts'
+import windowManager, { WINDOW_STATUS_ID } from '../services/window-manager.ts'
 import udsService from './uds-service.ts'
 import nativeProcessManager from '../services/native-process-manager.ts'
 import {
-  DEFAULT_IPC_CHANNEL, IPC_HIDE_STATUS_WINDOW_CHANNEL,
-  IPC_RESIZE_STATUS_WINDOW_CHANNEL, IPC_SHOW_STATUS_WINDOW_CHANNEL,
+  DEFAULT_IPC_CHANNEL,
+  IPC_HIDE_STATUS_WINDOW_CHANNEL,
+  IPC_RESIZE_STATUS_WINDOW_CHANNEL,
+  IPC_SHOW_STATUS_WINDOW_CHANNEL,
+  IPC_HOT_KEY_SETTING_START_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_CHANNEL,
   IPCMessage,
+  Message,
   MessageTypes,
+  IPC_HOT_KEY_SETTING_END_CHANNEL,
 } from '../types/message.ts'
 import userConfigManager from '../services/user-config-manager.ts'
 import { ipcMain } from 'electron'
@@ -87,6 +92,37 @@ class ProcessManager {
     ipcMain.handle(IPC_HIDE_STATUS_WINDOW_CHANNEL, () => {
       windowManager.hideWindow(WINDOW_STATUS_ID)
     })
+
+    //
+    ipcMain.handle(IPC_HOT_KEY_SETTING_START_CHANNEL, (_, mode: string) => {
+      const timestamp = Date.now()
+
+      udsService.broadcast({
+        type: 'hotkey_setting',
+        timestamp,
+        data: {
+          mode,
+          timestamp,
+        },
+      })
+    })
+
+    ipcMain.handle(
+      IPC_HOT_KEY_SETTING_END_CHANNEL,
+      (_, mode: string, hotkey_combination: any[]) => {
+        const timestamp = Date.now()
+
+        udsService.broadcast({
+          type: 'hotkey_setting_end',
+          timestamp,
+          data: {
+            mode,
+            timestamp,
+            hotkey_combination,
+          },
+        })
+      },
+    )
   }
 
   async destroy() {

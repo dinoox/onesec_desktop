@@ -5,11 +5,10 @@ import path from 'path'
 import fs from 'fs'
 
 class NativeProcessManager {
+  constructor() {}
   private nativeProcess: ChildProcess | null = null
 
-  constructor() {}
-
-  async start(): Promise<void> {
+  async start() {
     if (this.nativeProcess) {
       return
     }
@@ -28,7 +27,6 @@ class NativeProcessManager {
         console.warn('[MiaoyanSwiftManager] Failed to set executable permission:', chmodError)
       }
 
-      // 启动 MiaoyanSwift 进程
       this.nativeProcess = spawn(appPath, ['--disable-text-insertion'], {
         detached: false,
         stdio: ['ignore', 'pipe', 'pipe'],

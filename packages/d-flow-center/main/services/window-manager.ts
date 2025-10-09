@@ -148,7 +148,4 @@ class WindowManager {
 }
 
 export default new WindowManager()
-export {
-  WINDOW_STATUS_ID,
-  WINDOW_CONTENT_ID
-}
+export { WINDOW_STATUS_ID, WINDOW_CONTENT_ID }
