@@ -59,6 +59,36 @@ class WindowManager {
   }
 
   /**
+   * 根据 ID 显示窗口
+   * @param windowId - 窗口 ID
+   * @returns 窗口是否显示成功
+   */
+  public showWindow(windowId: string): boolean {
+    const window = this.windows.get(windowId)
+    if (!window || window.isDestroyed()) {
+      return false
+    }
+
+    window.show()
+    return true
+  }
+
+  /**
+   * 根据 ID 隐藏窗口
+   * @param windowId - 窗口 ID
+   * @returns 窗口是否隐藏成功
+   */
+  public hideWindow(windowId: string): boolean {
+    const window = this.windows.get(windowId)
+    if (!window || window.isDestroyed()) {
+      return false
+    }
+
+    window.hide()
+    return true
+  }
+
+  /**
    * 向指定窗口发送消息
    * @param windowId - 窗口 ID
    * @param channel - 消息通道

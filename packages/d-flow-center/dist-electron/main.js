@@ -2623,6 +2623,32 @@ class WindowManager {
     return Array.from(this.windows.values());
   }
   /**
+   * 根据 ID 显示窗口
+   * @param windowId - 窗口 ID
+   * @returns 窗口是否显示成功
+   */
+  showWindow(windowId) {
+    const window2 = this.windows.get(windowId);
+    if (!window2 || window2.isDestroyed()) {
+      return false;
+    }
+    window2.show();
+    return true;
+  }
+  /**
+   * 根据 ID 隐藏窗口
+   * @param windowId - 窗口 ID
+   * @returns 窗口是否隐藏成功
+   */
+  hideWindow(windowId) {
+    const window2 = this.windows.get(windowId);
+    if (!window2 || window2.isDestroyed()) {
+      return false;
+    }
+    window2.hide();
+    return true;
+  }
+  /**
    * 向指定窗口发送消息
    * @param windowId - 窗口 ID
    * @param channel - 消息通道
@@ -2689,6 +2715,7 @@ const DEFAULT_IPC_CHANNEL = "default_ipc_channel";
 const IPC_USER_CONFIG_GET_CHANNEL = "user_config_get_channel";
 const IPC_USER_CONFIG_SET_CHANNEL = "user_config_set_channel";
 const IPC_RESIZE_STATUS_WINDOW_CHANNEL = "resize_status_window_channel";
+const IPC_HIDE_STATUS_WINDOW_CHANNEL = "hide_status_window_channel";
 class UDSService extends EventEmitter {
   constructor(options = {}) {
     super();
@@ -11221,6 +11248,9 @@ const parseOptions$1 = (options) => {
 var parseOptions_1 = parseOptions$1;
 const numeric = /^[0-9]+$/;
 const compareIdentifiers$1 = (a, b) => {
+  if (typeof a === "number" && typeof b === "number") {
+    return a === b ? 0 : a < b ? -1 : 1;
+  }
   const anum = numeric.test(a);
   const bnum = numeric.test(b);
   if (anum && bnum) {
@@ -11320,7 +11350,25 @@ let SemVer$d = class SemVer {
     if (!(other instanceof SemVer)) {
       other = new SemVer(other, this.options);
     }
-    return compareIdentifiers(this.major, other.major) || compareIdentifiers(this.minor, other.minor) || compareIdentifiers(this.patch, other.patch);
+    if (this.major < other.major) {
+      return -1;
+    }
+    if (this.major > other.major) {
+      return 1;
+    }
+    if (this.minor < other.minor) {
+      return -1;
+    }
+    if (this.minor > other.minor) {
+      return 1;
+    }
+    if (this.patch < other.patch) {
+      return -1;
+    }
+    if (this.patch > other.patch) {
+      return 1;
+    }
+    return 0;
   }
   comparePre(other) {
     if (!(other instanceof SemVer)) {
@@ -11907,6 +11955,7 @@ function requireRange() {
     return result;
   };
   const parseComparator = (comp, options) => {
+    comp = comp.replace(re2[t2.BUILD], "");
     debug2("comp", comp, options);
     comp = replaceCarets(comp, options);
     debug2("caret", comp);
@@ -13479,10 +13528,13 @@ class ProcessManager {
     ipcMain$1.handle(IPC_USER_CONFIG_SET_CHANNEL, async (_, config) => {
       userConfigManager.setConfig(config);
       await this.initNativeProcessConfig();
-      return { success: true };
+      windowManager.showWindow("status");
     });
     ipcMain$1.handle(IPC_RESIZE_STATUS_WINDOW_CHANNEL, (_, toWidth, toHeight) => {
       windowManager.resizeStatusWindow(toWidth, toHeight);
+    });
+    ipcMain$1.handle(IPC_HIDE_STATUS_WINDOW_CHANNEL, () => {
+      windowManager.hideWindow("status");
     });
   }
   async destroy() {
@@ -13531,7 +13583,7 @@ function createStatusWindow() {
   const x = workArea.x + (screenWidth - winWidth) / 2;
   const y = workArea.y + workArea.height - winHeight;
   statusWin = new BrowserWindow({
-    // show: false,
+    show: false,
     width: winWidth,
     height: winHeight,
     x,

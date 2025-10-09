@@ -3,6 +3,7 @@ import { login, logout } from '@/services/api/authApi'
 import authStore from '@/store/authStore'
 import { useNavigate } from 'react-router'
 import { UserConfigService } from '@/services/userConfigService.ts'
+import IpcService from "@/services/ipcService.ts";
 
 export const useLoginQuery = () => {
   const navigate = useNavigate()
@@ -28,5 +29,6 @@ export const useLogoutQuery = () =>
 
       const userConf = await UserConfigService.getConfig()
       await UserConfigService.setConfig({ ...userConf, auth_token: null })
+      await IpcService.hideStatusWindow()
     },
   })

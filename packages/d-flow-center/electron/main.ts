@@ -60,7 +60,7 @@ function createStatusWindow() {
   const y = workArea.y + workArea.height - winHeight
 
   statusWin = new BrowserWindow({
-    // show: false,
+    show: false,
     width: winWidth,
     height: winHeight,
     x,

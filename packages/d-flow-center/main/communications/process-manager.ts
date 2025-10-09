@@ -3,7 +3,7 @@ import windowManager from '../services/window-manager.ts'
 import udsService from './uds-service.ts'
 import nativeProcessManager from '../services/native-process-manager.ts'
 import {
-  DEFAULT_IPC_CHANNEL,
+  DEFAULT_IPC_CHANNEL, IPC_HIDE_STATUS_WINDOW_CHANNEL,
   IPC_RESIZE_STATUS_WINDOW_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_CHANNEL,
@@ -73,12 +73,18 @@ class ProcessManager {
 
     ipcMain.handle(IPC_USER_CONFIG_SET_CHANNEL, async (_, config) => {
       userConfigManager.setConfig(config)
-      await this.initNativeProcessConfig() //TODO: 移动该逻辑
-      return { success: true }
+
+      //TODO: 移动登录后处理逻辑
+      await this.initNativeProcessConfig()
+      windowManager.showWindow('status')
     })
 
     ipcMain.handle(IPC_RESIZE_STATUS_WINDOW_CHANNEL, (_, toWidth, toHeight) => {
       windowManager.resizeStatusWindow(toWidth, toHeight)
+    })
+
+    ipcMain.handle(IPC_HIDE_STATUS_WINDOW_CHANNEL, () => {
+      windowManager.hideWindow('status')
     })
   }
 
