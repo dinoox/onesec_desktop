@@ -131,6 +131,9 @@
   body {
     @apply bg-background text-foreground h-svh w-full;
   }
+  button, [role="button"] {
+    cursor: pointer
+  }
 }
 
 @utility no-scrollbar {

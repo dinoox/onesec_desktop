@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import LogoIcon from '@/components/icons/app-logo'
+import { Separator } from '@/components/ui/separator'
 import { LoginFormSchema } from '@/types/zods.ts'
 import {
   Form,
@@ -22,8 +23,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import React, { useState } from 'react'
+import { Spinner } from '@/components/ui/spinner.tsx'
 
 export function LoginForm({}: { className?: string }) {
+  const [isRegisterMode, setIsRegisterMode] = useState(false)
+
   const form = useForm<z.infer<typeof LoginFormSchema>>({
     resolver: zodResolver(LoginFormSchema),
     defaultValues: {
@@ -80,21 +85,30 @@ export function LoginForm({}: { className?: string }) {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="invite_code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="gap-0.5">内测码</FormLabel>
-                    <FormControl>
-                      <Input placeholder="请输入内测码" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {isRegisterMode && (
+                <FormField
+                  control={form.control}
+                  name="invite_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="gap-0.5">内测码</FormLabel>
+                      <FormControl>
+                        <Input placeholder="请输入内测码" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <Button type="submit" className="w-full" disabled={mutation.isPending}>
-                {mutation.isPending ? '登录中···' : '登 录'}
+                {mutation.isPending ? <Spinner /> : null}
+                {mutation.isPending
+                  ? isRegisterMode
+                    ? '注册中'
+                    : '登录中'
+                  : isRegisterMode
+                    ? '注 册'
+                    : '登 录'}
               </Button>
             </div>
           </form>
@@ -102,14 +116,29 @@ export function LoginForm({}: { className?: string }) {
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
         <p className="text-xs text-center text-muted-foreground">
-          登录即表示您同意我们的
-          <a href="#" className="underline underline-offset-4 hover:text-primary">
+          {isRegisterMode ? '注册' : '登录'}即表示您同意我们的
+          <a href="#" className="underline underline-offset-4 mx-1 hover:text-primary">
             服务条款
           </a>
           和
-          <a href="#" className="underline underline-offset-4 hover:text-primary">
+          <a href="#" className="underline underline-offset-4 mx-1 hover:text-primary">
             隐私政策
           </a>
+        </p>
+        <Separator />
+        <p className="text-xs text-center">
+          <span className="text-muted-foreground">
+            {isRegisterMode ? '已有账号？' : '没有账号？'}
+          </span>
+          <Button
+            type="button"
+            variant="link"
+            className="text-xs p-0 ml-1 font-normal"
+            disabled={mutation.isPending}
+            onClick={() => setIsRegisterMode(!isRegisterMode)}
+          >
+            {isRegisterMode ? '立即登录' : '现在就注册'}
+          </Button>
         </p>
       </CardFooter>
     </Card>

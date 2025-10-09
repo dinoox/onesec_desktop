@@ -52,11 +52,11 @@ function StatusApp() {
             {/* 内圈 */}
             {status === 'processing' ? (
               <Spinner
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-5  ${mode ===  'normal' ? 'text-ripple-green' : 'text-ripple-yellow'} transition-all duration-100`}
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-5  ${mode === 'normal' ? 'text-ripple-green' : 'text-ripple-yellow'} transition-all duration-100`}
               />
             ) : (
               <div
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${ status === 'idle' ? 'bg-[#ccc]' : mode === 'normal' ? 'bg-ripple-green' : 'bg-ripple-yellow'} transition-all duration-100`}
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${status === 'idle' ? 'bg-[#ccc]' : mode === 'normal' ? 'bg-ripple-green' : 'bg-ripple-yellow'} transition-all duration-100`}
                 style={{
                   width: `${innerSize}%`,
                   height: `${innerSize}%`,
