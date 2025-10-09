@@ -33,7 +33,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
-        float: path.resolve(__dirname, 'float.html'),
+        status: path.resolve(__dirname, 'status.html'),
       },
     },
   },

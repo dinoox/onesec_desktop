@@ -30,7 +30,6 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win, statusWin: BrowserWindow | null
 
 function createWindow() {
-  log.info('createWindow')
   win = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -78,6 +77,10 @@ function createStatusWindow() {
     maximizable: false, // 不可最大化
     closable: true,
     transparent: true,
+    backgroundColor: '#00000000',
+    opacity: 1.0,
+    fullscreenable: false,
+    simpleFullscreen: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       backgroundThrottling: false,
