@@ -2695,6 +2695,21 @@ class WindowManager {
       height: toHeight
     });
   }
+  async moveStatusWindowToNewScreen() {
+    const statusWindow = this.windows.get(WINDOW_STATUS_ID);
+    if (!statusWindow) return;
+    const point = screen.getCursorScreenPoint();
+    const { bounds, workAreaSize, workArea } = screen.getDisplayNearestPoint(point);
+    const winBounds = statusWindow.getBounds();
+    const x = bounds.x + (workAreaSize.width - winBounds.width) / 2;
+    const y = workArea.y + workArea.height - winBounds.height;
+    statusWindow.setBounds({
+      x,
+      y,
+      width: winBounds.width,
+      height: winBounds.height
+    });
+  }
 }
 const windowManager = new WindowManager();
 const MessageTypes = {
@@ -13489,6 +13504,9 @@ class ProcessManager {
           timestamp: Date.now()
         };
         windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage);
+        if (messageType === "screen_change") {
+          windowManager.moveStatusWindowToNewScreen();
+        }
       });
     });
   }

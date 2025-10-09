@@ -52,6 +52,10 @@ class ProcessManager {
         }
 
         windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage)
+
+        if (messageType === 'screen_change') {
+          windowManager.moveStatusWindowToNewScreen()
+        }
       })
     })
   }
