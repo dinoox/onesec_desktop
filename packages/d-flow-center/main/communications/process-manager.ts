@@ -17,6 +17,7 @@ import {
 } from '../types/message.ts'
 import userConfigManager from '../services/user-config-manager.ts'
 import { ipcMain } from 'electron'
+import permissionService from "../services/permission-service.ts";
 
 /**
  * 全局进程管理类
@@ -45,7 +46,7 @@ class ProcessManager {
         const eventMessage: IPCMessage = {
           id: `event_${Date.now()}`,
           type: 'event',
-          source: 'worker',
+          source: 'main',
           action: messageType,
           data: originalMessage,
           timestamp: Date.now(),

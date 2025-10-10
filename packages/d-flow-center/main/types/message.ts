@@ -80,5 +80,3 @@ export const IPC_HIDE_STATUS_WINDOW_CHANNEL = 'hide_status_window_channel'
 //
 export const IPC_HOT_KEY_SETTING_START_CHANNEL = 'hot_key_setting_start_channel'
 export const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
-// export const IPC_START_HOT_KEY_SETTING_CHANNEL = 'hot_key_setting_channel'
-// export const IPC_START_HOT_KEY_SETTING_CHANNEL = 'start_hot_key_setting_channel'
