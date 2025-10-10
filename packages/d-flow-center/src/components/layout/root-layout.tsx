@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/sonner.tsx'
 const RootLayout: React.FC = () => {
   return (
     <>
-      <TopLoadingBar />
+      {/*<TopLoadingBar />*/}
       <Toaster position="top-center" richColors />
       <Outlet />
     </>
