@@ -33,7 +33,9 @@ class PermissionService {
   public requestAccessibility(): boolean {
     const granted = systemPreferences.isTrustedAccessibilityClient(true)
     if (!granted) {
-      log.warn('[PermissionService] Accessibility permission not granted, opening system preferences')
+      log.warn(
+        '[PermissionService] Accessibility permission not granted, opening system preferences',
+      )
       this.openSystemPreferences('accessibility')
     }
     return granted
@@ -76,7 +78,8 @@ class PermissionService {
    */
   public openSystemPreferences(type: PermissionType): void {
     const urls: Record<PermissionType, string> = {
-      accessibility: 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility',
+      accessibility:
+        'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility',
       microphone: 'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
     }
     shell.openExternal(urls[type])
@@ -85,5 +88,3 @@ class PermissionService {
 }
 
 export default new PermissionService()
-
-

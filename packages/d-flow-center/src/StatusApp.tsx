@@ -25,7 +25,8 @@ function StatusApp() {
       <div
         className="h-screen flex flex-col items-center justify-between relative"
         // onClick={() => ipcService.resizeStatusWindow(320, 130)}
-      ><div className="relative flex flex-col items-center mt-auto">
+      >
+        <div className="relative flex flex-col items-center mt-auto">
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[300px] ">
             {status === 'notification' && (
               <Item variant="outline" size="sm" asChild className="cursor-pointer bg-background">

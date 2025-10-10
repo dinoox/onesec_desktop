@@ -4,9 +4,11 @@ import {
   HotkeyMode,
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_CHANNEL,
+  IPC_USER_LOGIN_CHANNEL,
+  IPC_USER_LOGOUT_CHANNEL,
 } from '../../main/types/message'
 
-export class UserConfigService {
+export class UserService {
   static async getConfig(): Promise<GlobalConfig> {
     return window.ipcRenderer.invoke(IPC_USER_CONFIG_GET_CHANNEL)
   }
@@ -33,5 +35,13 @@ export class UserConfigService {
       ...config,
       hotkey_configs: updatedHotkeyConfigs,
     })
+  }
+
+  static async claimLogin() {
+    return window.ipcRenderer.invoke(IPC_USER_LOGIN_CHANNEL)
+  }
+
+  static async claimLogout() {
+    return window.ipcRenderer.invoke(IPC_USER_LOGOUT_CHANNEL)
   }
 }

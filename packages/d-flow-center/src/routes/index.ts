@@ -17,9 +17,9 @@ const router: RouteObject[] = [
       {
         Component: DashboardLayout,
         children: [
-          { 
-            index: true, 
-            loader: () => redirect('/content')
+          {
+            index: true,
+            loader: () => redirect('/content'),
           },
           ...ContentRoutes,
         ],

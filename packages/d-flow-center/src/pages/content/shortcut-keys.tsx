@@ -4,7 +4,7 @@ import ipcService from '@/services/ipc-service.ts'
 import useStatusStore from '@/store/status-store.ts'
 import { useClickOutside } from '@/hooks/use-click-outside.ts'
 import { AnimatePresence, motion } from 'framer-motion'
-import { UserConfigService } from '@/services/user-config-service.ts'
+import { UserService } from '@/services/user-service.ts'
 import { HotkeyMode } from '../../../main/types/message.ts'
 
 const ContestPage: React.FC = () => {
@@ -22,7 +22,7 @@ const ContestPage: React.FC = () => {
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const config = await UserConfigService.getConfig()
+        const config = await UserService.getConfig()
         const normalConfig = config.hotkey_configs?.find((item) => item.mode === 'normal')
         const commandConfig = config.hotkey_configs?.find((item) => item.mode === 'command')
         setShortcutKeys(normalConfig?.hotkey_combination || [])
@@ -51,7 +51,7 @@ const ContestPage: React.FC = () => {
 
       if (action === 'hotkey_setting_result') {
         setEditingMode(null)
-        UserConfigService.setHotKeyConfig(mode, hotkey_combination).then()
+        UserService.setHotKeyConfig(mode, hotkey_combination).then()
       }
     }
   }, [holdIPCMessage])

@@ -71,12 +71,29 @@ export interface APIResponse {
   data?: any
 }
 
-export const DEFAULT_IPC_CHANNEL = 'default_ipc_channel'
-export const IPC_USER_CONFIG_GET_CHANNEL = 'user_config_get_channel'
-export const IPC_USER_CONFIG_SET_CHANNEL = 'user_config_set_channel'
-export const IPC_RESIZE_STATUS_WINDOW_CHANNEL = 'resize_status_window_channel'
-export const IPC_SHOW_STATUS_WINDOW_CHANNEL = 'show_status_window_channel'
-export const IPC_HIDE_STATUS_WINDOW_CHANNEL = 'hide_status_window_channel'
+const DEFAULT_IPC_CHANNEL = 'default_ipc_channel'
+// User
+const IPC_USER_LOGIN_CHANNEL = 'user_login_channel'
+const IPC_USER_LOGOUT_CHANNEL = 'user_logout_channel'
+const IPC_USER_CONFIG_GET_CHANNEL = 'user_config_get_channel'
+const IPC_USER_CONFIG_SET_CHANNEL = 'user_config_set_channel'
+// Status Window
+const IPC_RESIZE_STATUS_WINDOW_CHANNEL = 'resize_status_window_channel'
+const IPC_SHOW_STATUS_WINDOW_CHANNEL = 'show_status_window_channel'
+const IPC_HIDE_STATUS_WINDOW_CHANNEL = 'hide_status_window_channel'
 //
-export const IPC_HOT_KEY_SETTING_START_CHANNEL = 'hot_key_setting_start_channel'
-export const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
+const IPC_HOT_KEY_SETTING_START_CHANNEL = 'hot_key_setting_start_channel'
+const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
+
+export {
+  DEFAULT_IPC_CHANNEL,
+  IPC_USER_LOGIN_CHANNEL,
+  IPC_USER_LOGOUT_CHANNEL,
+  IPC_USER_CONFIG_GET_CHANNEL,
+  IPC_USER_CONFIG_SET_CHANNEL,
+  IPC_RESIZE_STATUS_WINDOW_CHANNEL,
+  IPC_SHOW_STATUS_WINDOW_CHANNEL,
+  IPC_HIDE_STATUS_WINDOW_CHANNEL,
+  IPC_HOT_KEY_SETTING_START_CHANNEL,
+  IPC_HOT_KEY_SETTING_END_CHANNEL,
+}

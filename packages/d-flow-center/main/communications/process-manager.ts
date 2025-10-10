@@ -14,10 +14,12 @@ import {
   Message,
   MessageTypes,
   IPC_HOT_KEY_SETTING_END_CHANNEL,
+  IPC_USER_LOGIN_CHANNEL,
+  IPC_USER_LOGOUT_CHANNEL,
 } from '../types/message.ts'
 import userConfigManager from '../services/user-config-manager.ts'
 import { ipcMain } from 'electron'
-import permissionService from "../services/permission-service.ts";
+import permissionService from '../services/permission-service.ts'
 
 /**
  * 全局进程管理类
@@ -84,6 +86,16 @@ class ProcessManager {
     ipcMain.handle(IPC_USER_CONFIG_SET_CHANNEL, async (_, config) => {
       userConfigManager.setConfig(config)
       await this.syncUserConfigToNativeProcess()
+    })
+
+    ipcMain.handle(IPC_USER_LOGIN_CHANNEL, async (_, data) => {
+      await nativeProcessManager.restart()
+      windowManager.showWindow(WINDOW_STATUS_ID)
+    })
+
+    ipcMain.handle(IPC_USER_LOGOUT_CHANNEL, async (_, data) => {
+      await nativeProcessManager.stop()
+      windowManager.hideWindow(WINDOW_STATUS_ID)
     })
 
     ipcMain.handle(IPC_RESIZE_STATUS_WINDOW_CHANNEL, (_, toWidth, toHeight) => {

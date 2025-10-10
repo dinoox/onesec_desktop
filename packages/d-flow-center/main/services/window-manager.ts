@@ -154,7 +154,7 @@ class WindowManager {
     const { bounds, workAreaSize, workArea } = screen.getDisplayNearestPoint(point)
 
     const winBounds = statusWindow.getBounds()
-    const x = bounds.x + ((workAreaSize.width - winBounds.width) / 2)
+    const x = bounds.x + (workAreaSize.width - winBounds.width) / 2
     const y = workArea.y + workArea.height - winBounds.height
 
     statusWindow.setBounds({
