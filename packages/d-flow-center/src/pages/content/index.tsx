@@ -97,7 +97,9 @@ const ContestPage: React.FC = () => {
                   长按{' '}
                   <KbdGroup className="mx-1">
                     {shortcutCommandKeys.length > 0 ? (
-                      shortcutCommandKeys.map((key, index) => <Kbd key={index}>{key}</Kbd>)
+                      shortcutCommandKeys.map((key, index) => (
+                        <Kbd key={index}>{key}</Kbd>
+                      ))
                     ) : (
                       <>
                         <Kbd>fn</Kbd>
@@ -109,7 +111,9 @@ const ContestPage: React.FC = () => {
                 </p>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">语音命令：支持命令识别和智能交互</div>
+            <div className="text-sm text-muted-foreground">
+              语音命令：支持命令识别和智能交互
+            </div>
           </ItemContent>
         </Item>
       </div>
@@ -132,7 +136,9 @@ const ContestPage: React.FC = () => {
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="text-sm font-medium">{example.title}</div>
-                    <div className="text-sm text-muted-foreground">{example.description}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {example.description}
+                    </div>
                   </div>
                 </ItemContent>
               </Item>

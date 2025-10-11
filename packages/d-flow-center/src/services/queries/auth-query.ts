@@ -28,7 +28,10 @@ export const useLogoutQuery = () =>
     mutationFn: logout,
     onSuccess: async (_) => {
       await authStore.getState().actions.logout()
-      await UserService.setConfig({ ...(await UserService.getConfig()), auth_token: null })
+      await UserService.setConfig({
+        ...(await UserService.getConfig()),
+        auth_token: null,
+      })
       await UserService.claimLogout()
     },
   })

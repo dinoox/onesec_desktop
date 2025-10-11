@@ -17,7 +17,9 @@ export function useClickOutside(
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       const refs = Array.isArray(ref) ? ref : [ref]
 
-      const isClickInside = refs.some((r) => r.current && r.current.contains(event.target as Node))
+      const isClickInside = refs.some(
+        (r) => r.current && r.current.contains(event.target as Node),
+      )
 
       if (!isClickInside) {
         handler(event)

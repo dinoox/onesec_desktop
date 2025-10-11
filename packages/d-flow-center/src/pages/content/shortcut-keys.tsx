@@ -28,7 +28,8 @@ const ContestPage: React.FC = () => {
 
   useEffect(() => {
     const action = holdIPCMessage?.action
-    const isHotkeyUpdate = action === 'hotkey_setting_update' || action === 'hotkey_setting_result'
+    const isHotkeyUpdate =
+      action === 'hotkey_setting_update' || action === 'hotkey_setting_result'
 
     if (isHotkeyUpdate && holdIPCMessage?.data?.data) {
       const { mode, hotkey_combination } = holdIPCMessage.data.data
@@ -57,7 +58,8 @@ const ContestPage: React.FC = () => {
   const endHotKeySetting = async () => {
     if (
       editingMode &&
-      (hotkeySettingStatus === 'hotkey_setting' || hotkeySettingStatus === 'hotkey_setting_update')
+      (hotkeySettingStatus === 'hotkey_setting' ||
+        hotkeySettingStatus === 'hotkey_setting_update')
     ) {
       const currentKeys = editingMode === 'normal' ? shortcutKeys : shortcutCommandKeys
       await ipcService.endHotkeySetting(editingMode, currentKeys)
@@ -69,14 +71,18 @@ const ContestPage: React.FC = () => {
   // 判断是否正在编辑
   const isEditingNormal =
     editingMode === 'normal' &&
-    (hotkeySettingStatus === 'hotkey_setting' || hotkeySettingStatus === 'hotkey_setting_update')
+    (hotkeySettingStatus === 'hotkey_setting' ||
+      hotkeySettingStatus === 'hotkey_setting_update')
   const isEditingCommand =
     editingMode === 'command' &&
-    (hotkeySettingStatus === 'hotkey_setting' || hotkeySettingStatus === 'hotkey_setting_update')
+    (hotkeySettingStatus === 'hotkey_setting' ||
+      hotkeySettingStatus === 'hotkey_setting_update')
 
   // 判断是否等待按键（刚开始设置，还没有按键）
-  const isWaitingNormal = editingMode === 'normal' && hotkeySettingStatus === 'hotkey_setting'
-  const isWaitingCommand = editingMode === 'command' && hotkeySettingStatus === 'hotkey_setting'
+  const isWaitingNormal =
+    editingMode === 'normal' && hotkeySettingStatus === 'hotkey_setting'
+  const isWaitingCommand =
+    editingMode === 'command' && hotkeySettingStatus === 'hotkey_setting'
 
   useClickOutside([normalInputRef, commandInputRef], endHotKeySetting, !!editingMode)
 
@@ -85,7 +91,9 @@ const ContestPage: React.FC = () => {
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
         <div className="flex flex-col justify-center  space-y-2">
           <span className="text-base font-medium">普通模式</span>
-          <span className="text-sm text-muted-foreground">按住该快捷键会进入普通识别模式</span>
+          <span className="text-sm text-muted-foreground">
+            按住该快捷键会进入普通识别模式
+          </span>
         </div>
         <div
           ref={normalInputRef}

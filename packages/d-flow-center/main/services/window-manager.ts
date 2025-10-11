@@ -27,7 +27,9 @@ class WindowManager {
     this.windows.set(identifier, window)
     window.on('closed', () => this.unregister(identifier))
 
-    log.info(`[WindowManager] Window ${identifier} registered. Total windows: ${this.windows.size}`)
+    log.info(
+      `[WindowManager] Window ${identifier} registered. Total windows: ${this.windows.size}`,
+    )
     return identifier
   }
 

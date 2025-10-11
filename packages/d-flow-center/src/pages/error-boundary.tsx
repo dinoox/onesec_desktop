@@ -15,7 +15,11 @@ export default function ErrorBoundary() {
       <h3 className="text-xl">抱歉，出错了，请稍后重试</h3>
       <p className="text-base text-muted-foreground">{errMessage}</p>
       <div className="flex items-center justify-center gap-4 text-sm">
-        <Button size="sm" onClick={() => window.history.back()} className="cursor-pointer">
+        <Button
+          size="sm"
+          onClick={() => window.history.back()}
+          className="cursor-pointer"
+        >
           返回上一页
         </Button>
         <Button

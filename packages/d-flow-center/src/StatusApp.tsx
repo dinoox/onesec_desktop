@@ -1,6 +1,12 @@
 import { ThemeProvider } from '@/components/theme-provider'
 import { Spinner } from '@/components/ui/spinner'
-import { BadgeCheckIcon, ChevronRightIcon, OctagonAlert, PopcornIcon, X } from 'lucide-react'
+import {
+  BadgeCheckIcon,
+  ChevronRightIcon,
+  OctagonAlert,
+  PopcornIcon,
+  X,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import {

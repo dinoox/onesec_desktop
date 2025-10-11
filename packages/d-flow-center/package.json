@@ -1,6 +1,6 @@
 {
   "name": "onesec",
-  "author": "Onesec Dev",
+  "author": "Onesec Developer",
   "description": "The implementation of miaoyan electron desktop",
   "private": true,
   "version": "1.0.0",
@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder --mac",
-    "build:arm64": "tsc && vite build && electron-builder --mac --arm64",
-    "build:x64": "tsc && vite build && electron-builder --mac --x64",
+    "build:x64": "pnpm build -- --x64",
+    "build:arm64": "pnpm build -- --arm64",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier -w '**/*.{js,jsx,ts,tsx}'"
   },

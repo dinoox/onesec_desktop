@@ -16,7 +16,10 @@ class UserConfigManager {
   getConfig(): GlobalConfig {
     return {
       auth_token: this.store.get('auth_token', USER_DEFAULT_CONFIG.auth_token),
-      hotkey_configs: this.store.get('hotkey_configs', USER_DEFAULT_CONFIG.hotkey_configs),
+      hotkey_configs: this.store.get(
+        'hotkey_configs',
+        USER_DEFAULT_CONFIG.hotkey_configs,
+      ),
     }
   }
 

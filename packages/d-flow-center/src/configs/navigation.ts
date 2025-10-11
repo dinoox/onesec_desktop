@@ -1,4 +1,10 @@
-import { LucideHome, PuzzleIcon, LucideShell, Settings, type LucideIcon } from 'lucide-react'
+import {
+  LucideHome,
+  PuzzleIcon,
+  LucideShell,
+  Settings,
+  type LucideIcon,
+} from 'lucide-react'
 
 export type NavItem = {
   title: string

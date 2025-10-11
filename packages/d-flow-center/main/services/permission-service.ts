@@ -1,10 +1,15 @@
-import { systemPreferences, shell } from 'electron'
-import log from 'electron-log'
-import { PermissionStatus } from '@/store/status-store.ts'
-import { DEFAULT_IPC_CHANNEL, IPCMessage, MessageTypes } from '../types/message.ts'
-import windowManager from './window-manager.ts'
-import nativeProcessManager from './native-process-manager.ts'
 import chalk from 'chalk'
+import log from 'electron-log'
+import windowManager, { WINDOW_CONTENT_ID } from './window-manager.ts'
+import { systemPreferences, shell } from 'electron'
+import { PermissionStatus } from '@/store/status-store.ts'
+import nativeProcessManager from './native-process-manager.ts'
+import {
+  buildIPCMessage,
+  DEFAULT_IPC_CHANNEL,
+  IPCMessage,
+  MessageTypes,
+} from '../types/message.ts'
 
 type PermissionType = 'accessibility' | 'microphone'
 
@@ -15,29 +20,23 @@ class PermissionService {
 
   async initialize() {
     this.ps = await this.checkAllPermissions()
-
-    if (!this.ps.microphone || !this.ps.accessibility) {
-      await this.broadcastPermissionStateToRenderer(this.ps)
-    }
+    await this.broadcastPermissionStateToRenderer(this.ps)
 
     if (this.timeout) clearInterval(this.timeout)
     this.timeout = setInterval(async () => {
       const newPS = await this.checkAllPermissions()
 
-      if (!this.ps) return
       if (
-        newPS.microphone === this.ps.microphone &&
-        newPS.accessibility === this.ps.accessibility
+        newPS.microphone === this.ps!.microphone &&
+        newPS.accessibility === this.ps!.accessibility
       ) {
         return
       }
 
-      if (newPS.microphone && this.ps.microphone) {
+      if (newPS.microphone && newPS.accessibility) {
         await nativeProcessManager.restart()
-        log.info(chalk.green('✓', 'PermissionService restart native process'))
       } else {
         await nativeProcessManager.stop()
-        log.info(chalk.red('✗', 'PermissionService stop native process'))
       }
 
       await this.broadcastPermissionStateToRenderer(newPS)
@@ -46,21 +45,14 @@ class PermissionService {
   }
 
   async broadcastPermissionStateToRenderer(ps: PermissionStatus) {
-    const timestamp = Date.now()
-    const eventMessage: IPCMessage = {
-      id: `event_${timestamp}`,
-      type: 'event',
-      source: 'main',
-      timestamp,
-      action: MessageTypes.PERMISSION_STATUS,
-      data: {
+    windowManager.broadcast(
+      DEFAULT_IPC_CHANNEL,
+      buildIPCMessage(MessageTypes.PERMISSION_STATUS, {
         type: MessageTypes.PERMISSION_STATUS,
+        timestamp: Date.now(),
         data: ps,
-        timestamp,
-      },
-    }
-
-    windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage)
+      }),
+    )
   }
 
   /**
@@ -118,7 +110,8 @@ class PermissionService {
     const urls: Record<PermissionType, string> = {
       accessibility:
         'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility',
-      microphone: 'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
+      microphone:
+        'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
     }
     shell.openExternal(urls[type]).then()
   }
@@ -127,7 +120,10 @@ class PermissionService {
    * 根据权限状态跳转到对应的系统设置页面
    * @param permissionStatus - 权限状态对象
    */
-  openSettingsForPermission(permissionStatus: { microphone: boolean; accessibility: boolean }) {
+  openSettingsForPermission(permissionStatus: {
+    microphone: boolean
+    accessibility: boolean
+  }) {
     if (!permissionStatus.microphone) {
       this.openSystemPreferences('microphone')
       return

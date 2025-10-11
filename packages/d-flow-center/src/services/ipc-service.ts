@@ -21,7 +21,9 @@ class IPCService {
       throw new Error('IPC service requires an IPC server')
     }
 
-    window.ipcRenderer.on(DEFAULT_IPC_CHANNEL, (_event, data) => this.handleIPCMessage(data))
+    window.ipcRenderer.on(DEFAULT_IPC_CHANNEL, (_event, data) =>
+      this.handleIPCMessage(data),
+    )
     console.log(`[IPCService] Initialized`)
   }
 
@@ -104,7 +106,11 @@ class IPCService {
   }
 
   async resizeStatusWindow(width: number, height: number) {
-    return await window.ipcRenderer.invoke(IPC_RESIZE_STATUS_WINDOW_CHANNEL, width, height)
+    return await window.ipcRenderer.invoke(
+      IPC_RESIZE_STATUS_WINDOW_CHANNEL,
+      width,
+      height,
+    )
   }
 
   async showStatusWindow() {

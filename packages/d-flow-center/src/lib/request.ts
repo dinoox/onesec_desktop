@@ -24,7 +24,9 @@ class Request {
     let queryParams = '' //url参数
     let requestPayload = '' //请求体数据
     const config: Config = cache || { cache: 'no-store' }
-    Object.assign(headers, { Authorization: `Bearer ${authStore.getState().accessToken}` })
+    Object.assign(headers, {
+      Authorization: `Bearer ${authStore.getState().accessToken}`,
+    })
 
     if (method === 'GET' || method === 'DELETE') {
       //fetch对GET请求等，不支持将参数传在body上，只能拼接url
@@ -106,7 +108,11 @@ class Request {
     return this.interceptorsResponse<T>(res)
   }
 
-  async request<T>(method: Method, url: string, params?: Params): Promise<DataResponse<T>> {
+  async request<T>(
+    method: Method,
+    url: string,
+    params?: Params,
+  ): Promise<DataResponse<T>> {
     return this.httpFactory<DataResponse<T>>({ url, params, method })
   }
 

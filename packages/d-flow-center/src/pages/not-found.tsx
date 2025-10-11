@@ -7,7 +7,11 @@ export default function NotFound() {
       <h1 className="text-xl">抱歉，你访问的页面不存在</h1>
       <p className="text-base text-muted-foreground">网址已失效</p>
       <div className="flex items-center justify-center gap-4 text-sm">
-        <Button size="sm" onClick={() => window.history.back()} className="cursor-pointer">
+        <Button
+          size="sm"
+          onClick={() => window.history.back()}
+          className="cursor-pointer"
+        >
           返回上一页
         </Button>
         <Button

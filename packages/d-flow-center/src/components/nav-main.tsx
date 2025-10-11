@@ -1,5 +1,9 @@
 import { ChevronRight } from 'lucide-react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import {
   SidebarGroup,
   SidebarMenu,
@@ -30,14 +34,20 @@ function checkIsActive(href: string, item: NavItem, mainNav = false) {
   }
   return (
     !!item?.children?.filter((i) => i.url === href).length || // if child nav is active
-    (mainNav && href.split('/')[1] !== '' && href.split('/')[1] === item?.url?.split('/')[1])
+    (mainNav &&
+      href.split('/')[1] !== '' &&
+      href.split('/')[1] === item?.url?.split('/')[1])
   )
 }
 
 const SidebarMenuLink = ({ item, href }: { item: NavItem; href: string }) => {
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton tooltip={item.title} asChild isActive={checkIsActive(href, item)}>
+      <SidebarMenuButton
+        tooltip={item.title}
+        asChild
+        isActive={checkIsActive(href, item)}
+      >
         <Link to={item.url}>
           {item.icon && <item.icon />}
           <span>{item.title}</span>
@@ -66,7 +76,10 @@ const SidebarMenuCollapsible = ({ item, href }: { item: NavItem; href: string })
           <SidebarMenuSub>
             {item.children?.map((subItem) => (
               <SidebarMenuSubItem key={subItem.title}>
-                <SidebarMenuSubButton asChild isActive={checkIsActive(href, subItem, false)}>
+                <SidebarMenuSubButton
+                  asChild
+                  isActive={checkIsActive(href, subItem, false)}
+                >
                   <Link to={subItem.url}>
                     {subItem.icon && <subItem.icon />}
                     <span>{subItem.title}</span>
@@ -122,7 +135,8 @@ export function NavMain({ items }: { items: NavItem[] }) {
       <SidebarMenu>
         {items.map((item) => {
           const key = `${item.title}-${item.url}`
-          if (!item.children) return <SidebarMenuLink key={key} item={item} href={pathname} />
+          if (!item.children)
+            return <SidebarMenuLink key={key} item={item} href={pathname} />
           return state === 'collapsed' ? (
             <SidebarMenuDropdown key={key} item={item} href={pathname} />
           ) : (

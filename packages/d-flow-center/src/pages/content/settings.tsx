@@ -33,7 +33,11 @@ const ContestPage: React.FC = () => {
             disabled
             type="email"
             placeholder="Email"
-            value={user?.phone ? user.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未设置'}
+            value={
+              user?.phone
+                ? user.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+                : '未设置'
+            }
           />
         </div>
       </div>
@@ -54,7 +58,12 @@ const ContestPage: React.FC = () => {
         </div>
       </div>
 
-      <Button type="button" variant="secondary" onClick={logout} disabled={mutation.isPending}>
+      <Button
+        type="button"
+        variant="secondary"
+        onClick={logout}
+        disabled={mutation.isPending}
+      >
         {mutation.isPending ? <Spinner /> : null}
         退出登录
       </Button>

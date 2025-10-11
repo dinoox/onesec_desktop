@@ -5,7 +5,7 @@ import windowManager, {
   WINDOW_CONTENT_ID,
   WINDOW_STATUS_ID,
 } from '../main/services/window-manager.ts'
-import processManager from '../main/communications/process-manager.ts'
+import processManager from '../main/process-manager.ts'
 import log from 'electron-log'
 import nativeProcessManager from '../main/services/native-process-manager.ts'
 
@@ -118,8 +118,11 @@ app.on('before-quit', async (_) => {
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
+  const contentWindow = windowManager.getWindow(WINDOW_CONTENT_ID)
+  if (!contentWindow || contentWindow.isDestroyed()) {
     createWindow()
+  } else {
+    contentWindow.show()
   }
 })
 
@@ -128,7 +131,8 @@ app.whenReady().then(async () => {
     applicationName: '秒言',
     applicationVersion: '1.0.0',
     copyright: '© 2024 秒言团队',
-    credits: '秒言是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
+    credits:
+      '秒言是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
     website: 'https://miaoyan.app',
   })
   createWindow()

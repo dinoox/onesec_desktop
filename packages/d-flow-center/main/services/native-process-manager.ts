@@ -4,6 +4,9 @@ import { spawn, ChildProcess } from 'child_process'
 import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
+import userConfigManager from './user-config-manager.ts'
+import udsService from './uds-service.ts'
+import { MessageTypes } from '../types/message.ts'
 
 class NativeProcessManager {
   constructor() {}
@@ -26,7 +29,10 @@ class NativeProcessManager {
       try {
         fs.chmodSync(appPath, '755')
       } catch (chmodError) {
-        console.warn('[MiaoyanSwiftManager] Failed to set executable permission:', chmodError)
+        console.warn(
+          '[MiaoyanSwiftManager] Failed to set executable permission:',
+          chmodError,
+        )
       }
 
       this.nativeProcess = spawn(appPath, ['--disable-text-insertion'], {
@@ -52,7 +58,9 @@ class NativeProcessManager {
       })
 
       childProcess.on('exit', (code: number | null, signal: string | null) => {
-        log.info(`[NativeProcessManager] Process exited with code: ${code}, signal: ${signal}`)
+        log.info(
+          `[NativeProcessManager] Process exited with code: ${code}, signal: ${signal}`,
+        )
         this.nativeProcess = null
       })
 
@@ -123,16 +131,33 @@ class NativeProcessManager {
     return this.nativeProcess !== null && !this.nativeProcess.killed
   }
 
-  public getProcess(): ChildProcess | null {
-    return this.nativeProcess
-  }
-
   private getNativeAppPath(): string {
     if (!app.isPackaged) {
-      return path.join(app.getAppPath(), 'assets/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift')
+      return path.join(
+        app.getAppPath(),
+        'assets/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift',
+      )
     }
 
-    return path.join(process.resourcesPath, 'Helpers/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift')
+    return path.join(
+      process.resourcesPath,
+      'Helpers/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift',
+    )
+  }
+
+  async syncUserConfigToNativeProcess() {
+    const config = userConfigManager.getConfig()
+
+    udsService.broadcast({
+      type: MessageTypes.INIT_CONFIG,
+      timestamp: Date.now(),
+      data: {
+        auth_token: config.auth_token,
+        hotkey_configs: config.hotkey_configs,
+      },
+    })
+
+    log.info(`Init Native Config: ${JSON.stringify(config)}`)
   }
 }
 

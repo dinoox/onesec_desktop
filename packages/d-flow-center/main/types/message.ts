@@ -59,17 +59,25 @@ export interface GlobalConfig {
 export interface IPCMessage {
   id: string
   type: 'request' | 'response' | 'event' | 'ready'
-  source?: 'worker' | 'main'
   action?: string
   data?: Message
   error?: string | null
   timestamp?: number
 }
 
-export interface APIResponse {
-  code: number
-  message: string
-  data?: any
+export function buildIPCMessage(
+  action: string,
+  data?: Message,
+  type: 'request' | 'response' | 'event' | 'ready' = 'event',
+): IPCMessage {
+  return {
+    id: `event_${Date.now()}`,
+    type,
+    action,
+    data,
+    error: null,
+    timestamp: Date.now(),
+  }
 }
 
 const DEFAULT_IPC_CHANNEL = 'default_ipc_channel'
