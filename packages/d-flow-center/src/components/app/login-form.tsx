@@ -42,6 +42,7 @@ export function LoginForm({}: { className?: string }) {
 
   const mutation = useLoginQuery()
   async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
+    delete data.invitation_code
     await mutation.mutateAsync(data)
   }
 

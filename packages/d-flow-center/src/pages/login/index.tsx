@@ -20,6 +20,7 @@ const LoginPage: React.FC = () => {
         backgroundSize: '40px 40px',
       }}
     >
+      <div className="fixed top-0 left-0 right-0 h-[60px] app-drag-region"></div>
       <div className="w-full flex justify-center">
         <LoginForm />
       </div>
