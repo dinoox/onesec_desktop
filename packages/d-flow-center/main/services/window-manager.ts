@@ -56,6 +56,14 @@ class WindowManager {
   }
 
   /**
+   * 获取主 Content 窗口
+   * @returns Content Window 实例或
+   */
+  public getContentWindow(): BrowserWindow | undefined {
+    return this.windows.get(WINDOW_CONTENT_ID)
+  }
+
+  /**
    * 获取所有已注册的窗口
    * @returns 所有窗口的数组
    */

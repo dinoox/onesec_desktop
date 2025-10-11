@@ -8,6 +8,7 @@ import windowManager, {
 import processManager from '../main/process-manager.ts'
 import log from 'electron-log'
 import nativeProcessManager from '../main/services/native-process-manager.ts'
+import menuService from '../main/services/menu-service.ts'
 
 // 禁用HTTPS证书验证（仅用于开发环境或自签名证书）
 app.commandLine.appendSwitch('--ignore-certificate-errors')
@@ -43,6 +44,7 @@ function createWindow() {
 
   win.webContents.once('did-finish-load', async () => {
     windowManager.register(win!, WINDOW_CONTENT_ID)
+    menuService.initialize()
   })
 
   if (VITE_DEV_SERVER_URL) {

@@ -1,6 +1,4 @@
-import chalk from 'chalk'
-import log from 'electron-log'
-import windowManager, { WINDOW_CONTENT_ID } from './window-manager.ts'
+import windowManager from './window-manager.ts'
 import { systemPreferences, shell } from 'electron'
 import { PermissionStatus } from '@/store/status-store.ts'
 import nativeProcessManager from './native-process-manager.ts'
