@@ -1,4 +1,4 @@
-import { app, Menu, MenuItemConstructorOptions } from 'electron'
+import { app, Menu, MenuItemConstructorOptions, shell } from 'electron'
 import windowManager from './window-manager'
 
 class MenuService {
@@ -80,10 +80,8 @@ class MenuService {
         label: '帮助',
         submenu: [
           {
-            label: '打开秒言介绍',
-            click: () => {
-              // TODO: Send IPC message to renderer
-            },
+            label: '帮助中心',
+            click: () => shell.openExternal('https://miaoyan.cn/help.html'),
           },
         ],
       },

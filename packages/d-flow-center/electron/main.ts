@@ -6,11 +6,10 @@ import windowManager, {
   WINDOW_STATUS_ID,
 } from '../main/services/window-manager.ts'
 import processManager from '../main/process-manager.ts'
-import log from 'electron-log'
 import nativeProcessManager from '../main/services/native-process-manager.ts'
 import menuService from '../main/services/menu-service.ts'
 
-// 禁用HTTPS证书验证（仅用于开发环境或自签名证书）
+// Disable HTTPS Cert Verification（only dev）
 app.commandLine.appendSwitch('--ignore-certificate-errors')
 app.commandLine.appendSwitch('--ignore-ssl-errors')
 app.commandLine.appendSwitch('--ignore-certificate-errors-spki-list')
@@ -22,7 +21,6 @@ process.env.APP_ROOT = path.join(__dirname, '..')
 
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
-export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
@@ -36,7 +34,8 @@ function createWindow(onWebLoaded: Function = () => {}) {
     title: '秒言',
     width: 1024,
     height: 730,
-    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    minWidth: 1024,
+    minHeight: 730,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
@@ -44,15 +43,13 @@ function createWindow(onWebLoaded: Function = () => {}) {
 
   win.webContents.once('did-finish-load', async () => {
     windowManager.register(win!, WINDOW_CONTENT_ID)
-    menuService.initialize()
+    if (app.isPackaged) menuService.initialize()
     await onWebLoaded()
-    log.info('Content window did-finish-load')
   })
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL).then()
   } else {
-    // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, 'index.html')).then()
   }
 }

@@ -51,7 +51,7 @@ function StatusApp() {
       <div className="h-screen flex flex-col items-center justify-between relative">
         <div className="relative flex flex-col items-center mt-auto">
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-max max-w-[300px] ">
-            {status === 'processing' && (
+            {status === 'notification' && (
               <Alert className="dark">
                 <OctagonAlert />
                 <AlertTitle>服务器响应超时</AlertTitle>

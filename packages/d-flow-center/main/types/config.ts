@@ -10,7 +10,7 @@ const USER_DEFAULT_CONFIG: GlobalConfig = {
   hotkey_configs: [
     {
       mode: 'normal',
-      hotkey_combination: ['fn', 'Opt⌥'],
+      hotkey_combination: ['fn'],
     },
     { mode: 'command', hotkey_combination: ['fn', 'Cmd⌘'] },
   ],

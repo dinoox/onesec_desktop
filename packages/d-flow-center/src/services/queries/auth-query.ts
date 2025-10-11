@@ -14,6 +14,7 @@ export const useLoginQuery = () => {
         .getState()
         .actions.setAuthed(resp.data.user || {}, resp.data.access_token || 'token')
 
+      useStatusStore.getState().actions.setAuthTokenInvalid(false)
       await UserService.setConfig({
         ...(await UserService.getConfig()),
         auth_token: resp.data.access_token,
