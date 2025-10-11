@@ -141,7 +141,7 @@ class UDSService extends EventEmitter {
     const data = message.data || {}
 
     if (message.type !== MessageTypes.VOLUME_DATA) {
-      console.log(`UDS: ${message.type}: ${JSON.stringify(data)} - ${JSON.stringify(message)}`)
+      console.log(`UDS: ${message.type}: - ${JSON.stringify(message)}`)
     }
 
     this.emit(message.type, { clientId, timestamp: message.timestamp, data }, message)

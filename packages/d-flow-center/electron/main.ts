@@ -93,10 +93,6 @@ function createStatusWindow() {
     await nativeProcessManager.start()
   })
 
-  statusWin.webContents.on('did-finish-load', async () => {
-    log.info("statusWin did-finish-load")
-  })
-
   if (VITE_DEV_SERVER_URL) {
     statusWin.loadURL(`${VITE_DEV_SERVER_URL}status.html`).then()
   } else {

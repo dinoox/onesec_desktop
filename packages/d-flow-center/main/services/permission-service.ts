@@ -16,17 +16,21 @@ class PermissionService {
   async initialize() {
     this.ps = await this.checkAllPermissions()
 
+    if (!this.ps.microphone || !this.ps.accessibility) {
+      await this.broadcastPermissionStateToRenderer(this.ps)
+    }
 
     if (this.timeout) clearInterval(this.timeout)
     this.timeout = setInterval(async () => {
-      if (!this.ps) return
       const newPS = await this.checkAllPermissions()
 
-      if (newPS.microphone === this.ps.microphone && newPS.accessibility === this.ps.accessibility) {
+      if (!this.ps) return
+      if (
+        newPS.microphone === this.ps.microphone &&
+        newPS.accessibility === this.ps.accessibility
+      ) {
         return
       }
-
-      log.info(chalk.blue(`ps compare: `,`${JSON.stringify(newPS)}`,`${JSON.stringify(this.ps)}`))
 
       if (newPS.microphone && this.ps.microphone) {
         await nativeProcessManager.restart()
@@ -36,27 +40,27 @@ class PermissionService {
         log.info(chalk.red('✗', 'PermissionService stop native process'))
       }
 
-      const timestamp = Date.now()
-      const eventMessage: IPCMessage = {
-        id: `event_${timestamp}`,
-        type: 'event',
-        source: 'main',
-        timestamp,
-        action: MessageTypes.PERMISSION_STATUS,
-        data: {
-          type: MessageTypes.PERMISSION_STATUS,
-          data: newPS,
-          timestamp,
-        },
-      }
-
-      windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage)
-      log.info(chalk.green(`PermissionService ps compare: `,`${JSON.stringify(newPS)}`,`${JSON.stringify(this.ps)}`))
-      log.info(chalk.green(`PermissionService send ipc: ${JSON.stringify(eventMessage)}`))
+      await this.broadcastPermissionStateToRenderer(newPS)
       this.ps = newPS
     }, 3000)
+  }
 
+  async broadcastPermissionStateToRenderer(ps: PermissionStatus) {
+    const timestamp = Date.now()
+    const eventMessage: IPCMessage = {
+      id: `event_${timestamp}`,
+      type: 'event',
+      source: 'main',
+      timestamp,
+      action: MessageTypes.PERMISSION_STATUS,
+      data: {
+        type: MessageTypes.PERMISSION_STATUS,
+        data: ps,
+        timestamp,
+      },
+    }
 
+    windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage)
   }
 
   /**

@@ -38,7 +38,7 @@ interface StatusStore {
 const useStatusStore = create<StatusStore>((set) => ({
   mode: 'normal',
   status: 'idle',
-  permissionStatus: { microphone: false, accessibility: false },
+  permissionStatus: { microphone: true, accessibility: true },
   hotKeySettingStatus: 'idle',
   holdIPCMessage: {
     id: 'id',
@@ -53,7 +53,7 @@ const useStatusStore = create<StatusStore>((set) => ({
     setHotkeySettingStatus: (hotKeySettingStatus) => set({ hotKeySettingStatus }),
     setAudioLevel: (audioLevel) => set({ audioLevel }),
     setIPCMessage: (message) => set({ holdIPCMessage: message }),
-    setAuthTokenInvalid: (authTokenInvalid) => set({ authTokenInvalid}),
+    setAuthTokenInvalid: (authTokenInvalid) => set({ authTokenInvalid }),
     reset: () => set({ mode: 'normal', status: 'idle', audioLevel: 0 }),
   },
 }))

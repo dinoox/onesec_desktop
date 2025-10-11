@@ -3,15 +3,14 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './global.css'
 import IPCService from '@/services/ipc-service.ts'
-import SoundService from "@/services/sound-service.ts";
-import useAuthStore from "@/store/auth-store.ts";
+import SoundService from '@/services/sound-service.ts'
+import useAuthStore from '@/store/auth-store.ts'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
   </StrictMode>,
 )
-
 ;(async () => {
   await IPCService.initialize()
 })()

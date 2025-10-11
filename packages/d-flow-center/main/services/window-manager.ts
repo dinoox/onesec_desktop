@@ -138,12 +138,15 @@ class WindowManager {
     const x = bounds.x + (workAreaSize.width - winBounds.width) / 2
     const y = workArea.y + workArea.height - winBounds.height
 
-    statusWindow.setBounds({
-      x,
-      y,
-      width: toWidth,
-      height: toHeight,
-    }, true)
+    statusWindow.setBounds(
+      {
+        x,
+        y,
+        width: toWidth,
+        height: toHeight,
+      },
+      true,
+    )
   }
 
   async moveStatusWindowToNewScreen() {
@@ -157,12 +160,15 @@ class WindowManager {
     const x = bounds.x + (workAreaSize.width - winBounds.width) / 2
     const y = workArea.y + workArea.height - winBounds.height
 
-    statusWindow.setBounds({
-      x,
-      y,
-      width: winBounds.width,
-      height: winBounds.height,
-    }, true)
+    statusWindow.setBounds(
+      {
+        x,
+        y,
+        width: winBounds.width,
+        height: winBounds.height,
+      },
+      true,
+    )
   }
 }
 

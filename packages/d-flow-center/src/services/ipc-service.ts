@@ -35,7 +35,7 @@ class IPCService {
       setHotkeySettingStatus,
       setAudioLevel,
       setIPCMessage,
-      setAuthTokenInvalid
+      setAuthTokenInvalid,
     } = useStatusStore.getState().actions
 
     setIPCMessage(message)

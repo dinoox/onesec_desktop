@@ -3,7 +3,7 @@ import log from 'electron-log'
 import { spawn, ChildProcess } from 'child_process'
 import path from 'path'
 import fs from 'fs'
-import chalk from "chalk";
+import chalk from 'chalk'
 
 class NativeProcessManager {
   constructor() {}
@@ -85,10 +85,8 @@ class NativeProcessManager {
     }
   }
 
-  /**
-   * 停止 MiaoyanSwift 应用
-   */
-  public async stop(): Promise<void> {
+  async stop(): Promise<void> {
+    log.info(chalk.red('Native process stop'))
     if (!this.nativeProcess) {
       return
     }
@@ -134,10 +132,7 @@ class NativeProcessManager {
       return path.join(app.getAppPath(), 'assets/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift')
     }
 
-    return path.join(
-      process.resourcesPath,
-      'Helpers/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift'
-    )
+    return path.join(process.resourcesPath, 'Helpers/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift')
   }
 }
 
