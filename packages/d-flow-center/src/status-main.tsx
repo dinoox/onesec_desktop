@@ -13,8 +13,11 @@ createRoot(document.getElementById('status-root')!).render(
   </StrictMode>,
 )
 
-await SoundService.initialize()
-await IPCService.initialize()
-if (useAuthStore.getState().isAuthed) {
-  await IPCService.showStatusWindow()
-}
+// use async IIFE to avoid top-level await
+;(async () => {
+  await SoundService.initialize()
+  await IPCService.initialize()
+  if (useAuthStore.getState().isAuthed) {
+    await IPCService.showStatusWindow()
+  }
+})()

@@ -32,6 +32,7 @@ let win, statusWin: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
+    title: '秒言',
     width: 1024,
     height: 730,
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
@@ -129,7 +130,6 @@ app.whenReady().then(async () => {
     copyright: '© 2024 秒言团队',
     credits: '秒言是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
     website: 'https://miaoyan.app',
-    iconPath: path.join(__dirname, '../../assets/icon.icns'),
   })
   createWindow()
   createStatusWindow()

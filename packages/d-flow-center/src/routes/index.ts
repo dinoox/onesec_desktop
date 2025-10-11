@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { createBrowserRouter, redirect, type RouteObject } from 'react-router'
+import { createHashRouter, redirect, type RouteObject } from 'react-router'
 import RootLayout from '@/components/layout/root-layout'
 import DashboardLayout from '@/components/layout/dashboard-layout'
 import { ContentRoutes } from '@/routes/content'
@@ -30,4 +30,4 @@ const router: RouteObject[] = [
   },
 ]
 
-export default createBrowserRouter(router)
+export default createHashRouter(router)

@@ -1,9 +1,9 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "com.ripplestar.miaoyan",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "Onesec",
   "directories": {
     "output": "release/${version}"
   },
@@ -11,17 +11,35 @@
     "dist",
     "dist-electron"
   ],
+  "extraResources": [
+    {
+      "from": "assets/MiaoyanSwift.app",
+      "to": "Helpers/MiaoyanSwift.app"
+    }
+  ],
   "mac": {
+    "icon": "assets/icon.icns",
     "target": [
-      "dmg"
+      {
+        "target": "default",
+        "arch": [
+          "arm64",
+          "x64"
+        ]
+      }
     ],
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
-    "entitlements": "build/entitlements.mac.plist",
-    "entitlementsInherit": "build/entitlements.mac.plist",
+    "identity": "Hangzhou RippleStar Technology Co., Ltd. (PNG2RBG62Z)",
+    "type": "distribution",
     "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "assets/entitlements.mac.plist",
+    "entitlementsInherit": "assets/entitlements.mac.plist",
     "extendInfo": {
-      "NSMicrophoneUsageDescription": "此应用需要访问麦克风以实现语音输入功能",
-      "NSCameraUsageDescription": "此应用需要访问摄像头以实现视频功能"
+      "NSMicrophoneUsageDescription": "此应用需要访问麦克风以进行语音识别和音频录制功能",
+      "NSCameraUsageDescription": "此应用需要访问摄像头以进行视频录制功能",
+      "NSAppleEventsUsageDescription": "此应用需要控制其他应用程序以提供自动化功能",
+      "NSAccessibilityUsageDescription": "此应用需要辅助功能权限以监听键盘事件和提供无障碍服务"
     }
   },
   "win": {

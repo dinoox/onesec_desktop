@@ -134,17 +134,10 @@ class NativeProcessManager {
       return path.join(app.getAppPath(), 'assets/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift')
     }
 
-    let appPath: string
-    if (process.platform === 'darwin') {
-      appPath = path.join(
-        process.resourcesPath.replace('/Resources', ''),
-        'Resources',
-        'Helpers/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift',
-      )
-    } else {
-      appPath = path.join(process.resourcesPath, 'assets', 'MiaoyanSwift')
-    }
-    return appPath
+    return path.join(
+      process.resourcesPath,
+      'Helpers/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift'
+    )
   }
 }
 

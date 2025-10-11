@@ -1,11 +1,15 @@
 {
-  "name": "d-flow-center",
+  "name": "onesec",
+  "author": "Onesec Dev",
+  "description": "The implementation of miaoyan electron desktop",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
+    "build": "tsc && vite build && electron-builder --mac",
+    "build:arm64": "tsc && vite build && electron-builder --mac --arm64",
+    "build:x64": "tsc && vite build && electron-builder --mac --x64",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier -w '**/*.{js,jsx,ts,tsx}'"
   },
@@ -60,27 +64,5 @@
     "vite-plugin-electron": "^0.28.6",
     "vite-plugin-electron-renderer": "^0.14.5"
   },
-  "main": "dist-electron/main.js",
-  "mac": {
-    "notarize": false,
-    "identity": "Hangzhou RippleStar Technology Co., Ltd. (PNG2RBG62Z)",
-    "target": {
-      "target": "default",
-      "arch": [
-        "arm64",
-        "x64"
-      ]
-    },
-    "type": "distribution",
-    "hardenedRuntime": true,
-    "entitlements": "assets/entitlements.mac.plist",
-    "entitlementsInherit": "assets/entitlements.mac.plist",
-    "gatekeeperAssess": false,
-    "extendInfo": {
-      "NSMicrophoneUsageDescription": "此应用需要访问麦克风以进行语音识别和音频录制功能",
-      "NSCameraUsageDescription": "此应用需要访问摄像头以进行视频录制功能",
-      "NSAppleEventsUsageDescription": "此应用需要控制其他应用程序以提供自动化功能",
-      "NSAccessibilityUsageDescription": "此应用需要辅助功能权限以监听键盘事件和提供无障碍服务"
-    }
-  }
+  "main": "dist-electron/main.js"
 }
