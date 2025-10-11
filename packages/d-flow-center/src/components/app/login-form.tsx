@@ -42,12 +42,16 @@ export function LoginForm({}: { className?: string }) {
 
   const mutation = useLoginQuery()
   async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
-    delete data.invitation_code
+    if (!isRegisterMode) {
+      delete data.invitation_code
+    }
     await mutation.mutateAsync(data)
   }
 
   const codeMutation = useVerifyCodeQuery()
   async function onRequestCode() {
+    form.clearErrors('phone')
+
     const phone = form.getValues('phone')
     if (!phone) {
       form.setError('phone', { message: '请先输入手机号' })
@@ -92,7 +96,14 @@ export function LoginForm({}: { className?: string }) {
                   <FormItem>
                     <FormLabel className="gap-0.5">手机号</FormLabel>
                     <FormControl>
-                      <Input placeholder="请输入手机号" {...field} />
+                      <Input
+                        placeholder="请输入手机号"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          form.clearErrors('phone')
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -106,7 +117,14 @@ export function LoginForm({}: { className?: string }) {
                     <FormItem>
                       <FormLabel className="gap-0.5">内测码</FormLabel>
                       <FormControl>
-                        <Input placeholder="请输入内测码" {...field} />
+                        <Input
+                          placeholder="请输入内测码"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            form.clearErrors('invitation_code')
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -121,7 +139,15 @@ export function LoginForm({}: { className?: string }) {
                     <FormLabel className="gap-0.5">验证码</FormLabel>
                     <FormControl>
                       <div className="flex w-full justify-between gap-2">
-                        <Input type="text" placeholder="请输入验证码" {...field} />
+                        <Input
+                          type="text"
+                          placeholder="请输入验证码"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            form.clearErrors('verification_code')
+                          }}
+                        />
                         <Button
                           type="button"
                           variant="outline"
