@@ -24,17 +24,6 @@ class ProcessManager {
         nativeProcessManager.syncUserConfigToNativeProcess()
         permissionService.initialize()
       })
-
-      setTimeout(() => {
-        windowManager.broadcast(
-          DEFAULT_IPC_CHANNEL,
-          buildIPCMessage(MessageTypes.AUTH_TOKEN_FAILED, {
-            type: MessageTypes.AUTH_TOKEN_FAILED,
-            timestamp: Date.now(),
-            data: {},
-          }),
-        )
-      }, 5000)
     } catch (err) {
       log.error(err)
     }
