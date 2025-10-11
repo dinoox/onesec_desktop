@@ -38,6 +38,7 @@ class ProcessManager {
         )
 
         if (messageType === 'auth_token_failed') {
+          nativeProcessManager.stop()
           if (!windowManager.getContentWindow()) {
             createWindow(() => {
               windowManager.broadcast(
