@@ -53,14 +53,12 @@ class NativeProcessManager {
       const childProcess = this.nativeProcess
 
       childProcess.on('error', (error: Error) => {
-        log.error('[NativeProcessManager] Process error:', error)
+        log.error('[NativeProcess] Process error:', error)
         this.nativeProcess = null
       })
 
       childProcess.on('exit', (code: number | null, signal: string | null) => {
-        log.info(
-          `[NativeProcessManager] Process exited with code: ${code}, signal: ${signal}`,
-        )
+        log.info(`[NativeProcess] Process exited with code: ${code}, signal: ${signal}`)
         this.nativeProcess = null
       })
 

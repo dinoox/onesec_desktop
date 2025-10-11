@@ -26,6 +26,42 @@ class MenuService {
         ],
       },
       {
+        label: '编辑',
+        submenu: [
+          {
+            label: '撤销',
+            accelerator: process.platform === 'darwin' ? 'Command+Z' : 'Ctrl+Z',
+            role: 'undo',
+          },
+          {
+            label: '重做',
+            accelerator: process.platform === 'darwin' ? 'Command+Shift+Z' : 'Ctrl+Y',
+            role: 'redo',
+          },
+          { type: 'separator' },
+          {
+            label: '剪切',
+            accelerator: process.platform === 'darwin' ? 'Command+X' : 'Ctrl+X',
+            role: 'cut',
+          },
+          {
+            label: '复制',
+            accelerator: process.platform === 'darwin' ? 'Command+C' : 'Ctrl+C',
+            role: 'copy',
+          },
+          {
+            label: '粘贴',
+            accelerator: process.platform === 'darwin' ? 'Command+V' : 'Ctrl+V',
+            role: 'paste',
+          },
+          {
+            label: '全选',
+            accelerator: process.platform === 'darwin' ? 'Command+A' : 'Ctrl+A',
+            role: 'selectAll',
+          },
+        ],
+      },
+      {
         label: '开发',
         submenu: [
           {

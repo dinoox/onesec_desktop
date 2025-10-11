@@ -3,7 +3,7 @@ import { login, logout } from '@/services/api/auth-api.ts'
 import authStore from '@/store/auth-store.ts'
 import { useNavigate } from 'react-router'
 import { UserService } from '@/services/user-service.ts'
-import { toast } from 'sonner'
+import useStatusStore from '@/store/status-store.ts'
 
 export const useLoginQuery = () => {
   const navigate = useNavigate()
@@ -28,6 +28,7 @@ export const useLogoutQuery = () =>
     mutationFn: logout,
     onSuccess: async (_) => {
       await authStore.getState().actions.logout()
+      useStatusStore.getState().actions.setAuthTokenInvalid(false)
       await UserService.setConfig({
         ...(await UserService.getConfig()),
         auth_token: null,

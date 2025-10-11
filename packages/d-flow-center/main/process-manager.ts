@@ -5,6 +5,7 @@ import nativeProcessManager from './services/native-process-manager.ts'
 import { DEFAULT_IPC_CHANNEL, MessageTypes, buildIPCMessage } from './types/message.ts'
 import permissionService from './services/permission-service.ts'
 import ipcService from './services/ipc-service.ts'
+import { createWindow } from '../electron/main.ts'
 
 /**
  * 全局进程管理类
@@ -23,6 +24,17 @@ class ProcessManager {
         nativeProcessManager.syncUserConfigToNativeProcess()
         permissionService.initialize()
       })
+
+      setTimeout(() => {
+        windowManager.broadcast(
+          DEFAULT_IPC_CHANNEL,
+          buildIPCMessage(MessageTypes.AUTH_TOKEN_FAILED, {
+            type: MessageTypes.AUTH_TOKEN_FAILED,
+            timestamp: Date.now(),
+            data: {},
+          }),
+        )
+      }, 5000)
     } catch (err) {
       log.error(err)
     }
@@ -37,6 +49,14 @@ class ProcessManager {
         )
 
         if (messageType === 'auth_token_failed') {
+          if (!windowManager.getContentWindow()) {
+            createWindow(() => {
+              windowManager.broadcast(
+                DEFAULT_IPC_CHANNEL,
+                buildIPCMessage(messageType, udsMessage),
+              )
+            })
+          }
           windowManager.getWindow(WINDOW_CONTENT_ID)?.show()
         }
       })

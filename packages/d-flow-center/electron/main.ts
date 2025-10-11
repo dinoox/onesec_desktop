@@ -31,7 +31,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 let win, statusWin: BrowserWindow | null
 
-function createWindow() {
+function createWindow(onWebLoaded: Function = () => {}) {
   win = new BrowserWindow({
     title: '秒言',
     width: 1024,
@@ -45,6 +45,8 @@ function createWindow() {
   win.webContents.once('did-finish-load', async () => {
     windowManager.register(win!, WINDOW_CONTENT_ID)
     menuService.initialize()
+    await onWebLoaded()
+    log.info('Content window did-finish-load')
   })
 
   if (VITE_DEV_SERVER_URL) {
@@ -141,3 +143,5 @@ app.whenReady().then(async () => {
   createStatusWindow()
   await processManager.initialize()
 })
+
+export { createWindow, createStatusWindow }
