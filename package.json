@@ -12,5 +12,8 @@
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
     "prettier": "3.6.2"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1"
   }
 }

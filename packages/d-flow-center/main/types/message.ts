@@ -96,6 +96,8 @@ const IPC_PERMISSION_SET_CHANNEL = 'permission_set_channel'
 //
 const IPC_HOT_KEY_SETTING_START_CHANNEL = 'hot_key_setting_start_channel'
 const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
+// External URL
+const IPC_OPEN_EXTERNAL_URL_CHANNEL = 'open_external_url_channel'
 
 export {
   DEFAULT_IPC_CHANNEL,
@@ -110,4 +112,5 @@ export {
   IPC_HOT_KEY_SETTING_END_CHANNEL,
   IPC_PERMISSION_SET_CHANNEL,
   IPC_PERMISSION_GET_CHANNEL,
+  IPC_OPEN_EXTERNAL_URL_CHANNEL,
 }

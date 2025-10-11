@@ -15,6 +15,7 @@ export default function DashboardLayout() {
       <SidebarProvider defaultOpen={true}>
         <AppSidebar />
         <SidebarInset className="overflow-hidden h-screen">
+          <div className="h-[2rem] app-drag-region"></div>
           <Header />
           <div className="p-4 flex grow flex-col overflow-hidden">
             {isNavigating && <PageLoading />}

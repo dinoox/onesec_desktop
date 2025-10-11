@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useLoginQuery } from '@/services/queries/auth-query.ts'
+import {useLoginQuery, useVerifyCodeQuery} from '@/services/queries/auth-query.ts'
 import {
   Card,
   CardContent,
@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/form'
 import React, { useState } from 'react'
 import { Spinner } from '@/components/ui/spinner.tsx'
+import {data} from "react-router"
+import IPCService from '@/services/ipc-service.ts'
 
 export function LoginForm({}: { className?: string }) {
   const [isRegisterMode, setIsRegisterMode] = useState(false)
@@ -42,6 +44,35 @@ export function LoginForm({}: { className?: string }) {
   async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
     await mutation.mutateAsync(data)
   }
+
+  const codeMutation = useVerifyCodeQuery()
+  async function onRequestCode() {
+    const phone = form.getValues('phone')
+    if (!phone) {
+      form.setError('phone', { message: '请先输入手机号' })
+      return
+    }
+
+    if (isRegisterMode) {
+      const invitation_code = form.getValues('invite_code')
+      if (!invitation_code) {
+        form.setError('invite_code', { message: '请先输入内测码' })
+        return
+      }
+      await codeMutation.mutateAsync({ phone, invitation_code })
+    } else {
+      await codeMutation.mutateAsync({ phone })
+    }
+  }
+
+  const handleOpenExternalUrl = async (url: string) => {
+    try {
+      await IPCService.openExternalUrl(url)
+    } catch (error) {
+      console.error('Failed to open external URL:', error)
+    }
+  }
+
 
   return (
     <Card className="w-[350px]">
@@ -90,9 +121,14 @@ export function LoginForm({}: { className?: string }) {
                     <FormLabel className="gap-0.5">验证码</FormLabel>
                     <FormControl>
                       <div className="flex w-full justify-between gap-2">
-                        <Input type="password" placeholder="请输入验证码" {...field} />
-                        <Button type="button" variant="outline">
-                          获取验证码
+                        <Input type="text" placeholder="请输入验证码" {...field} />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={onRequestCode}
+                          disabled={codeMutation.isPending}
+                        >
+                          {codeMutation.isPending ? <Spinner /> : '获取验证码'}
                         </Button>
                       </div>
                     </FormControl>
@@ -117,13 +153,21 @@ export function LoginForm({}: { className?: string }) {
       <CardFooter className="flex flex-col gap-4">
         <p className="text-xs text-center text-muted-foreground">
           {isRegisterMode ? '注册' : '登录'}即表示您同意我们的
-          <a href="#" className="underline underline-offset-4 mx-1 hover:text-primary">
+          <button
+            type="button"
+            onClick={() => handleOpenExternalUrl('https://www.miaoyan.cn/terms.html')}
+            className="underline underline-offset-4 mx-1 hover:text-primary cursor-pointer bg-transparent border-none p-0 text-inherit"
+          >
             服务条款
-          </a>
+          </button>
           和
-          <a href="#" className="underline underline-offset-4 mx-1 hover:text-primary">
+          <button
+            type="button"
+            onClick={() => handleOpenExternalUrl('https://www.miaoyan.cn/privacy.html')}
+            className="underline underline-offset-4 mx-1 hover:text-primary cursor-pointer bg-transparent border-none p-0 text-inherit"
+          >
             隐私政策
-          </a>
+          </button>
         </p>
         <Separator />
         <p className="text-xs text-center">

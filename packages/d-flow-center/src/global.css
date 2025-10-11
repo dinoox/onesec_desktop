@@ -158,3 +158,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Electron 窗口拖动区域 */
+.app-drag-region {
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 可交互元素不可拖动 */
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}

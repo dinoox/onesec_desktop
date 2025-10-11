@@ -9,6 +9,7 @@ import {
   IPC_HOT_KEY_SETTING_END_CHANNEL,
   IPC_PERMISSION_SET_CHANNEL,
   IPC_PERMISSION_GET_CHANNEL,
+  IPC_OPEN_EXTERNAL_URL_CHANNEL,
 } from '../../main/types/message.ts'
 import useStatusStore, { PermissionStatus, Status } from '@/store/status-store.ts'
 import SoundService from '@/services/sound-service.ts'
@@ -141,6 +142,11 @@ class IPCService {
       mode,
       hotkey_combination,
     )
+  }
+
+  // External URL
+  async openExternalUrl(url: string) {
+    return await window.ipcRenderer.invoke(IPC_OPEN_EXTERNAL_URL_CHANNEL, url)
   }
 
   /**

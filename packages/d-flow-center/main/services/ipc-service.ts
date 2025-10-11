@@ -10,6 +10,7 @@ import {
   IPC_USER_CONFIG_SET_CHANNEL,
   IPC_USER_LOGIN_CHANNEL,
   IPC_USER_LOGOUT_CHANNEL,
+  IPC_OPEN_EXTERNAL_URL_CHANNEL,
 } from '../types/message'
 import userConfigManager from './user-config-manager'
 import nativeProcessManager from './native-process-manager'
@@ -17,7 +18,7 @@ import windowManager, { WINDOW_STATUS_ID } from './window-manager'
 import permissionService from './permission-service'
 import { PermissionStatus } from '@/store/status-store.ts'
 import udsService from './uds-service.ts'
-import { ipcMain } from 'electron'
+import { ipcMain, shell } from 'electron'
 
 class IPCService {
   constructor() {}
@@ -34,6 +35,7 @@ class IPCService {
     ipcMain.handle(IPC_PERMISSION_SET_CHANNEL, this.handleSetPermission)
     ipcMain.handle(IPC_HOT_KEY_SETTING_START_CHANNEL, this.handleHotKeySettingStart)
     ipcMain.handle(IPC_HOT_KEY_SETTING_END_CHANNEL, this.handleHotKeySettingEnd)
+    ipcMain.handle(IPC_OPEN_EXTERNAL_URL_CHANNEL, this.handleOpenExternalUrl)
   }
 
   // User Config
@@ -95,6 +97,11 @@ class IPCService {
         hotkey_combination,
       },
     })
+  }
+
+  // External URL
+  private handleOpenExternalUrl = async (_: any, url: string) => {
+    return await shell.openExternal(url)
   }
 }
 

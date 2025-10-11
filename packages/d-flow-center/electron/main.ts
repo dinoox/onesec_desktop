@@ -36,6 +36,8 @@ function createWindow(onWebLoaded: Function = () => {}) {
     height: 730,
     minWidth: 1024,
     minHeight: 730,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 10, y: 10 }, // 设置红绿灯按钮位置（macOS）
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },

@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { login, logout } from '@/services/api/auth-api.ts'
+import { login, logout, sendVerificationCode } from '@/services/api/auth-api.ts'
 import authStore from '@/store/auth-store.ts'
 import { useNavigate } from 'react-router'
 import { UserService } from '@/services/user-service.ts'
@@ -23,6 +23,14 @@ export const useLoginQuery = () => {
     },
   })
 }
+
+export const useVerifyCodeQuery = () => {
+  return useMutation({
+    mutationFn: ({ phone, invitation_code }: { phone: string; invitation_code?: string }) =>
+      sendVerificationCode(phone, invitation_code),
+  })
+}
+
 
 export const useLogoutQuery = () =>
   useMutation({

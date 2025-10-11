@@ -29,6 +29,7 @@
     "chalk": "^5.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
     "electron-log": "^5.4.3",
     "electron-store": "^11.0.2",
     "framer-motion": "^12.23.22",
@@ -48,6 +49,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^24.7.0",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",

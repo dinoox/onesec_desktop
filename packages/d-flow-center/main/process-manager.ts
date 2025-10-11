@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import windowManager, { WINDOW_CONTENT_ID } from './services/window-manager.ts'
+import windowManager, {WINDOW_CONTENT_ID, WINDOW_STATUS_ID} from './services/window-manager.ts'
 import udsService from './services/uds-service.ts'
 import nativeProcessManager from './services/native-process-manager.ts'
 import { DEFAULT_IPC_CHANNEL, MessageTypes, buildIPCMessage } from './types/message.ts'
@@ -48,6 +48,7 @@ class ProcessManager {
             })
           }
           windowManager.getWindow(WINDOW_CONTENT_ID)?.show()
+          windowManager.getWindow(WINDOW_STATUS_ID)?.hide()
         }
       })
     })

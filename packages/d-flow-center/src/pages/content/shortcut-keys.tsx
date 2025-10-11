@@ -97,6 +97,9 @@ const ContestPage: React.FC = () => {
         </div>
         <div
           ref={normalInputRef}
+          onClick={async () => {
+            await startHotKeySetting('normal')
+          }}
           className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-all cursor-pointer"
           style={isEditingNormal ? { borderColor: 'var(--color-ripple-green)' } : {}}
           tabIndex={0}
@@ -123,9 +126,6 @@ const ContestPage: React.FC = () => {
           )}
           <span
             className="text-muted-foreground text-sm ml-auto"
-            onClick={async () => {
-              await startHotKeySetting('normal')
-            }}
           >
             点击修改
           </span>
@@ -144,6 +144,9 @@ const ContestPage: React.FC = () => {
           className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-all cursor-pointer"
           style={isEditingCommand ? { borderColor: 'var(--color-ripple-yellow)' } : {}}
           tabIndex={0}
+          onClick={async () => {
+            await startHotKeySetting('command')
+          }}
         >
           {isWaitingCommand ? (
             <span className="text-muted-foreground text-sm">等待按键...</span>
@@ -167,19 +170,16 @@ const ContestPage: React.FC = () => {
           )}
           <span
             className="text-muted-foreground text-sm ml-auto"
-            onClick={async () => {
-              await startHotKeySetting('command')
-            }}
           >
             点击修改
           </span>
         </div>
       </div>
 
-      <div>
-        <span>{hotkeySettingStatus}</span>
-        <span>{JSON.stringify(holdIPCMessage)}</span>
-      </div>
+      {/*<div>*/}
+      {/*  <span>{hotkeySettingStatus}</span>*/}
+      {/*  <span>{JSON.stringify(holdIPCMessage)}</span>*/}
+      {/*</div>*/}
     </div>
   )
 }

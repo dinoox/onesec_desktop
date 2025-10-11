@@ -45,15 +45,6 @@ const ContestPage: React.FC = () => {
           <span className="text-base font-medium">如何使用</span>
           <span
             className="text-sm text-muted-foreground"
-            onClick={() =>
-              toast('Event has been created', {
-                description: 'Sunday, December 03, 2023 at 9:00 AM',
-                action: {
-                  label: 'Undo',
-                  onClick: () => console.log('Undo'),
-                },
-              })
-            }
           >
             按住快捷键说话，松开后内容自动输入到当前光标位置
           </span>
