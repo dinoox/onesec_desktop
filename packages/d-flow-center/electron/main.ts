@@ -7,6 +7,7 @@ import windowManager, {
 } from '../main/services/window-manager.ts'
 import processManager from '../main/communications/process-manager.ts'
 import log from 'electron-log'
+import nativeProcessManager from '../main/services/native-process-manager.ts'
 
 // 禁用HTTPS证书验证（仅用于开发环境或自签名证书）
 app.commandLine.appendSwitch('--ignore-certificate-errors')
@@ -31,15 +32,15 @@ let win, statusWin: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1024,
+    height: 730,
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
   })
 
-  win.webContents.on('did-finish-load', async () => {
+  win.webContents.once('did-finish-load', async () => {
     windowManager.register(win!, WINDOW_CONTENT_ID)
   })
 
@@ -86,10 +87,10 @@ function createStatusWindow() {
       backgroundThrottling: false,
     },
   })
-
-  statusWin.webContents.on('did-finish-load', async () =>
-    windowManager.register(statusWin!, WINDOW_STATUS_ID),
-  )
+  statusWin.webContents.once('did-finish-load', async () => {
+    windowManager.register(statusWin!, WINDOW_STATUS_ID)
+    await nativeProcessManager.start()
+  })
 
   if (VITE_DEV_SERVER_URL) {
     statusWin.loadURL(`${VITE_DEV_SERVER_URL}status.html`).then()

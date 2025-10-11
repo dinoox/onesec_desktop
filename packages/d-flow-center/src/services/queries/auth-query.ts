@@ -3,7 +3,7 @@ import { login, logout } from '@/services/api/auth-api.ts'
 import authStore from '@/store/auth-store.ts'
 import { useNavigate } from 'react-router'
 import { UserService } from '@/services/user-service.ts'
-import IpcService from '@/services/ipc-service.ts'
+import { toast } from 'sonner'
 
 export const useLoginQuery = () => {
   const navigate = useNavigate()
@@ -19,7 +19,6 @@ export const useLoginQuery = () => {
         auth_token: resp.data.access_token,
       })
       await UserService.claimLogin()
-      navigate('/content')
     },
   })
 }

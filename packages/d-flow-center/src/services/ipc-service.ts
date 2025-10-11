@@ -7,8 +7,10 @@ import {
   IPCMessage,
   MessageType,
   IPC_HOT_KEY_SETTING_END_CHANNEL,
+  IPC_PERMISSION_SET_CHANNEL,
+  IPC_PERMISSION_GET_CHANNEL,
 } from '../../main/types/message.ts'
-import useStatusStore, { Status } from '@/store/status-store.ts'
+import useStatusStore, { PermissionStatus, Status } from '@/store/status-store.ts'
 import SoundService from '@/services/sound-service.ts'
 
 class IPCService {
@@ -18,6 +20,7 @@ class IPCService {
     if (!window.ipcRenderer) {
       throw new Error('IPC service requires an IPC server')
     }
+
     window.ipcRenderer.on(DEFAULT_IPC_CHANNEL, (_event, data) => this.handleIPCMessage(data))
     console.log(`[IPCService] Initialized`)
   }
@@ -25,16 +28,33 @@ class IPCService {
   async handleIPCMessage(message: IPCMessage) {
     console.log(`[IPCService] ${JSON.stringify(message)}`)
 
-    const { setMode, setStatus, setHotkeySettingStatus, setAudioLevel, setIPCMessage } =
-      useStatusStore.getState().actions
-
-    const action = message.action as MessageType
+    const {
+      setMode,
+      setStatus,
+      setPermissionStatus,
+      setHotkeySettingStatus,
+      setAudioLevel,
+      setIPCMessage,
+    } = useStatusStore.getState().actions
 
     setIPCMessage(message)
+
+    const action = message.action as MessageType
 
     if (action === 'volume_data') {
       if (message.data?.data?.volume !== undefined) {
         setAudioLevel(SoundService.normalizeVolumeValue(message.data.data.volume))
+      }
+      return
+    }
+
+    if (action === 'permission_status') {
+      const pmStatus = message.data?.data as PermissionStatus
+      setPermissionStatus(pmStatus)
+      if (!pmStatus.accessibility || !pmStatus.microphone) {
+        await this.resizeStatusWindow(320, 130)
+      } else if (pmStatus.accessibility && pmStatus.microphone) {
+        await this.resizeStatusWindow(90, 30)
       }
       return
     }
@@ -54,13 +74,13 @@ class IPCService {
     }
 
     if (action === 'recording_timeout') {
-      await this.resizeStatusWindow(320, 130)
-      setStatus('notification')
-      await SoundService.playNotification()
-      await delay(4000)
-      setStatus('idle')
-      await delay(2000)
-      await this.resizeStatusWindow(90, 30)
+      await this.showStatusWindowNotification(async () => {
+        setStatus('notification')
+        await SoundService.playNotification()
+        await delay(4000)
+        setStatus('idle')
+      })
+
       return
     }
 
@@ -89,6 +109,15 @@ class IPCService {
     return await window.ipcRenderer.invoke(IPC_HIDE_STATUS_WINDOW_CHANNEL)
   }
 
+  // Permission
+  async getPermissionStatus(): Promise<PermissionStatus> {
+    return await window.ipcRenderer.invoke(IPC_PERMISSION_GET_CHANNEL)
+  }
+
+  async askForPermissionSetting(ps: PermissionStatus) {
+    return await window.ipcRenderer.invoke(IPC_PERMISSION_SET_CHANNEL, ps)
+  }
+
   // Hotkey Channel
   async startHotkeySetting(mode: 'normal' | 'command') {
     return await window.ipcRenderer.invoke(IPC_HOT_KEY_SETTING_START_CHANNEL, mode)
@@ -100,6 +129,31 @@ class IPCService {
       mode,
       hotkey_combination,
     )
+  }
+
+  /**
+   * 向所有窗口广播消息
+   * @param handleFn - 处理函数
+   * @param completeFn - 后置处理函数
+   * @param autoClose - 是否默认关闭
+   * @param closeDelay - 消息通道
+   * @returns 成功发送的窗口数量
+   */
+  async showStatusWindowNotification(
+    handleFn: Function,
+    completeFn: Function = () => {},
+    autoClose: boolean = true,
+    closeDelay: number = 0,
+  ) {
+    await this.resizeStatusWindow(320, 130)
+
+    await handleFn()
+
+    if (autoClose) {
+      await delay(closeDelay)
+      await this.resizeStatusWindow(90, 30)
+    }
+    await completeFn()
   }
 }
 

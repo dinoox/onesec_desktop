@@ -29,17 +29,19 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Search } from 'lucide-react'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { Search, Info, PopcornIcon, X } from 'lucide-react'
+import ipcService from '@/services/ipc-service.ts'
 
 const shortKeys = [
   {
-    key: 'shadcn',
+    key: '点动星河',
   },
   {
-    key: 'maxleiter',
+    key: '阿里巴巴',
   },
   {
-    key: 'evilrabbit',
+    key: '字节跳动',
   },
 ]
 
@@ -49,7 +51,7 @@ const ContestPage: React.FC = () => {
 
   return (
     <>
-      <div className="flex w-full flex-col mb-4 gap-6">
+      <div className="flex w-full flex-col gap-6">
         <div className="flex items-center justify-between gap-4 w-full">
           <InputGroup className="max-w-md">
             <InputGroupInput
@@ -87,6 +89,16 @@ const ContestPage: React.FC = () => {
           </Dialog>
         </div>
       </div>
+      <Alert className="max-w-md my-4">
+        <PopcornIcon />
+        <AlertTitle>让秒言更懂你</AlertTitle>
+        <AlertDescription>
+          添加常用的人名、地名或术语，系统会优先识别，避免识别错误或遗漏。
+        </AlertDescription>
+        <button className="absolute top-3 right-3" onClick={() => {}}>
+          <X className="h-4 w-4" />
+        </button>
+      </Alert>
       <div className="flex w-full max-w-md flex-col gap-6">
         <ItemGroup className="border border-border rounded-md">
           {shortKeys.map((item, index) => (

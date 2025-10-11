@@ -9,15 +9,22 @@ export type HotkeySettingStatus =
   | 'hotkey_setting_update'
   | 'hotkey_setting_result'
 
+export type PermissionStatus = {
+  microphone: boolean
+  accessibility: boolean
+}
+
 interface StatusStore {
   mode: Mode
   status: Status
   hotKeySettingStatus: HotkeySettingStatus
+  permissionStatus: PermissionStatus
   holdIPCMessage: IPCMessage
   audioLevel: number
   actions: {
     setMode: (mode: Mode) => void
     setStatus: (status: Status) => void
+    setPermissionStatus: (status: PermissionStatus) => void
     setHotkeySettingStatus: (status: HotkeySettingStatus) => void
     setAudioLevel: (level: number) => void
     setIPCMessage: (message: IPCMessage) => void
@@ -28,6 +35,7 @@ interface StatusStore {
 const useStatusStore = create<StatusStore>((set) => ({
   mode: 'normal',
   status: 'idle',
+  permissionStatus: { microphone: false, accessibility: false },
   hotKeySettingStatus: 'idle',
   holdIPCMessage: {
     id: 'id',
@@ -37,6 +45,7 @@ const useStatusStore = create<StatusStore>((set) => ({
   actions: {
     setMode: (mode) => set({ mode }),
     setStatus: (status) => set({ status }),
+    setPermissionStatus: (permissionStatus) => set({ permissionStatus }),
     setHotkeySettingStatus: (hotKeySettingStatus) => set({ hotKeySettingStatus }),
     setAudioLevel: (audioLevel) => set({ audioLevel }),
     setIPCMessage: (message) => set({ holdIPCMessage: message }),

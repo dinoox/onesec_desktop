@@ -16,10 +16,15 @@ import {
   IPC_HOT_KEY_SETTING_END_CHANNEL,
   IPC_USER_LOGIN_CHANNEL,
   IPC_USER_LOGOUT_CHANNEL,
+  IPC_PERMISSION_SET_CHANNEL,
+  IPC_PERMISSION_GET_CHANNEL,
 } from '../types/message.ts'
 import userConfigManager from '../services/user-config-manager.ts'
 import { ipcMain } from 'electron'
 import permissionService from '../services/permission-service.ts'
+import { PermissionStatus } from '@/store/status-store.ts'
+import { config } from 'zod'
+import chalk from 'chalk'
 
 /**
  * 全局进程管理类
@@ -30,13 +35,16 @@ class ProcessManager {
   constructor() {}
 
   async initialize() {
+    log.info(chalk.green('✓', `ProcessManager initialize`))
     try {
       await udsService.start()
-      await nativeProcessManager.start()
       await this.setupUDSForward()
       await this.setupIPCMainHandlers()
       // TODO: 暂时用 PERMISSION_STATUS 事件监测 Native Process 已启动
-      udsService.on(MessageTypes.PERMISSION_STATUS, () => this.syncUserConfigToNativeProcess())
+      udsService.on(MessageTypes.PERMISSION_STATUS, (_: any, udsMessage: any) => {
+        this.syncUserConfigToNativeProcess()
+        permissionService.initialize(udsMessage.data)
+      })
     } catch (err) {
       log.error(err)
     }
@@ -44,21 +52,20 @@ class ProcessManager {
 
   async setupUDSForward() {
     Object.values(MessageTypes).forEach((messageType) => {
-      udsService.on(messageType, (_data: any, originalMessage: any) => {
+      udsService.on(messageType, (_data: any, udsMessage: any) => {
         const eventMessage: IPCMessage = {
           id: `event_${Date.now()}`,
           type: 'event',
           source: 'main',
           action: messageType,
-          data: originalMessage,
+          data: udsMessage,
           timestamp: Date.now(),
         }
-
         windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage)
 
-        if (messageType === 'screen_change') {
-          windowManager.moveStatusWindowToNewScreen()
-        }
+        // if (messageType === 'screen_change') {
+        //   windowManager.moveStatusWindowToNewScreen()
+        // }
       })
     })
   }
@@ -108,6 +115,14 @@ class ProcessManager {
 
     ipcMain.handle(IPC_HIDE_STATUS_WINDOW_CHANNEL, () => {
       windowManager.hideWindow(WINDOW_STATUS_ID)
+    })
+
+    // Permission
+    ipcMain.handle(IPC_PERMISSION_GET_CHANNEL, async () => {
+      return await permissionService.checkAllPermissions()
+    })
+    ipcMain.handle(IPC_PERMISSION_SET_CHANNEL, (_, ps: PermissionStatus) => {
+      permissionService.openSettingsForPermission(ps)
     })
 
     //

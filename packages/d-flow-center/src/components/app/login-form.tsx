@@ -76,7 +76,7 @@ export function LoginForm({}: { className?: string }) {
                     <FormControl>
                       <div className="flex w-full justify-between gap-2">
                         <Input type="password" placeholder="请输入验证码" {...field} />
-                        <Button type="submit" variant="outline">
+                        <Button type="button" variant="outline">
                           获取验证码
                         </Button>
                       </div>

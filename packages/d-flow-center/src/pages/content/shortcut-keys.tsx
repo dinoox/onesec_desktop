@@ -2,14 +2,17 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Kbd, KbdGroup } from '@/components/ui/kbd.tsx'
 import ipcService from '@/services/ipc-service.ts'
 import useStatusStore from '@/store/status-store.ts'
+import useUserConfigStore from '@/store/user-config-store.ts'
 import { useClickOutside } from '@/hooks/use-click-outside.ts'
 import { AnimatePresence, motion } from 'framer-motion'
-import { UserService } from '@/services/user-service.ts'
 import { HotkeyMode } from '../../../main/types/message.ts'
 
 const ContestPage: React.FC = () => {
-  const [shortcutKeys, setShortcutKeys] = useState<string[]>([])
-  const [shortcutCommandKeys, setShortcutCommandKeys] = useState<string[]>([])
+  const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
+  const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
+  const { setShortcutKeys, setShortcutCommandKeys, loadUserConfig, updateHotkeyConfig } =
+    useUserConfigStore((state) => state.actions)
+
   const [editingMode, setEditingMode] = useState<'normal' | 'command' | null>(null)
 
   const normalInputRef = useRef<HTMLDivElement>(null)
@@ -20,18 +23,7 @@ const ContestPage: React.FC = () => {
   const { setHotkeySettingStatus } = useStatusStore.getState().actions
 
   useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const config = await UserService.getConfig()
-        const normalConfig = config.hotkey_configs?.find((item) => item.mode === 'normal')
-        const commandConfig = config.hotkey_configs?.find((item) => item.mode === 'command')
-        setShortcutKeys(normalConfig?.hotkey_combination || [])
-        setShortcutCommandKeys(commandConfig?.hotkey_combination || [])
-      } catch (error) {
-        console.error('Failed to load hotkey config:', error)
-      }
-    }
-    loadConfig().then()
+    loadUserConfig().then()
   }, [])
 
   useEffect(() => {
@@ -51,7 +43,7 @@ const ContestPage: React.FC = () => {
 
       if (action === 'hotkey_setting_result') {
         setEditingMode(null)
-        UserService.setHotKeyConfig(mode, hotkey_combination).then()
+        updateHotkeyConfig(mode, hotkey_combination).then()
       }
     }
   }, [holdIPCMessage])

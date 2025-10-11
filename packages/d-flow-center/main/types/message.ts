@@ -60,7 +60,7 @@ export interface IPCMessage {
   type: 'request' | 'response' | 'event' | 'ready'
   source?: 'worker' | 'main'
   action?: string
-  data?: any
+  data?: Message
   error?: string | null
   timestamp?: number
 }
@@ -81,6 +81,9 @@ const IPC_USER_CONFIG_SET_CHANNEL = 'user_config_set_channel'
 const IPC_RESIZE_STATUS_WINDOW_CHANNEL = 'resize_status_window_channel'
 const IPC_SHOW_STATUS_WINDOW_CHANNEL = 'show_status_window_channel'
 const IPC_HIDE_STATUS_WINDOW_CHANNEL = 'hide_status_window_channel'
+//Permission
+const IPC_PERMISSION_GET_CHANNEL = 'permission_get_channel'
+const IPC_PERMISSION_SET_CHANNEL = 'permission_set_channel'
 //
 const IPC_HOT_KEY_SETTING_START_CHANNEL = 'hot_key_setting_start_channel'
 const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
@@ -96,4 +99,6 @@ export {
   IPC_HIDE_STATUS_WINDOW_CHANNEL,
   IPC_HOT_KEY_SETTING_START_CHANNEL,
   IPC_HOT_KEY_SETTING_END_CHANNEL,
+  IPC_PERMISSION_SET_CHANNEL,
+  IPC_PERMISSION_GET_CHANNEL,
 }
