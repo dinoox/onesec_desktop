@@ -143,7 +143,7 @@ class WindowManager {
       y,
       width: toWidth,
       height: toHeight,
-    })
+    }, true)
   }
 
   async moveStatusWindowToNewScreen() {
@@ -162,7 +162,7 @@ class WindowManager {
       y,
       width: winBounds.width,
       height: winBounds.height,
-    })
+    }, true)
   }
 }
 

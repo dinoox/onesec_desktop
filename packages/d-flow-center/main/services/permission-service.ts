@@ -13,18 +13,22 @@ class PermissionService {
   private ps: PermissionStatus | null = null
   private timeout: NodeJS.Timeout | null = null
 
-  async initialize(ps: PermissionStatus) {
-    log.info(chalk.green('✓', `PermissionService initialize ${JSON.stringify(ps)}`))
+  async initialize() {
+    this.ps = await this.checkAllPermissions()
 
-    this.ps = ps
+
     if (this.timeout) clearInterval(this.timeout)
     this.timeout = setInterval(async () => {
+      if (!this.ps) return
       const newPS = await this.checkAllPermissions()
-      if (newPS.microphone === ps.microphone && newPS.accessibility === ps.accessibility) {
+
+      if (newPS.microphone === this.ps.microphone && newPS.accessibility === this.ps.accessibility) {
         return
       }
 
-      if (newPS.microphone && ps.microphone) {
+      log.info(chalk.blue(`ps compare: `,`${JSON.stringify(newPS)}`,`${JSON.stringify(this.ps)}`))
+
+      if (newPS.microphone && this.ps.microphone) {
         await nativeProcessManager.restart()
         log.info(chalk.green('✓', 'PermissionService restart native process'))
       } else {
@@ -41,14 +45,18 @@ class PermissionService {
         action: MessageTypes.PERMISSION_STATUS,
         data: {
           type: MessageTypes.PERMISSION_STATUS,
-          data: ps,
+          data: newPS,
           timestamp,
         },
       }
 
       windowManager.broadcast(DEFAULT_IPC_CHANNEL, eventMessage)
+      log.info(chalk.green(`PermissionService ps compare: `,`${JSON.stringify(newPS)}`,`${JSON.stringify(this.ps)}`))
+      log.info(chalk.green(`PermissionService send ipc: ${JSON.stringify(eventMessage)}`))
       this.ps = newPS
     }, 3000)
+
+
   }
 
   /**

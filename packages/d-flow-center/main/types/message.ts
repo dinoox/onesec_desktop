@@ -12,6 +12,7 @@ export const MessageTypes = {
   HOTKEY_SETTING_END: 'hotkey_setting_end',
   INIT_CONFIG: 'init_config',
   SCREEN_CHANGE: 'screen_change',
+  CONNECTION_SUCCESS: 'connection_success',
   PERMISSION_STATUS: 'permission_status',
   AUTH_TOKEN_FAILED: 'auth_token_failed',
   RECORDING_TIMEOUT: 'recording_timeout',

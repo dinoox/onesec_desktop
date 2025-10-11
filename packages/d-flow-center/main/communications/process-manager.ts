@@ -40,10 +40,9 @@ class ProcessManager {
       await udsService.start()
       await this.setupUDSForward()
       await this.setupIPCMainHandlers()
-      // TODO: 暂时用 PERMISSION_STATUS 事件监测 Native Process 已启动
-      udsService.on(MessageTypes.PERMISSION_STATUS, (_: any, udsMessage: any) => {
+      udsService.on(MessageTypes.CONNECTION_SUCCESS, () => {
         this.syncUserConfigToNativeProcess()
-        permissionService.initialize(udsMessage.data)
+        permissionService.initialize()
       })
     } catch (err) {
       log.error(err)

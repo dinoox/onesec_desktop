@@ -29,6 +29,11 @@ export default defineConfig({
           : {},
     }),
   ],
+  server: {
+    watch: {
+      ignored: ['**/assets/**'],
+    },
+  },
   build: {
     rollupOptions: {
       input: {

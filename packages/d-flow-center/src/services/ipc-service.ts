@@ -35,6 +35,7 @@ class IPCService {
       setHotkeySettingStatus,
       setAudioLevel,
       setIPCMessage,
+      setAuthTokenInvalid
     } = useStatusStore.getState().actions
 
     setIPCMessage(message)
@@ -56,6 +57,11 @@ class IPCService {
       } else if (pmStatus.accessibility && pmStatus.microphone) {
         await this.resizeStatusWindow(90, 30)
       }
+      return
+    }
+
+    if (action === 'auth_token_failed') {
+      setAuthTokenInvalid(true)
       return
     }
 

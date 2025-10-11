@@ -21,6 +21,8 @@ interface StatusStore {
   permissionStatus: PermissionStatus
   holdIPCMessage: IPCMessage
   audioLevel: number
+  //
+  authTokenInvalid: boolean
   actions: {
     setMode: (mode: Mode) => void
     setStatus: (status: Status) => void
@@ -28,6 +30,7 @@ interface StatusStore {
     setHotkeySettingStatus: (status: HotkeySettingStatus) => void
     setAudioLevel: (level: number) => void
     setIPCMessage: (message: IPCMessage) => void
+    setAuthTokenInvalid: (value: boolean) => void
     reset: () => void
   }
 }
@@ -42,6 +45,7 @@ const useStatusStore = create<StatusStore>((set) => ({
     type: 'event',
   },
   audioLevel: 0,
+  authTokenInvalid: false,
   actions: {
     setMode: (mode) => set({ mode }),
     setStatus: (status) => set({ status }),
@@ -49,6 +53,7 @@ const useStatusStore = create<StatusStore>((set) => ({
     setHotkeySettingStatus: (hotKeySettingStatus) => set({ hotKeySettingStatus }),
     setAudioLevel: (audioLevel) => set({ audioLevel }),
     setIPCMessage: (message) => set({ holdIPCMessage: message }),
+    setAuthTokenInvalid: (authTokenInvalid) => set({ authTokenInvalid}),
     reset: () => set({ mode: 'normal', status: 'idle', audioLevel: 0 }),
   },
 }))

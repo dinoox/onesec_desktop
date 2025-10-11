@@ -3,12 +3,14 @@ import log from 'electron-log'
 import { spawn, ChildProcess } from 'child_process'
 import path from 'path'
 import fs from 'fs'
+import chalk from "chalk";
 
 class NativeProcessManager {
   constructor() {}
   private nativeProcess: ChildProcess | null = null
 
   async start() {
+    log.info(chalk.green('Starting native process'))
     if (this.nativeProcess) {
       return
     }
@@ -16,7 +18,7 @@ class NativeProcessManager {
     try {
       const appPath = this.getNativeAppPath()
       if (!fs.existsSync(appPath)) {
-        const err = `MiaoyanSwift 文件不存在: ${appPath}`
+        const err = `NativeProcess 文件不存在: ${appPath}`
         log.error(err)
         throw new Error(err)
       }
@@ -45,12 +47,12 @@ class NativeProcessManager {
       const childProcess = this.nativeProcess
 
       childProcess.on('error', (error: Error) => {
-        console.error('[MiaoyanSwiftManager] Process error:', error)
+        log.error('[NativeProcessManager] Process error:', error)
         this.nativeProcess = null
       })
 
       childProcess.on('exit', (code: number | null, signal: string | null) => {
-        console.log(`[MiaoyanSwiftManager] Process exited with code: ${code}, signal: ${signal}`)
+        log.info(`[NativeProcessManager] Process exited with code: ${code}, signal: ${signal}`)
         this.nativeProcess = null
       })
 
@@ -58,7 +60,7 @@ class NativeProcessManager {
         childProcess.stdout.on('data', (data: Buffer) => {
           const output = data.toString().trim()
           if (output) {
-            log.info(`[MiaoyanSwift] ${output}`)
+            log.info(`[NativeProcess] ${output}`)
           }
         })
       }
@@ -67,17 +69,18 @@ class NativeProcessManager {
         childProcess.stderr.on('data', (data: Buffer) => {
           const output = data.toString().trim()
           if (output) {
-            console.error(`[MiaoyanSwift] ${output}`)
+            log.error(`[NativeProcess] ${output}`)
           }
         })
       }
 
-      log.log('[MiaoyanSwiftManager] Started successfully', {
+      process.on('exit', () => childProcess.kill())
+      log.log('[NativeProcess] Started successfully', {
         pid: childProcess.pid,
         path: appPath,
       })
     } catch (err) {
-      log.error('[MiaoyanSwiftManager] Failed to start:', err)
+      log.error('[NativeProcess] Failed to start:', err)
       throw err
     }
   }
@@ -118,9 +121,6 @@ class NativeProcessManager {
     await this.start()
   }
 
-  /**
-   * 检查 MiaoyanSwift 是否正在运行
-   */
   public isRunning(): boolean {
     return this.nativeProcess !== null && !this.nativeProcess.killed
   }

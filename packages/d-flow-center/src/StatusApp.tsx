@@ -25,6 +25,8 @@ function StatusApp() {
 
   useEffect(() => {}, [pmStatus])
 
+  console.log(`pmStatus: `, pmStatus)
+
   const testFn = () => {
     ipcService
       .showStatusWindowNotification(
