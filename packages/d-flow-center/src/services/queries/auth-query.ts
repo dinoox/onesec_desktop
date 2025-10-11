@@ -26,11 +26,15 @@ export const useLoginQuery = () => {
 
 export const useVerifyCodeQuery = () => {
   return useMutation({
-    mutationFn: ({ phone, invitation_code }: { phone: string; invitation_code?: string }) =>
-      sendVerificationCode(phone, invitation_code),
+    mutationFn: ({
+      phone,
+      invitation_code,
+    }: {
+      phone: string
+      invitation_code?: string
+    }) => sendVerificationCode(phone, invitation_code),
   })
 }
-
 
 export const useLogoutQuery = () =>
   useMutation({

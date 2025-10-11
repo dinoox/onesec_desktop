@@ -54,12 +54,19 @@ class IPCService {
 
     if (action === 'permission_status') {
       const pmStatus = message.data?.data as PermissionStatus
-      setPermissionStatus(pmStatus)
+      const preStatus = useStatusStore.getState().permissionStatus
+      if (
+        pmStatus.accessibility === preStatus.accessibility &&
+        pmStatus.microphone === preStatus.microphone
+      ) {
+        return
+      }
       if (!pmStatus.accessibility || !pmStatus.microphone) {
         await this.resizeStatusWindow(320, 130)
       } else if (pmStatus.accessibility && pmStatus.microphone) {
-        await this.resizeStatusWindow(90, 30)
+        await this.resizeStatusWindow(90, 40)
       }
+      setPermissionStatus(pmStatus)
       return
     }
 
@@ -169,7 +176,7 @@ class IPCService {
 
     if (autoClose) {
       await delay(closeDelay)
-      await this.resizeStatusWindow(90, 30)
+      await this.resizeStatusWindow(90, 40)
     }
     await completeFn()
   }

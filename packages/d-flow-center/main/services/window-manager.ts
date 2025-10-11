@@ -1,5 +1,6 @@
 import log from 'electron-log'
 import { BrowserWindow, screen } from 'electron'
+import chalk from 'chalk'
 
 const WINDOW_STATUS_ID = 'status'
 const WINDOW_CONTENT_ID = 'content'
@@ -157,6 +158,7 @@ class WindowManager {
       },
       true,
     )
+    log.info(chalk(`resize status window ${toWidth} ${toHeight}`))
   }
 
   async moveStatusWindowToNewScreen() {

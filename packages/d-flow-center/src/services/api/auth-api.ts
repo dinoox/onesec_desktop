@@ -1,6 +1,6 @@
 import request from '@/lib/request'
 import type { AccessToken, LoginResp } from '@/types/user'
-import {generateSignature} from "@/services/sign-service.ts";
+import { generateSignature } from '@/services/sign-service.ts'
 
 export const login = (params: any) => {
   return request.post<LoginResp>('/auth/login', {
@@ -10,15 +10,15 @@ export const login = (params: any) => {
 
 export const sendVerificationCode = async (phone: string, invitation_code?: string) => {
   const params = invitation_code ? { phone, invitation_code } : { phone }
-  const signature =  await generateSignature(params)
+  const signature = await generateSignature(params)
 
   return request.post<{
-    success: boolean;
-    message: string;
+    success: boolean
+    message: string
   }>('/auth/send-code', {
     params: {
       ...params,
-      ...signature
+      ...signature,
     },
   })
 }

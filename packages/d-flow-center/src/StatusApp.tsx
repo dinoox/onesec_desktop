@@ -29,23 +29,6 @@ function StatusApp() {
 
   const innerSize = 20 + audioLevel * 50
 
-  useEffect(() => {}, [pmStatus])
-
-  console.log(`pmStatus: `, pmStatus)
-
-  const testFn = () => {
-    ipcService
-      .showStatusWindowNotification(
-        () => {
-          console.log(1)
-        },
-        async () => {},
-        false,
-        30000,
-      )
-      .then()
-  }
-
   return (
     <ThemeProvider defaultTheme="system" storageKey="app-ui-theme">
       <div className="h-screen flex flex-col items-center justify-between relative">
@@ -62,7 +45,7 @@ function StatusApp() {
               <Alert
                 className="dark hover:bg-[#000000] transition-colors duration-200"
                 onClick={() => {
-                  ipcService.askForPermissionSetting(pmStatus)
+                  ipcService.askForPermissionSetting(pmStatus).then()
                 }}
               >
                 <PopcornIcon />
@@ -83,7 +66,7 @@ function StatusApp() {
                   className="absolute top-3 right-3"
                   onClick={(e) => {
                     e.stopPropagation()
-                    ipcService.resizeStatusWindow(90, 30)
+                    ipcService.resizeStatusWindow(90, 30).then()
                   }}
                 >
                   <X className="h-4 w-4" />
@@ -92,12 +75,11 @@ function StatusApp() {
             )}
           </div>
           <div
-            className={`status relative shrink-0 transition-all duration-300 ${status === 'idle' ? 'w-5 h-5' : 'w-7 h-7'}`}
+            className={`mb-1 status relative shrink-0 transition-all duration-300 ${status === 'idle' ? 'w-5 h-5' : 'w-7 h-7'} ${status !== 'idle' ? '-translate-y-[4px]' : ''}`}
           >
             {/* 外圈 */}
             <div
-              // onClick={testFn}
-              className={`absolute inset-0 rounded-full ${status === 'idle' ? 'bg-transparent' : 'bg-black'} border ${status === 'speaking' ? 'border-[#888888B2]' : 'border-[#FFFFFF4C]'} transition-all duration-100`}
+              className={`absolute inset-0 rounded-full ${status === 'idle' ? 'bg-transparent' : 'bg-black'} border ${status === 'speaking' ? 'border-[#888888B2]' : 'border-[#888888b3]'} transition-all duration-100`}
             ></div>
             {/* 内圈 */}
             {status === 'processing' ? (
@@ -106,7 +88,7 @@ function StatusApp() {
               />
             ) : (
               <div
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${status === 'idle' ? 'bg-[#ccc]' : mode === 'normal' ? 'bg-ripple-green' : 'bg-ripple-yellow'} transition-all duration-100`}
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${status === 'idle' ? 'bg-[#888888b3]' : mode === 'normal' ? 'bg-ripple-green' : 'bg-ripple-yellow'} transition-all duration-100`}
                 style={{
                   width: `${innerSize}%`,
                   height: `${innerSize}%`,

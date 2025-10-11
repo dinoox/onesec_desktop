@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {useLoginQuery, useVerifyCodeQuery} from '@/services/queries/auth-query.ts'
+import { useLoginQuery, useVerifyCodeQuery } from '@/services/queries/auth-query.ts'
 import {
   Card,
   CardContent,
@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/form'
 import React, { useState } from 'react'
 import { Spinner } from '@/components/ui/spinner.tsx'
-import {data} from "react-router"
+import { data } from 'react-router'
 import IPCService from '@/services/ipc-service.ts'
 
 export function LoginForm({}: { className?: string }) {
@@ -36,7 +36,7 @@ export function LoginForm({}: { className?: string }) {
     defaultValues: {
       phone: '',
       verification_code: '',
-      invite_code: '',
+      invitation_code: '',
     },
   })
 
@@ -54,9 +54,9 @@ export function LoginForm({}: { className?: string }) {
     }
 
     if (isRegisterMode) {
-      const invitation_code = form.getValues('invite_code')
+      const invitation_code = form.getValues('invitation_code')
       if (!invitation_code) {
-        form.setError('invite_code', { message: '请先输入内测码' })
+        form.setError('invitation_code', { message: '请先输入内测码' })
         return
       }
       await codeMutation.mutateAsync({ phone, invitation_code })
@@ -72,7 +72,6 @@ export function LoginForm({}: { className?: string }) {
       console.error('Failed to open external URL:', error)
     }
   }
-
 
   return (
     <Card className="w-[350px]">
@@ -101,7 +100,7 @@ export function LoginForm({}: { className?: string }) {
               {isRegisterMode && (
                 <FormField
                   control={form.control}
-                  name="invite_code"
+                  name="invitation_code"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="gap-0.5">内测码</FormLabel>

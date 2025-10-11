@@ -124,11 +124,7 @@ const ContestPage: React.FC = () => {
               </AnimatePresence>
             </KbdGroup>
           )}
-          <span
-            className="text-muted-foreground text-sm ml-auto"
-          >
-            点击修改
-          </span>
+          <span className="text-muted-foreground text-sm ml-auto">点击修改</span>
         </div>
       </div>
 
@@ -168,11 +164,7 @@ const ContestPage: React.FC = () => {
               </AnimatePresence>
             </KbdGroup>
           )}
-          <span
-            className="text-muted-foreground text-sm ml-auto"
-          >
-            点击修改
-          </span>
+          <span className="text-muted-foreground text-sm ml-auto">点击修改</span>
         </div>
       </div>
 

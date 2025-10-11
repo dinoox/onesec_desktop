@@ -62,7 +62,7 @@ function createStatusWindow() {
   const { workArea } = primaryDisplay
 
   const winWidth = 90
-  const winHeight = 30
+  const winHeight = 40
   const x = workArea.x + (screenWidth - winWidth) / 2
   const y = workArea.y + workArea.height - winHeight
 
