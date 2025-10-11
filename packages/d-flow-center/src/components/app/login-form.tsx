@@ -67,6 +67,21 @@ export function LoginForm({}: { className?: string }) {
                   </FormItem>
                 )}
               />
+              {isRegisterMode && (
+                <FormField
+                  control={form.control}
+                  name="invite_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="gap-0.5">内测码</FormLabel>
+                      <FormControl>
+                        <Input placeholder="请输入内测码" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <FormField
                 control={form.control}
                 name="verification_code"
@@ -85,21 +100,6 @@ export function LoginForm({}: { className?: string }) {
                   </FormItem>
                 )}
               />
-              {isRegisterMode && (
-                <FormField
-                  control={form.control}
-                  name="invite_code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="gap-0.5">内测码</FormLabel>
-                      <FormControl>
-                        <Input placeholder="请输入内测码" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
               <Button type="submit" className="w-full" disabled={mutation.isPending}>
                 {mutation.isPending ? <Spinner /> : null}
                 {mutation.isPending
