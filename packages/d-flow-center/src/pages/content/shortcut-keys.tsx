@@ -113,7 +113,7 @@ const ContestPage: React.FC = () => {
           onClick={async () => {
             await startHotKeySetting('normal')
           }}
-          className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-all cursor-pointer"
+          className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
           style={isEditingNormal ? { borderColor: 'var(--color-ripple-green)' } : {}}
           tabIndex={0}
         >
@@ -150,7 +150,7 @@ const ContestPage: React.FC = () => {
         </div>
         <div
           ref={commandInputRef}
-          className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-all cursor-pointer"
+          className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
           style={isEditingCommand ? { borderColor: 'var(--color-ripple-yellow)' } : {}}
           tabIndex={0}
           onClick={async () => {
