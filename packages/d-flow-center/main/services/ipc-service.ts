@@ -19,6 +19,7 @@ import permissionService from './permission-service'
 import { PermissionStatus } from '@/store/status-store.ts'
 import udsService from './uds-service.ts'
 import { ipcMain, shell } from 'electron'
+import {USER_DEFAULT_CONFIG} from "../types/config.ts";
 
 class IPCService {
   constructor() {}
@@ -54,6 +55,7 @@ class IPCService {
 
   private handleUserLogout = async () => {
     await nativeProcessManager.stop()
+    userConfigManager.setConfig(USER_DEFAULT_CONFIG)
     windowManager.hideWindow(WINDOW_STATUS_ID)
   }
 
