@@ -23,13 +23,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Spinner } from '@/components/ui/spinner.tsx'
 import { data } from 'react-router'
 import IPCService from '@/services/ipc-service.ts'
 
 export function LoginForm({}: { className?: string }) {
   const [isRegisterMode, setIsRegisterMode] = useState(false)
+  const [countdown, setCountdown] = useState(0)
 
   const form = useForm<z.infer<typeof LoginFormSchema>>({
     resolver: zodResolver(LoginFormSchema),
@@ -39,6 +40,16 @@ export function LoginForm({}: { className?: string }) {
       invitation_code: '',
     },
   })
+
+  // 倒计时逻辑
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [countdown])
 
   const mutation = useLoginQuery()
   async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
@@ -58,15 +69,20 @@ export function LoginForm({}: { className?: string }) {
       return
     }
 
-    if (isRegisterMode) {
-      const invitation_code = form.getValues('invitation_code')
-      if (!invitation_code) {
-        form.setError('invitation_code', { message: '请先输入内测码' })
-        return
+    try {
+      if (isRegisterMode) {
+        const invitation_code = form.getValues('invitation_code')
+        if (!invitation_code) {
+          form.setError('invitation_code', { message: '请先输入内测码' })
+          return
+        }
+        await codeMutation.mutateAsync({ phone, invitation_code })
+      } else {
+        await codeMutation.mutateAsync({ phone })
       }
-      await codeMutation.mutateAsync({ phone, invitation_code })
-    } else {
-      await codeMutation.mutateAsync({ phone })
+      setCountdown(60)
+    } catch (error) {
+      console.error('获取验证码失败:', error)
     }
   }
 
@@ -152,9 +168,18 @@ export function LoginForm({}: { className?: string }) {
                           type="button"
                           variant="outline"
                           onClick={onRequestCode}
-                          disabled={codeMutation.isPending}
+                          disabled={codeMutation.isPending || countdown > 0}
+                          className={`${countdown > 0 ? 'w-[146px]' : ''}`}
                         >
-                          {codeMutation.isPending ? <Spinner /> : '获取验证码'}
+                          {codeMutation.isPending ? (
+                            <Spinner />
+                          ) : countdown > 0 ? (
+                            <>
+                              获取验证码({countdown}秒)
+                            </>
+                          ) : (
+                            '获取验证码'
+                          )}
                         </Button>
                       </div>
                     </FormControl>

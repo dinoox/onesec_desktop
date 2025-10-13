@@ -43,7 +43,7 @@ class IPCService {
       setAudioLevel,
       setIPCMessage,
       setAuthTokenInvalid,
-    } = useStatusActions()
+    } = useStatusStore.getState().actions
 
     setIPCMessage(message)
 
