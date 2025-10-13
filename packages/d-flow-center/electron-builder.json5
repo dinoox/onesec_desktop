@@ -22,13 +22,14 @@
     "target": [
       {
         "target": "dmg",
-        "arch": [
-          "arm64",
-          "x64"
-        ]
+        "arch": "arm64"
+      },
+      {
+        "target": "dmg",
+        "arch": "x64"
       }
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
+    "artifactName": "${productName}-Mac-${arch}-${version}-Installer.${ext}",
     "identity": "Hangzhou RippleStar Technology Co., Ltd. (PNG2RBG62Z)",
     "type": "distribution",
     "hardenedRuntime": true,
