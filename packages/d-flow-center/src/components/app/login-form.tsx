@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useLoginQuery, useVerifyCodeQuery } from '@/services/queries/auth-query.ts'
+import { useLoginQuery, useVerificationCodeQuery } from '@/services/queries/auth-query.ts'
 import {
   Card,
   CardContent,
@@ -48,9 +48,9 @@ export function LoginForm({}: { className?: string }) {
     await mutation.mutateAsync(data)
   }
 
-  const codeMutation = useVerifyCodeQuery()
+  const codeMutation = useVerificationCodeQuery()
   async function onRequestCode() {
-    form.clearErrors('phone')
+    form.clearErrors()
 
     const phone = form.getValues('phone')
     if (!phone) {

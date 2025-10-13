@@ -18,7 +18,6 @@ export const generateSignature = async (
     const timestamp = Date.now()
     const sortedKeys = Object.keys(params).sort()
 
-    // 构建签名字符串：参数按字母排序，用"#"分开，最后加上time=时间戳和secret_key
     const signString =
       sortedKeys.map((key) => `${key}=${params[key]}`).join('#') +
       `#time=${timestamp}#secret_key=${SECRET_KEY}`

@@ -11,7 +11,11 @@ import {
   IPC_PERMISSION_GET_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
 } from '../../main/types/message.ts'
-import useStatusStore, {PermissionStatus, Status, useStatusActions} from '@/store/status-store.ts'
+import useStatusStore, {
+  PermissionStatus,
+  Status,
+  useStatusActions,
+} from '@/store/status-store.ts'
 import SoundService from '@/services/sound-service.ts'
 
 class IPCService {

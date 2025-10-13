@@ -29,7 +29,7 @@ export const useLoginQuery = () => {
   })
 }
 
-export const useVerifyCodeQuery = () => {
+export const useVerificationCodeQuery = () => {
   return useMutation({
     mutationFn: ({
       phone,
