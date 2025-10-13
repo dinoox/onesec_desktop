@@ -117,7 +117,7 @@ export function LoginForm({}: { className?: string }) {
                         {...field}
                         onChange={(e) => {
                           field.onChange(e)
-                          form.clearErrors('phone')
+                          form.clearErrors()
                         }}
                       />
                     </FormControl>
@@ -138,7 +138,7 @@ export function LoginForm({}: { className?: string }) {
                           {...field}
                           onChange={(e) => {
                             field.onChange(e)
-                            form.clearErrors('invitation_code')
+                            form.clearErrors()
                           }}
                         />
                       </FormControl>
@@ -161,7 +161,7 @@ export function LoginForm({}: { className?: string }) {
                           {...field}
                           onChange={(e) => {
                             field.onChange(e)
-                            form.clearErrors('verification_code')
+                            form.clearErrors()
                           }}
                         />
                         <Button

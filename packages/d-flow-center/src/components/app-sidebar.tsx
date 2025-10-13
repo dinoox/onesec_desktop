@@ -27,7 +27,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <div
-      className={`border-r border-dashed bg-background flex flex-col flex-none overflow-y-auto ${
+      className={`border-r bg-background flex flex-col flex-none overflow-y-auto ${
         sidebarCollapsed ? 'w-15' : 'w-64'
       }`}
     >

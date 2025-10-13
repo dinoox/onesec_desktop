@@ -5,7 +5,12 @@ import windowManager, {
 } from './services/window-manager.ts'
 import udsService from './services/uds-service.ts'
 import nativeProcessManager from './services/native-process-manager.ts'
-import { DEFAULT_IPC_CHANNEL, MessageTypes, buildIPCMessage } from './types/message.ts'
+import {
+  DEFAULT_IPC_CHANNEL,
+  MessageTypes,
+  buildIPCMessage,
+  MessageType, IPCMessage,
+} from './types/message.ts'
 import permissionService from './services/permission-service.ts'
 import ipcService from './services/ipc-service.ts'
 import { createWindow } from '../electron/main.ts'
@@ -36,44 +41,46 @@ class ProcessManager {
   async setupUDSForward() {
     Object.values(MessageTypes).forEach((messageType) => {
       udsService.on(messageType, (_data: any, udsMessage: any) => {
+        const ipcMessage: IPCMessage = buildIPCMessage(messageType, udsMessage)
+
         windowManager.broadcast(
           DEFAULT_IPC_CHANNEL,
-          buildIPCMessage(messageType, udsMessage),
+          ipcMessage,
         )
 
-        if (messageType === 'auth_token_failed') {
-          nativeProcessManager.stop()
-          if (!windowManager.getContentWindow()) {
-            createWindow(() => {
-              windowManager.broadcast(
-                DEFAULT_IPC_CHANNEL,
-                buildIPCMessage(messageType, udsMessage),
-              )
-            })
-          }
-          windowManager.getWindow(WINDOW_CONTENT_ID)?.show()
-          windowManager.getWindow(WINDOW_STATUS_ID)?.hide()
-        }
-
-        if (messageType === 'hotkey_setting_result') {
-          const { mode, hotkey_combination } = udsMessage.data || {}
-          if (!(mode && hotkey_combination)) return
-
-          const conflictingMode = userConfigManager
-            .getConfig()
-            .hotkey_configs.find(
-              (conf) =>
-                conf.mode !== mode &&
-                JSON.stringify(conf.hotkey_combination) ===
-                  JSON.stringify(hotkey_combination),
-            )
-
-          if (conflictingMode) {
-            nativeProcessManager.syncUserConfigToNativeProcess()
-          }
-        }
+        this.ipcInterceptor(ipcMessage)
       })
     })
+  }
+
+  async ipcInterceptor(message: IPCMessage) {
+    if (message.action === 'auth_token_failed') {
+      await nativeProcessManager.stop()
+      if (!windowManager.getContentWindow()) {
+        createWindow(() => windowManager.broadcast(DEFAULT_IPC_CHANNEL, message))
+      }
+      windowManager.getWindow(WINDOW_CONTENT_ID)?.show()
+      windowManager.getWindow(WINDOW_STATUS_ID)?.hide()
+      return
+    }
+
+    if (message.action === 'hotkey_setting_result') {
+      const { mode, hotkey_combination } = message.data?.data || {}
+      if (!mode || !hotkey_combination) return
+
+      const isConflict = userConfigManager
+        .getConfig()
+        .hotkey_configs.find(
+          (conf) =>
+            conf.mode !== mode &&
+            JSON.stringify(conf.hotkey_combination) ===
+              JSON.stringify(hotkey_combination),
+        )
+
+      if (isConflict) {
+        await nativeProcessManager.syncUserConfigToNativeProcess()
+      }
+    }
   }
 
   async destroy() {
