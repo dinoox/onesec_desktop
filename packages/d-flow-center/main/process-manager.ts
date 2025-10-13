@@ -59,12 +59,14 @@ class ProcessManager {
           const { mode, hotkey_combination } = udsMessage.data || {}
           if (!(mode && hotkey_combination)) return
 
-          const conflictingMode = userConfigManager.getConfig().hotkey_configs.find(
-            (conf) =>
-              conf.mode !== mode &&
-              JSON.stringify(conf.hotkey_combination) ===
-              JSON.stringify(hotkey_combination)
-          )
+          const conflictingMode = userConfigManager
+            .getConfig()
+            .hotkey_configs.find(
+              (conf) =>
+                conf.mode !== mode &&
+                JSON.stringify(conf.hotkey_combination) ===
+                  JSON.stringify(hotkey_combination),
+            )
 
           if (conflictingMode) {
             nativeProcessManager.syncUserConfigToNativeProcess()

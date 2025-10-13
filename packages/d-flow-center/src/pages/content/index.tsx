@@ -49,7 +49,7 @@ const ContestPage: React.FC = () => {
         </div>
         <Item
           variant="muted"
-          className="hover:border-green-300 transition-all duration-300 cursor-pointer"
+          className="hover:border-border transition-all duration-300 cursor-pointer"
         >
           <ItemContent className="flex flex-col gap-2">
             <div className="text-sm font-medium">
@@ -77,7 +77,7 @@ const ContestPage: React.FC = () => {
         </Item>
         <Item
           variant="muted"
-          className="hover:border-green-300 transition-all duration-300 cursor-pointer"
+          className="hover:border-border transition-all duration-300 cursor-pointer"
         >
           <ItemContent className="flex flex-col gap-2">
             <div className="text-sm font-medium">

@@ -14,18 +14,18 @@ const useUIStore = create<UIStore>()(
     (set) => ({
       sidebarCollapsed: false,
       actions: {
-        toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+        toggleSidebar: () =>
+          set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
         setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
       },
     }),
     {
       name: 'ui-storage',
       partialize: (state) => ({ sidebarCollapsed: state.sidebarCollapsed }),
-    }
-  )
+    },
+  ),
 )
 
 export const useUIActions = () => useUIStore((state) => state.actions)
 
 export default useUIStore
-
