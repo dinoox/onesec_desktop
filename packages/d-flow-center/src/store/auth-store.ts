@@ -7,12 +7,10 @@ import { logout } from '@/services/api/auth-api.ts'
 interface AuthStore {
   user: User
   accessToken: string
-  refreshToken: string
   isAuthed: boolean
   actions: {
     setAuthed: (user: User, accessToken: string) => void
     setAccessToken: (t: string) => void
-    setRefreshToken: (t: string) => void
     logout: () => Promise<void>
   }
 }
@@ -27,7 +25,6 @@ const useAuthStore = create(
       actions: {
         setAuthed: (user, accessToken) => set({ user, accessToken, isAuthed: true }),
         setAccessToken: (t) => set({ accessToken: t }),
-        setRefreshToken: (t) => set({ refreshToken: t }),
         logout: async () => {
           await logout()
           set({ user: undefined, isAuthed: false })
@@ -42,13 +39,10 @@ const useAuthStore = create(
         ({
           [StorageKeys.User]: state.user,
           [StorageKeys.AccessToken]: state.accessToken,
-          [StorageKeys.RefreshToken]: state.refreshToken,
           [StorageKeys.Authed]: state.isAuthed,
         }) as AuthStore,
     },
   ),
 )
-
-export const useAuthActions = () => useAuthStore((state) => state.actions)
 
 export default useAuthStore

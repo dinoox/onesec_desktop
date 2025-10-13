@@ -1,6 +1,5 @@
 import { Outlet, useNavigation } from 'react-router'
 import AppSidebar from '@/components/app-sidebar'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import Header from '@/components/header'
 import PageLoading from '@/components/page-loading'
 import Footer from '@/components/footer'
@@ -12,18 +11,22 @@ export default function DashboardLayout() {
 
   return (
     <AuthGuardContainer>
-      <SidebarProvider defaultOpen={true}>
-        <AppSidebar />
-        <SidebarInset className="overflow-hidden h-screen">
-          <div className="h-[2rem] app-drag-region"></div>
+      <div className="flex flex-col h-screen overflow-hidden">
+        <div className="flex-none app-drag-region">
           <Header />
-          <div className="p-4 flex grow flex-col overflow-hidden">
-            {isNavigating && <PageLoading />}
-            <Outlet />
+        </div>
+
+        <div className="flex flex-1 overflow-hidden">
+          <AppSidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="p-4 flex-1 flex flex-col overflow-hidden">
+              {isNavigating && <PageLoading />}
+              <Outlet />
+            </div>
+            <Footer />
           </div>
-          <Footer />
-        </SidebarInset>
-      </SidebarProvider>
+        </div>
+      </div>
     </AuthGuardContainer>
   )
 }
