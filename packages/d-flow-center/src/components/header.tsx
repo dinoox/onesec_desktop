@@ -1,7 +1,7 @@
 import React from 'react'
 import { useLocation } from 'react-router'
 import { navMain } from '@/configs/navigation'
-import {Button} from "@/components/ui/button.tsx";
+import { Button } from '@/components/ui/button.tsx'
 
 const Header: React.FC = () => {
   const location = useLocation()

@@ -174,9 +174,7 @@ export function LoginForm({}: { className?: string }) {
                           {codeMutation.isPending ? (
                             <Spinner />
                           ) : countdown > 0 ? (
-                            <>
-                              获取验证码({countdown}秒)
-                            </>
+                            <>获取验证码({countdown}秒)</>
                           ) : (
                             '获取验证码'
                           )}

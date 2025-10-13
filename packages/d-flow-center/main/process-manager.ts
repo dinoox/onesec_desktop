@@ -9,6 +9,7 @@ import { DEFAULT_IPC_CHANNEL, MessageTypes, buildIPCMessage } from './types/mess
 import permissionService from './services/permission-service.ts'
 import ipcService from './services/ipc-service.ts'
 import { createWindow } from '../electron/main.ts'
+import userConfigManager from './services/user-config-manager.ts'
 
 /**
  * 全局进程管理类
@@ -52,6 +53,22 @@ class ProcessManager {
           }
           windowManager.getWindow(WINDOW_CONTENT_ID)?.show()
           windowManager.getWindow(WINDOW_STATUS_ID)?.hide()
+        }
+
+        if (messageType === 'hotkey_setting_result') {
+          const { mode, hotkey_combination } = udsMessage.data || {}
+          if (!(mode && hotkey_combination)) return
+
+          const conflictingMode = userConfigManager.getConfig().hotkey_configs.find(
+            (conf) =>
+              conf.mode !== mode &&
+              JSON.stringify(conf.hotkey_combination) ===
+              JSON.stringify(hotkey_combination)
+          )
+
+          if (conflictingMode) {
+            nativeProcessManager.syncUserConfigToNativeProcess()
+          }
         }
       })
     })

@@ -3,6 +3,7 @@ import { Link, useLocation, matchPath } from 'react-router'
 import { navMain, type NavItem } from '@/configs/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Home } from 'iconsax-reactjs'
+import { useTheme } from '@/components/theme-provider'
 
 function checkIsActive(href: string, item: NavItem) {
   if (matchPath({ path: item.url, end: true }, href)) return true
@@ -17,6 +18,18 @@ function checkIsActive(href: string, item: NavItem) {
 const AppSidebar: React.FC = () => {
   const location = useLocation()
   const { pathname } = location
+  const { theme } = useTheme()
+
+  const getActualTheme = () => {
+    if (theme === 'system') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    }
+    return theme
+  }
+
+  const actualTheme = getActualTheme()
+  const accentColor = actualTheme === 'light' ? 'text-[#FFC700]' : 'text-ripple-green'
+  const badgeBgColor = actualTheme === 'light' ? 'bg-[#FFC700]' : 'bg-ripple-green'
 
   return (
     <div className="w-64 border-r bg-sidebar flex flex-col flex-none overflow-y-auto">
@@ -26,7 +39,7 @@ const AppSidebar: React.FC = () => {
           <span className="font-semibold">秒言</span>
           <Badge
             variant="outline"
-            className="border-black text-black text-[10px] rounded-xl bg-[#fc0]"
+            className={`border-black text-black text-[10px] rounded-xl ${badgeBgColor}`}
           >
             试用版
           </Badge>
@@ -49,12 +62,10 @@ const AppSidebar: React.FC = () => {
             >
               {item.icon && (
                 <item.icon
-                  className={`w-4 h-4 ${isActive && 'text-ripple-green flash-icon'}`}
+                  className={`w-4 h-4 ${isActive && `${accentColor} flash-icon`}`}
                 />
               )}
-              <span className={`text-sm ${isActive && 'text-ripple-green'}`}>
-                {item.title}
-              </span>
+              <span className={`text-sm ${isActive && accentColor}`}>{item.title}</span>
             </Link>
           )
         })}
