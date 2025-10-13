@@ -5,6 +5,7 @@ import useStatusStore from '@/store/status-store.ts'
 import useUserConfigStore from '@/store/user-config-store.ts'
 import { useClickOutside } from '@/hooks/use-click-outside.ts'
 import { AnimatePresence, motion } from 'framer-motion'
+import { toast } from 'sonner'
 import { HotkeyMode } from '../../../main/types/message.ts'
 
 const ContestPage: React.FC = () => {
@@ -44,7 +45,19 @@ const ContestPage: React.FC = () => {
 
       if (action === 'hotkey_setting_result') {
         setEditingMode(null)
-        updateHotkeyConfig(mode, hotkey_combination).then()
+
+        const otherModeKeys = mode === 'normal' ? shortcutCommandKeys : shortcutKeys
+        const keysMatch =
+          hotkey_combination.length === otherModeKeys.length &&
+          hotkey_combination.every(
+            (key: string, idx: number) => key === otherModeKeys[idx],
+          )
+
+        if (keysMatch) {
+          loadUserConfig().then(() => toast.warning('快捷键设置冲突，请重新设置'))
+        } else {
+          updateHotkeyConfig(mode, hotkey_combination).then()
+        }
       }
     }
   }, [holdIPCMessage])
