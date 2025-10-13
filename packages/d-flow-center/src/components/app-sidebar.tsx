@@ -27,13 +27,13 @@ const AppSidebar: React.FC = () => {
 
   return (
     <div
-      className={`border-r border-dashed bg-background flex flex-col flex-none overflow-y-auto transition-colors duration-300 ${
+      className={`border-r border-dashed bg-background flex flex-col flex-none overflow-y-auto ${
         sidebarCollapsed ? 'w-15' : 'w-64'
       }`}
     >
       {/* Sidebar Header */}
       {!sidebarCollapsed && (
-        <div className="p-3 pt-5">
+        <div className="p-3 pt-5 transition-colors duration-300">
           <div className="flex items-center gap-2 px-2 py-2">
             <span className="font-semibold">秒言</span>
             <Badge
@@ -58,7 +58,7 @@ const AppSidebar: React.FC = () => {
                   <TooltipTrigger asChild>
                     <Link
                       to={item.url}
-                      className={`flex items-center justify-center p-[10px] rounded-md mb-1 transition-colors ${
+                      className={`flex items-center justify-center p-[10px] rounded-md mb-1 ${
                         isActive
                           ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                           : 'hover:bg-sidebar-accent/50'
@@ -82,7 +82,7 @@ const AppSidebar: React.FC = () => {
               <Link
                 key={item.url}
                 to={item.url}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md mb-1 transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-md mb-1 transition-colors duration-300 ${
                   isActive
                     ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                     : 'hover:bg-sidebar-accent/50'
