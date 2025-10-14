@@ -9,7 +9,8 @@ import {
   DEFAULT_IPC_CHANNEL,
   MessageTypes,
   buildIPCMessage,
-  MessageType, IPCMessage,
+  MessageType,
+  IPCMessage,
 } from './types/message.ts'
 import permissionService from './services/permission-service.ts'
 import ipcService from './services/ipc-service.ts'
@@ -43,10 +44,7 @@ class ProcessManager {
       udsService.on(messageType, (_data: any, udsMessage: any) => {
         const ipcMessage: IPCMessage = buildIPCMessage(messageType, udsMessage)
 
-        windowManager.broadcast(
-          DEFAULT_IPC_CHANNEL,
-          ipcMessage,
-        )
+        windowManager.broadcast(DEFAULT_IPC_CHANNEL, ipcMessage)
 
         this.ipcInterceptor(ipcMessage)
       })

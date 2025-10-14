@@ -5,6 +5,7 @@ const TEAM_ID = process.env.TEAM_ID || 'PNG2RBG62Z'
 const APPLE_ID = process.env.APPLE_ID || 'liyunba8@gmail.com'
 const APPLE_ID_PASSWORD = process.env.APPLE_ID_PASSWORD || 'awkm-mtbp-yzps-oqgw'
 
+// xcrun notarytool submit "xxxxxx.dmg" --apple-id "liyunba8@gmail.com" --team-id "PNG2RBG62Z" --password "awkm-mtbp-yzps-oqgw"
 // xcrun notarytool history --apple-id "liyunba8@gmail.com" --team-id "PNG2RBG62Z" --password "awkm-mtbp-yzps-oqgw"
 // xcrun notarytool log YOUR_REQUEST_ID --apple-id "liyunba8@gmail.com" --team-id "PNG2RBG62Z" --password "awkm-mtbp-yzps-oqgw"
 

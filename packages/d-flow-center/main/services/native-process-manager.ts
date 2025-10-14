@@ -104,19 +104,22 @@ class NativeProcessManager {
       }
 
       this.nativeProcess.once('exit', () => {
+        log.info(chalk.red('Native process once exit'))
         this.nativeProcess = null
         resolve()
       })
 
       this.nativeProcess.kill('SIGTERM')
 
-      setTimeout(() => {
-        if (this.nativeProcess) {
-          this.nativeProcess.kill('SIGKILL')
-          this.nativeProcess = null
-          resolve()
-        }
-      }, 5000)
+      // setTimeout(() => {
+      //
+      //   if (this.nativeProcess) {
+      //     log.info(chalk.red('Native process SIGKILL'))
+      //     this.nativeProcess.kill('SIGKILL')
+      //     this.nativeProcess = null
+      //     resolve()
+      //   }
+      // }, 5000)
     })
   }
 

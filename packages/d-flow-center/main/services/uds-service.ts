@@ -23,7 +23,7 @@ class UDSService extends EventEmitter {
 
   constructor(options: UdsServiceOptions = {}) {
     super()
-    this.socketPath = options.socketPath || '/tmp/com.ripplestars.miaoyan.uds'
+    this.socketPath = options.socketPath || '/tmp/com.ripplestars.miaoyan.uds.test'
   }
 
   async start(): Promise<string> {

@@ -36,9 +36,7 @@
     "gatekeeperAssess": false,
     "entitlements": "assets/entitlements.mac.plist",
     "entitlementsInherit": "assets/entitlements.mac.plist",
-    "notarize": {
-      "teamId": "PNG2RBG62Z"
-    },
+    "notarize": true,
     "extendInfo": {
       "NSMicrophoneUsageDescription": "此应用需要访问麦克风以进行语音识别和音频录制功能",
       "NSCameraUsageDescription": "此应用需要访问摄像头以进行视频录制功能",

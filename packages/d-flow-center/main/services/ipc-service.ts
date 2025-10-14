@@ -19,7 +19,7 @@ import permissionService from './permission-service'
 import { PermissionStatus } from '@/store/status-store.ts'
 import udsService from './uds-service.ts'
 import { ipcMain, shell } from 'electron'
-import {USER_DEFAULT_CONFIG} from "../types/config.ts";
+import { USER_DEFAULT_CONFIG } from '../types/config.ts'
 
 class IPCService {
   constructor() {}

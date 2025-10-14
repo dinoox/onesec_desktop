@@ -41,8 +41,6 @@
     <key>LSUIElement</key>
     <true/>
     
-   
-    
     <!-- 网络权限 -->
     <key>NSAppTransportSecurity</key>
     <dict>
