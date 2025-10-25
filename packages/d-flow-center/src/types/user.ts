@@ -5,11 +5,6 @@ export type AccessToken = {
   expiresIn: number
 }
 
-export type LoginReq = {
-  credential: string
-  password: string
-}
-
 export type User = {
   user_id: number
   user_name: string

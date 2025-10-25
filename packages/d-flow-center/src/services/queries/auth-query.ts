@@ -1,29 +1,39 @@
 import { useMutation } from '@tanstack/react-query'
-import { login, logout, sendVerificationCode } from '@/services/api/auth-api.ts'
+import { login, logout, sendVerificationCode, register } from '@/services/api/auth-api.ts'
 import authStore from '@/store/auth-store.ts'
-import { useNavigate } from 'react-router'
-import { UserService } from '@/services/user-service.ts'
-import useStatusStore from '@/store/status-store.ts'
 import { toast } from 'sonner'
+import useStatusStore from '@/store/status-store.ts'
+
+const handleAuthSuccess = async (resp: any) => {
+  await authStore
+    .getState()
+    .actions.setAuthed(resp.data.user || {}, resp.data.token || '')
+  useStatusStore.getState().actions.setAuthTokenInvalid(false)
+}
 
 export const useLoginQuery = () => {
-  const navigate = useNavigate()
   return useMutation({
     mutationFn: login,
     onSuccess: async (resp) => {
       try {
-        authStore
-          .getState()
-          .actions.setAuthed(resp.data.user || {}, resp.data.access_token || 'token')
-
-        useStatusStore.getState().actions.setAuthTokenInvalid(false)
-        await UserService.setConfig({
-          ...(await UserService.getConfig()),
-          auth_token: resp.data.access_token,
-        })
-        await UserService.claimLogin()
+        await handleAuthSuccess(resp)
+        toast.success(resp.message)
       } catch (error) {
-        toast.error('登陆失败')
+        toast.error(`${resp.message}`)
+      }
+    },
+  })
+}
+
+export const useRegisterQuery = () => {
+  return useMutation({
+    mutationFn: register,
+    onSuccess: async (resp) => {
+      try {
+        await handleAuthSuccess(resp)
+        toast.success(resp.message)
+      } catch (error) {
+        toast.error('注册失败')
       }
     },
   })
@@ -52,13 +62,9 @@ export const useVerificationCodeQuery = () => {
 export const useLogoutQuery = () =>
   useMutation({
     mutationFn: logout,
-    onSuccess: async (_) => {
+    onSuccess: async (resp) => {
       await authStore.getState().actions.logout()
-      useStatusStore.getState().actions.setAuthTokenInvalid(false)
-      await UserService.setConfig({
-        ...(await UserService.getConfig()),
-        auth_token: null,
-      })
-      await UserService.claimLogout()
+      useStatusStore.getState().actions.setAuthTokenInvalid(true)
+      toast.success(resp.message)
     },
   })

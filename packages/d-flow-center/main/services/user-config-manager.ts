@@ -20,12 +20,27 @@ class UserConfigManager {
         'hotkey_configs',
         USER_DEFAULT_CONFIG.hotkey_configs,
       ),
+      user: this.store.get('user', USER_DEFAULT_CONFIG.user),
     }
   }
 
   setConfig(config: GlobalConfig): void {
     this.store.set('auth_token', config.auth_token)
     this.store.set('hotkey_configs', config.hotkey_configs)
+    this.store.set('user', config.user)
+  }
+
+  updateHotkeyConfig(mode: string, hotkey_combination: string[]): void {
+    const configs = this.store.get('hotkey_configs', USER_DEFAULT_CONFIG.hotkey_configs)
+    const index = configs.findIndex((c) => c.mode === mode)
+
+    if (index !== -1) {
+      configs[index].hotkey_combination = hotkey_combination
+    } else {
+      configs.push({ mode: mode as any, hotkey_combination })
+    }
+
+    this.store.set('hotkey_configs', configs)
   }
 }
 

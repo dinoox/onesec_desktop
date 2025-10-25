@@ -13,8 +13,8 @@
   ],
   "extraResources": [
     {
-      "from": "assets/MiaoyanSwift.app",
-      "to": "Helpers/MiaoyanSwift.app"
+      "from": "assets/OnesecCore.app",
+      "to": "Helpers/OnesecCore.app"
     }
   ],
   "mac": {
@@ -29,14 +29,16 @@
         "arch": "x64"
       }
     ],
+    "notarize": {
+      "teamId": "PNG2RBG62Z"
+    },
     "artifactName": "${productName}-Mac-${arch}-${version}-Installer.${ext}",
     "identity": "Hangzhou RippleStar Technology Co., Ltd. (PNG2RBG62Z)",
     "type": "distribution",
     "hardenedRuntime": true,
-    "gatekeeperAssess": false,
+    "gatekeeperAssess": true,
     "entitlements": "assets/entitlements.mac.plist",
     "entitlementsInherit": "assets/entitlements.mac.plist",
-    "notarize": true,
     "extendInfo": {
       "NSMicrophoneUsageDescription": "此应用需要访问麦克风以进行语音识别和音频录制功能",
       "NSCameraUsageDescription": "此应用需要访问摄像头以进行视频录制功能",

@@ -1,48 +1,70 @@
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
 import type { User } from '@/types/user'
-import { StorageKeys } from '@/types/constants'
 import { logout } from '@/services/api/auth-api.ts'
+import { UserService } from '@/services/user-service.ts'
 
 interface AuthStore {
-  user: User
+  user: User | null
   accessToken: string
   isAuthed: boolean
   actions: {
-    setAuthed: (user: User, accessToken: string) => void
-    setAccessToken: (t: string) => void
+    initAuth: () => Promise<void>
+    setAuthed: (user: User, accessToken: string) => Promise<void>
     logout: () => Promise<void>
   }
 }
 
-const useAuthStore = create(
-  persist<AuthStore>(
-    (set) => ({
-      user: {} as User,
-      isAuthed: false,
-      refreshToken: '',
-      accessToken: '',
-      actions: {
-        setAuthed: (user, accessToken) => set({ user, accessToken, isAuthed: true }),
-        setAccessToken: (t) => set({ accessToken: t }),
-        logout: async () => {
-          await logout()
-          set({ user: undefined, isAuthed: false })
-          localStorage.removeItem(StorageKeys.AuthStorage)
-        },
-      },
-    }),
-    {
-      name: StorageKeys.AuthStorage,
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) =>
-        ({
-          [StorageKeys.User]: state.user,
-          [StorageKeys.AccessToken]: state.accessToken,
-          [StorageKeys.Authed]: state.isAuthed,
-        }) as AuthStore,
+const useAuthStore = create<AuthStore>((set) => ({
+  user: null,
+  isAuthed: false,
+  accessToken: '',
+  actions: {
+    initAuth: async () => {
+      const config = await UserService.getConfig()
+      const hasToken = !!config.auth_token
+      set({
+        isAuthed: hasToken,
+        accessToken: config.auth_token,
+        user: config.user,
+      })
     },
-  ),
-)
+
+    setAuthed: async (user, accessToken) => {
+      const config = await UserService.getConfig()
+      await UserService.setConfig({
+        ...config,
+        auth_token: accessToken,
+        user,
+      })
+
+      set({
+        user,
+        accessToken,
+        isAuthed: true,
+      })
+
+      await UserService.claimLogin()
+    },
+
+    logout: async () => {
+      await logout()
+
+      const config = await UserService.getConfig()
+      await UserService.setConfig({
+        ...config,
+        auth_token: '',
+        user: null,
+      })
+
+      set({
+        user: null,
+        accessToken: '',
+        isAuthed: false,
+      })
+
+      await UserService.claimLogout()
+    },
+  },
+}))
 
 export default useAuthStore

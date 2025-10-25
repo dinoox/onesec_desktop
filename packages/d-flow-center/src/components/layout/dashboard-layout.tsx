@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Outlet, useNavigation } from 'react-router'
 import AppSidebar from '@/components/app-sidebar'
 import Header from '@/components/header'
@@ -21,7 +22,9 @@ export default function DashboardLayout() {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="p-4 flex-1 flex flex-col overflow-hidden">
               {isNavigating && <PageLoading />}
-              <Outlet />
+              <Suspense fallback={<PageLoading />}>
+                <Outlet />
+              </Suspense>
             </div>
             <Footer />
           </div>

@@ -1,6 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useLoginQuery, useVerificationCodeQuery } from '@/services/queries/auth-query.ts'
+import {
+  useLoginQuery,
+  useRegisterQuery,
+  useVerificationCodeQuery,
+} from '@/services/queries/auth-query.ts'
 import {
   Card,
   CardContent,
@@ -41,7 +45,6 @@ export function LoginForm({}: { className?: string }) {
     },
   })
 
-  // 倒计时逻辑
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => {
@@ -51,12 +54,19 @@ export function LoginForm({}: { className?: string }) {
     }
   }, [countdown])
 
-  const mutation = useLoginQuery()
+  const loginMutation = useLoginQuery()
+  const registerMutation = useRegisterQuery()
+  const mutation = isRegisterMode ? registerMutation : loginMutation
+
   async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
-    if (!isRegisterMode) {
-      delete data.invitation_code
-    }
-    await mutation.mutateAsync(data)
+    const params = isRegisterMode
+      ? {
+          phone: data.phone,
+          code: data.verification_code,
+          invitation_code: data.invitation_code,
+        }
+      : { phone: data.phone, code: data.verification_code }
+    await mutation.mutateAsync(params)
   }
 
   const codeMutation = useVerificationCodeQuery()
@@ -95,7 +105,7 @@ export function LoginForm({}: { className?: string }) {
   }
 
   return (
-    <Card className="w-[350px]">
+    <Card className="w-[350px] bg-black/85  border border-border backdrop-blur">
       <CardHeader className="flex flex-col items-center p-3">
         <LogoIcon />
         <CardTitle className="text-xl">秒言</CardTitle>

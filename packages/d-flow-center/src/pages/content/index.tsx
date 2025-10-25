@@ -4,6 +4,7 @@ import { Kbd, KbdGroup } from '@/components/ui/kbd.tsx'
 import { Languages, Globe, Terminal } from 'lucide-react'
 import { toast } from 'sonner'
 import useUserConfigStore from '@/store/user-config-store.ts'
+import { getKeyDisplayText } from '@/lib/utils.ts'
 
 const exampleList = [
   {
@@ -58,7 +59,9 @@ const ContestPage: React.FC = () => {
                   长按{' '}
                   <KbdGroup className="mx-1">
                     {shortcutKeys.length > 0 ? (
-                      shortcutKeys.map((key, index) => <Kbd key={index}>{key}</Kbd>)
+                      shortcutKeys.map((key, index) => (
+                        <Kbd key={index}>{getKeyDisplayText(key)}</Kbd>
+                      ))
                     ) : (
                       <>
                         <Kbd>fn</Kbd>
@@ -87,7 +90,7 @@ const ContestPage: React.FC = () => {
                   <KbdGroup className="mx-1">
                     {shortcutCommandKeys.length > 0 ? (
                       shortcutCommandKeys.map((key, index) => (
-                        <Kbd key={index}>{key}</Kbd>
+                        <Kbd key={index}>{getKeyDisplayText(key)}</Kbd>
                       ))
                     ) : (
                       <>

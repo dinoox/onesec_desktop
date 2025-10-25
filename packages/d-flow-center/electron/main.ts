@@ -1,12 +1,8 @@
 import { app, BrowserWindow, screen } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import windowManager, {
-  WINDOW_CONTENT_ID,
-  WINDOW_STATUS_ID,
-} from '../main/services/window-manager.ts'
+import windowManager, { WINDOW_CONTENT_ID } from '../main/services/window-manager.ts'
 import processManager from '../main/process-manager.ts'
-import nativeProcessManager from '../main/services/native-process-manager.ts'
 import menuService from '../main/services/menu-service.ts'
 
 // Disable HTTPS Cert Verification（only dev）
@@ -33,11 +29,11 @@ function createWindow(onWebLoaded: Function = () => {}) {
   win = new BrowserWindow({
     title: '秒言',
     width: 1024,
-    height: 730,
+    height: 710,
     minWidth: 1024,
-    minHeight: 730,
+    minHeight: 710,
     titleBarStyle: 'hidden',
-    trafficLightPosition: { x: 10, y: 10 }, // 设置红绿灯按钮位置（macOS）
+    trafficLightPosition: { x: 10, y: 10 },
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
@@ -53,53 +49,6 @@ function createWindow(onWebLoaded: Function = () => {}) {
     win.loadURL(VITE_DEV_SERVER_URL).then()
   } else {
     win.loadFile(path.join(RENDERER_DIST, 'index.html')).then()
-  }
-}
-
-function createStatusWindow() {
-  const primaryDisplay = screen.getPrimaryDisplay()
-  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize
-  const { workArea } = primaryDisplay
-
-  const winWidth = 90
-  const winHeight = 40
-  const x = workArea.x + (screenWidth - winWidth) / 2
-  const y = workArea.y + workArea.height - winHeight
-
-  statusWin = new BrowserWindow({
-    show: false,
-    width: winWidth,
-    height: winHeight,
-    x,
-    y,
-    frame: false, // 无边框
-    alwaysOnTop: true, // 始终在最上层
-    hasShadow: false,
-    skipTaskbar: true, // 不在任务栏显示
-    resizable: false, // 不可调整大小
-    movable: true, // 可移动
-    minimizable: false, // 不可最小化
-    maximizable: false, // 不可最大化
-    closable: true,
-    transparent: true,
-    backgroundColor: '#00000000',
-    opacity: 1.0,
-    fullscreenable: false,
-    simpleFullscreen: false,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
-      backgroundThrottling: false,
-    },
-  })
-  statusWin.webContents.once('did-finish-load', async () => {
-    windowManager.register(statusWin!, WINDOW_STATUS_ID)
-    await nativeProcessManager.start()
-  })
-
-  if (VITE_DEV_SERVER_URL) {
-    statusWin.loadURL(`${VITE_DEV_SERVER_URL}status.html`).then()
-  } else {
-    statusWin.loadFile(path.join(RENDERER_DIST, 'status.html')).then()
   }
 }
 
@@ -139,8 +88,7 @@ app.whenReady().then(async () => {
     website: 'https://miaoyan.app',
   })
   createWindow()
-  createStatusWindow()
   await processManager.initialize()
 })
 
-export { createWindow, createStatusWindow }
+export { createWindow }

@@ -2,9 +2,23 @@ import request from '@/lib/request'
 import type { AccessToken, LoginResp } from '@/types/user'
 import { generateSignature } from '@/services/sign-service.ts'
 
-export const login = (params: any) => {
+export const login = async (params: any) => {
+  const signature = await generateSignature(params)
   return request.post<LoginResp>('/auth/login', {
-    params,
+    params: {
+      ...params,
+      ...signature,
+    },
+  })
+}
+
+export const register = async (params: any) => {
+  const signature = await generateSignature(params)
+  return request.post<LoginResp>('/auth/register', {
+    params: {
+      ...params,
+      ...signature,
+    },
   })
 }
 
@@ -24,7 +38,7 @@ export const sendVerificationCode = async (phone: string, invitation_code?: stri
 }
 
 export const logout = () => {
-  return request.post('/user/logout')
+  return request.post('/auth/logout')
 }
 
 export const refreshToken = async (refreshToken: string) => {

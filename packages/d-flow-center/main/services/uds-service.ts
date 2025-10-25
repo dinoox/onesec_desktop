@@ -1,13 +1,7 @@
 import * as net from 'net'
 import * as fs from 'fs'
 import { EventEmitter } from 'events'
-import {
-  ClientInfo,
-  Message,
-  MessageTypes,
-  ServerResultOptions,
-  UdsServiceOptions,
-} from '../types/message'
+import { ClientInfo, Message } from '../types/message'
 import log from 'electron-log'
 
 /**
@@ -15,15 +9,14 @@ import log from 'electron-log'
  * 实现秒言 Electron 主进程与 Native 进程之间的 UDS 通信协议
  */
 class UDSService extends EventEmitter {
-  private readonly socketPath: string
+  readonly socketPath: string = '/tmp/com.ripplestars.miaoyan.uds.test'
   private server: net.Server | null = null
   private clients: Map<string, ClientInfo> = new Map()
 
   private isRunning = false
 
-  constructor(options: UdsServiceOptions = {}) {
+  constructor() {
     super()
-    this.socketPath = options.socketPath || '/tmp/com.ripplestars.miaoyan.uds.test'
   }
 
   async start(): Promise<string> {
@@ -139,11 +132,6 @@ class UDSService extends EventEmitter {
     }
 
     const data = message.data || {}
-
-    if (message.type !== MessageTypes.VOLUME_DATA) {
-      console.log(`UDS: ${message.type}: - ${JSON.stringify(message)}`)
-    }
-
     this.emit(message.type, { clientId, timestamp: message.timestamp, data }, message)
   }
 
@@ -171,28 +159,6 @@ class UDSService extends EventEmitter {
       this.clients.delete(clientId)
       return false
     }
-  }
-
-  sendServerResult(
-    resultType: string,
-    content: string,
-    options: ServerResultOptions = {},
-  ): Message {
-    const message: Message = {
-      type: MessageTypes.SERVER_RESULT,
-      timestamp: Date.now(),
-      data: {
-        result_type: resultType,
-        content,
-        confidence: options.confidence,
-        status: options.status || 'success',
-        error_message: options.errorMessage || null,
-      },
-    }
-
-    console.log(`Sending server result: ${resultType} - ${content}`)
-    this.broadcast(message)
-    return message
   }
 
   private cleanupSocket() {

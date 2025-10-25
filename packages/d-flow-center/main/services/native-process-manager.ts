@@ -35,18 +35,18 @@ class NativeProcessManager {
         )
       }
 
-      this.nativeProcess = spawn(appPath, ['--disable-text-insertion'], {
+      const args = this.buildNativeProcessArgs()
+      log.info('[NativeProcess] Starting with args:', args)
+
+      this.nativeProcess = spawn(appPath, args, {
         detached: false,
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
-          PATH: process.env.PATH,
-          HOME: process.env.HOME,
-          USER: process.env.USER,
-          TMPDIR: process.env.TMPDIR,
+          ...process.env,
           LANG: process.env.LANG || 'zh_CN.UTF-8',
-          // 告诉 MiaoyanSwift 禁用文本插入，由 Electron 负责
-          DISABLE_TEXT_INSERTION: 'true',
-          LAUNCHED_FROM_ELECTRON: 'true',
+          // 禁用输出缓冲，确保日志能实时输出
+          NSUnbufferedIO: 'YES',
+          PYTHONUNBUFFERED: '1',
         } as unknown as NodeJS.ProcessEnv,
       })
 
@@ -110,16 +110,6 @@ class NativeProcessManager {
       })
 
       this.nativeProcess.kill('SIGTERM')
-
-      // setTimeout(() => {
-      //
-      //   if (this.nativeProcess) {
-      //     log.info(chalk.red('Native process SIGKILL'))
-      //     this.nativeProcess.kill('SIGKILL')
-      //     this.nativeProcess = null
-      //     resolve()
-      //   }
-      // }, 5000)
     })
   }
 
@@ -136,21 +126,64 @@ class NativeProcessManager {
     if (!app.isPackaged) {
       return path.join(
         app.getAppPath(),
-        'assets/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift',
+        'assets/OnesecCore.app/Contents/MacOS/OnesecCore',
       )
     }
 
     return path.join(
       process.resourcesPath,
-      'Helpers/MiaoyanSwift.app/Contents/MacOS/MiaoyanSwift',
+      'Helpers/OnesecCore.app/Contents/MacOS/OnesecCore',
     )
+  }
+
+  /**
+   * 构建 Native 进程的启动参数
+   */
+  private buildNativeProcessArgs(): string[] {
+    const config = userConfigManager.getConfig()
+
+    // 1. 获取或生成 auth token
+    const authToken = config.auth_token
+
+    // 2. 获取 UDS channel 路径
+    const udsChannel = udsService.socketPath
+
+    // 3. 获取服务器地址
+    const url = new URL(import.meta.env.VITE_API_BASEURL || 'https://114.55.98.75:443')
+    const server = url.host
+
+    // 4. 获取快捷键配置
+    const normalKeysConfig = config.hotkey_configs.find((c) => c.mode === 'normal')
+    const commandKeysConfig = config.hotkey_configs.find((c) => c.mode === 'command')
+
+    const normalKeys = normalKeysConfig
+      ? normalKeysConfig.hotkey_combination.join('+')
+      : 'Fn'
+    const commandKeys = commandKeysConfig
+      ? commandKeysConfig.hotkey_combination.join('+')
+      : 'Fn+Cmd'
+
+    return [
+      '--uds-channel',
+      udsChannel,
+      '--server',
+      server,
+      '--auth-token',
+      authToken,
+      '--debug-mode',
+      'true',
+      '--normal-keys',
+      normalKeys,
+      '--command-keys',
+      commandKeys,
+    ]
   }
 
   async syncUserConfigToNativeProcess() {
     const config = userConfigManager.getConfig()
 
     udsService.broadcast({
-      type: MessageTypes.INIT_CONFIG,
+      type: MessageTypes.UPDATE_CONFIG,
       timestamp: Date.now(),
       data: {
         auth_token: config.auth_token,
@@ -158,7 +191,7 @@ class NativeProcessManager {
       },
     })
 
-    log.info(`Init Native Config: ${JSON.stringify(config)}`)
+    log.info(`Update Native Config: ${JSON.stringify(config)}`)
   }
 }
 

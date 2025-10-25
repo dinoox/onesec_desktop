@@ -1,18 +1,13 @@
 import log from 'electron-log'
-import windowManager, {
-  WINDOW_CONTENT_ID,
-  WINDOW_STATUS_ID,
-} from './services/window-manager.ts'
+import windowManager, { WINDOW_CONTENT_ID } from './services/window-manager.ts'
 import udsService from './services/uds-service.ts'
 import nativeProcessManager from './services/native-process-manager.ts'
 import {
-  DEFAULT_IPC_CHANNEL,
-  MessageTypes,
   buildIPCMessage,
-  MessageType,
+  DEFAULT_IPC_CHANNEL,
   IPCMessage,
+  MessageTypes,
 } from './types/message.ts'
-import permissionService from './services/permission-service.ts'
 import ipcService from './services/ipc-service.ts'
 import { createWindow } from '../electron/main.ts'
 import userConfigManager from './services/user-config-manager.ts'
@@ -30,10 +25,7 @@ class ProcessManager {
       await udsService.start()
       await this.setupUDSForward()
       await ipcService.initialize()
-      udsService.on(MessageTypes.CONNECTION_SUCCESS, () => {
-        nativeProcessManager.syncUserConfigToNativeProcess()
-        permissionService.initialize()
-      })
+      await nativeProcessManager.start()
     } catch (err) {
       log.error(err)
     }
@@ -53,12 +45,11 @@ class ProcessManager {
 
   async ipcInterceptor(message: IPCMessage) {
     if (message.action === 'auth_token_failed') {
-      await nativeProcessManager.stop()
+      if (!userConfigManager.getConfig().auth_token) return
       if (!windowManager.getContentWindow()) {
         createWindow(() => windowManager.broadcast(DEFAULT_IPC_CHANNEL, message))
       }
       windowManager.getWindow(WINDOW_CONTENT_ID)?.show()
-      windowManager.getWindow(WINDOW_STATUS_ID)?.hide()
       return
     }
 
@@ -66,18 +57,16 @@ class ProcessManager {
       const { mode, hotkey_combination } = message.data?.data || {}
       if (!mode || !hotkey_combination) return
 
-      const isConflict = userConfigManager
-        .getConfig()
-        .hotkey_configs.find(
-          (conf) =>
-            conf.mode !== mode &&
-            JSON.stringify(conf.hotkey_combination) ===
-              JSON.stringify(hotkey_combination),
-        )
+      // 更新配置
+      userConfigManager.updateHotkeyConfig(mode, hotkey_combination)
 
-      if (isConflict) {
-        await nativeProcessManager.syncUserConfigToNativeProcess()
-      }
+      // 通知前端配置已更新
+      const updateMessage = buildIPCMessage(MessageTypes.HOTKEY_SETTING_RESULT, {
+        type: MessageTypes.HOTKEY_SETTING_RESULT,
+        timestamp: Date.now(),
+        data: { mode, hotkey_combination },
+      })
+      windowManager.broadcast(DEFAULT_IPC_CHANNEL, updateMessage)
     }
   }
 

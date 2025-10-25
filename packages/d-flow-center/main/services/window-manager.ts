@@ -2,7 +2,6 @@ import log from 'electron-log'
 import { BrowserWindow, screen } from 'electron'
 import chalk from 'chalk'
 
-const WINDOW_STATUS_ID = 'status'
 const WINDOW_CONTENT_ID = 'content'
 
 class WindowManager {
@@ -134,55 +133,7 @@ class WindowManager {
 
     return successCount
   }
-
-  async resizeStatusWindow(toWidth: number = 90, toHeight: number = 30) {
-    const statusWindow = this.windows.get(WINDOW_STATUS_ID)
-    if (!statusWindow) return
-
-    const point = screen.getCursorScreenPoint()
-    const { bounds, workAreaSize, workArea } = screen.getDisplayNearestPoint(point)
-
-    const winBounds = statusWindow.getBounds()
-    winBounds.width = toWidth
-    winBounds.height = toHeight
-
-    const x = bounds.x + (workAreaSize.width - winBounds.width) / 2
-    const y = workArea.y + workArea.height - winBounds.height
-
-    statusWindow.setBounds(
-      {
-        x,
-        y,
-        width: toWidth,
-        height: toHeight,
-      },
-      true,
-    )
-    log.info(chalk(`resize status window ${toWidth} ${toHeight}`))
-  }
-
-  async moveStatusWindowToNewScreen() {
-    const statusWindow = this.windows.get(WINDOW_STATUS_ID)
-    if (!statusWindow) return
-
-    const point = screen.getCursorScreenPoint()
-    const { bounds, workAreaSize, workArea } = screen.getDisplayNearestPoint(point)
-
-    const winBounds = statusWindow.getBounds()
-    const x = bounds.x + (workAreaSize.width - winBounds.width) / 2
-    const y = workArea.y + workArea.height - winBounds.height
-
-    statusWindow.setBounds(
-      {
-        x,
-        y,
-        width: winBounds.width,
-        height: winBounds.height,
-      },
-      true,
-    )
-  }
 }
 
 export default new WindowManager()
-export { WINDOW_STATUS_ID, WINDOW_CONTENT_ID }
+export { WINDOW_CONTENT_ID }
