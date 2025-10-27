@@ -8,6 +8,18 @@
 		<data>
 		+5+rrJNVjVnEnhUoSBpuw/gwqYk=
 		</data>
+		<key>Resources/OnesecCore_OnesecCore.bundle/close.wav</key>
+		<data>
+		hrYoFJ8HVNWXW+3dMyVQ6Lb7E/Q=
+		</data>
+		<key>Resources/OnesecCore_OnesecCore.bundle/notification.wav</key>
+		<data>
+		tDZszuH8HFAuj8DxP+ehijesb5g=
+		</data>
+		<key>Resources/OnesecCore_OnesecCore.bundle/open.wav</key>
+		<data>
+		6kkP3syrxAwdmr8CC2LELuCLW/o=
+		</data>
 		<key>Resources/Sounds/close.wav</key>
 		<data>
 		hrYoFJ8HVNWXW+3dMyVQ6Lb7E/Q=
@@ -23,11 +35,41 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Frameworks/libswift_Concurrency.dylib</key>
+		<dict>
+			<key>cdhash</key>
+			<data>
+			LP4+Jw9cpeY3+MjTIF+s7bHi7ek=
+			</data>
+			<key>requirement</key>
+			<string>identifier "com.apple.dt.runtime.swiftConcurrency" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = PNG2RBG62Z</string>
+		</dict>
 		<key>Resources/AppIcon.icns</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			P+2Jcpj1iT+eoToroiH+jkW47WyrWLtqCQmEvkdK7wo=
+			</data>
+		</dict>
+		<key>Resources/OnesecCore_OnesecCore.bundle/close.wav</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ZqLY6wQt74vR4+icPav0Yx+wNJ+4eFv2+bZVkvfiV5Y=
+			</data>
+		</dict>
+		<key>Resources/OnesecCore_OnesecCore.bundle/notification.wav</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			t80HuOxlTinb4to3gQ2CfHZ+/CGkvzka6XOb2BNrEm8=
+			</data>
+		</dict>
+		<key>Resources/OnesecCore_OnesecCore.bundle/open.wav</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			of16JxdV7h0898NJYfJPRFqpkIzut7G9gP3zYJJOJ6c=
 			</data>
 		</dict>
 		<key>Resources/Sounds/close.wav</key>

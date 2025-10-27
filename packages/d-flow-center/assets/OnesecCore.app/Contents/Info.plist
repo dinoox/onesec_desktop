@@ -7,15 +7,37 @@
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
-    <string>com.ripplestar.oneseccore</string>
+    <string>com.ripplestar.miaoyan.accessHelper</string>
     <key>CFBundleName</key>
     <string>OnesecCore</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
+    <key>CFBundleSignature</key>
+    <string>MYWS</string>
+    <key>CFBundleVersion</key>
+    <string>1.0.1</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.0</string>
+    <string>1.0.1</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
     <key>LSMinimumSystemVersion</key>
     <string>10.15</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSSupportsAutomaticGraphicsSwitching</key>
+    <true/>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2024 Hangzhou RippleStar Technology Co., Ltd. All rights reserved.</string>
+    <key>NSAppleScriptEnabled</key>
+    <false/>
+    <key>NSSupportsAutomaticTermination</key>
+    <true/>
+    <key>NSSupportsSuddenTermination</key>
+    <true/>
+    <key>LSBackgroundOnly</key>
+    <true/>
     <key>LSUIElement</key>
     <true/>
     <key>NSMicrophoneUsageDescription</key>
