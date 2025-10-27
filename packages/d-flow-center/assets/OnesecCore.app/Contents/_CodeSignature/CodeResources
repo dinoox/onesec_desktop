@@ -20,18 +20,6 @@
 		<data>
 		6kkP3syrxAwdmr8CC2LELuCLW/o=
 		</data>
-		<key>Resources/Sounds/close.wav</key>
-		<data>
-		hrYoFJ8HVNWXW+3dMyVQ6Lb7E/Q=
-		</data>
-		<key>Resources/Sounds/notification.wav</key>
-		<data>
-		tDZszuH8HFAuj8DxP+ehijesb5g=
-		</data>
-		<key>Resources/Sounds/open.wav</key>
-		<data>
-		6kkP3syrxAwdmr8CC2LELuCLW/o=
-		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
@@ -66,27 +54,6 @@
 			</data>
 		</dict>
 		<key>Resources/OnesecCore_OnesecCore.bundle/open.wav</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			of16JxdV7h0898NJYfJPRFqpkIzut7G9gP3zYJJOJ6c=
-			</data>
-		</dict>
-		<key>Resources/Sounds/close.wav</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			ZqLY6wQt74vR4+icPav0Yx+wNJ+4eFv2+bZVkvfiV5Y=
-			</data>
-		</dict>
-		<key>Resources/Sounds/notification.wav</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			t80HuOxlTinb4to3gQ2CfHZ+/CGkvzka6XOb2BNrEm8=
-			</data>
-		</dict>
-		<key>Resources/Sounds/open.wav</key>
 		<dict>
 			<key>hash2</key>
 			<data>
