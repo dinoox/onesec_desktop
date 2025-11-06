@@ -20,11 +20,11 @@ export const navMain: NavItem[] = [
     url: '/content',
     icon: LucideHome,
   },
-  // {
-  //   title: '常用词',
-  //   url: '/content/common-words',
-  //   icon: PuzzleIcon,
-  // },
+  {
+    title: '常用词',
+    url: '/content/hot-words',
+    icon: PuzzleIcon,
+  },
   {
     title: '快捷键设置',
     url: '/content/shortcut-keys',

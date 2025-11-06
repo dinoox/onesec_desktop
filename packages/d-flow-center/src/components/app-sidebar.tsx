@@ -38,7 +38,7 @@ const AppSidebar: React.FC = () => {
             <span className="font-semibold">秒言</span>
             <Badge
               variant="outline"
-              className="border-black text-black text-[10px] rounded-xl bg-[#fc0] dark:bg-ripple-yellow"
+              className="border-black text-black text-[10px] rounded-xl bg-ripple-green dark:bg-ripple-yellow"
             >
               试用版
             </Badge>

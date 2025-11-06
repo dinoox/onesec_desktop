@@ -18,9 +18,9 @@ export const generateSignature = async (
     const timestamp = Date.now()
     const sortedKeys = Object.keys(params).sort()
 
-    const signString =
-      sortedKeys.map((key) => `${key}=${params[key]}`).join('#') +
-      `#time=${timestamp}#secret_key=${SECRET_KEY}`
+    const baseParams = sortedKeys.map((k) => `${k}=${params[k]}`)
+    baseParams.push(`time=${timestamp}`, `secret_key=${SECRET_KEY}`)
+    const signString = baseParams.join('#')
 
     const sign = CryptoJS.MD5(signString).toString()
 

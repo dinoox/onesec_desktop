@@ -21,8 +21,8 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
         shortcutKeys: normalConfig?.hotkey_combination || [],
         shortcutCommandKeys: commandConfig?.hotkey_combination || [],
       })
-    }
-  }
+    },
+  },
 }))
 
 export const useUserConfigActions = () => useUserConfigStore((state) => state.actions)

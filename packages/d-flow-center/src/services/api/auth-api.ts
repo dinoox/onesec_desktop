@@ -37,8 +37,13 @@ export const sendVerificationCode = async (phone: string, invitation_code?: stri
   })
 }
 
-export const logout = () => {
-  return request.post('/auth/logout')
+export const logout = async () => {
+  const signature = await generateSignature({})
+  return request.post('/auth/logout', {
+    params: {
+      ...signature,
+    },
+  })
 }
 
 export const refreshToken = async (refreshToken: string) => {

@@ -105,7 +105,7 @@ export function LoginForm({}: { className?: string }) {
   }
 
   return (
-    <Card className="w-[350px] bg-black/85  border border-border backdrop-blur">
+    <Card className="w-[350px] bg-background  border border-border backdrop-blur">
       <CardHeader className="flex flex-col items-center p-3">
         <LogoIcon />
         <CardTitle className="text-xl">秒言</CardTitle>

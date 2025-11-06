@@ -9,8 +9,7 @@ import { PopcornIcon, X } from 'lucide-react'
 const ContestPage: React.FC = () => {
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
   const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
-  const { loadUserConfig } =
-    useUserConfigStore((state) => state.actions)
+  const { loadUserConfig } = useUserConfigStore((state) => state.actions)
 
   const [editingMode, setEditingMode] = useState<'normal' | 'command' | null>(null)
 
@@ -84,9 +83,9 @@ const ContestPage: React.FC = () => {
           </KbdGroup>
         </div>
       </div>
-      <Alert className="max-w-md my-4 border-ripple-yellow/30 opacity-90">
-        <PopcornIcon className="text-ripple-yellow!" />
-        <AlertDescription className="text-ripple-yellow">
+      <Alert className="max-w-md my-2 border-ripple-green dark:border-ripple-yellow/30 opacity-90">
+        <PopcornIcon className="text-ripple-green! dark:text-ripple-yellow!" />
+        <AlertDescription className="text-ripple-green dark:text-ripple-yellow">
           可点击屏幕底部的状态区，配置快捷键
         </AlertDescription>
       </Alert>
