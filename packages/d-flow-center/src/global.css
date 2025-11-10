@@ -82,6 +82,7 @@
 
   --ripple-green-brand: #2EDDA8;
   --ripple-yellow-brand: #ffcc00;
+  --ripple-brand: #2EDDA8;
 }
 
 .dark {
@@ -120,6 +121,7 @@
 
   --ripple-green-brand: #2EDDA8;
   --ripple-yellow-brand: #ffcc00;
+  --ripple-brand: #ffcc00;
 }
 
 @layer base {

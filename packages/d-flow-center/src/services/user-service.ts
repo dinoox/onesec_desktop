@@ -37,6 +37,16 @@ export class UserService {
     })
   }
 
+  static async setTranslationConfig(showComparison: boolean) {
+    const config = await this.getConfig()
+    return this.setConfig({
+      ...config,
+      translation: {
+        show_comparison: showComparison,
+      },
+    })
+  }
+
   static async claimLogin() {
     return window.ipcRenderer.invoke(IPC_USER_LOGIN_CHANNEL)
   }

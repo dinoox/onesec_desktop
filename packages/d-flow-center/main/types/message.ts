@@ -41,6 +41,7 @@ export interface GlobalConfig {
   auth_token: string
   hotkey_configs: HotkeyConfig[]
   user: User | null
+  translation: { show_comparison: boolean }
 }
 
 export interface IPCMessage {

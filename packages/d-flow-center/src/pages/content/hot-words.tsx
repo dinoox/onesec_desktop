@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Loader2, PopcornIcon, Search } from 'lucide-react'
+import { Loader2, PopcornIcon, Search, EllipsisVerticalIcon } from 'lucide-react'
 import {
   useCreateHotWordQuery,
   useDeleteHotWordQuery,
@@ -193,7 +193,7 @@ const ContestPage: React.FC = () => {
       <div className="flex w-full max-w-md flex-col gap-6 my-4">
         {isLoading ? (
           <div className="flex justify-center items-center py-8">
-            <Spinner />
+            <Spinner className="size-6 text-muted-foreground" />
           </div>
         ) : filteredHotWords.length === 0 ? (
           <Empty>
@@ -221,7 +221,7 @@ const ContestPage: React.FC = () => {
                       <Button variant="ghost" size="icon" className="rounded-full">
                         <DropdownMenu>
                           <DropdownMenuTrigger>
-                            <HamburgerMenu />
+                            <EllipsisVerticalIcon />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-56" align="start">
                             <DropdownMenuLabel>提示词操作</DropdownMenuLabel>

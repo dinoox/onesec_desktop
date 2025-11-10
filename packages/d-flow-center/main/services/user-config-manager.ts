@@ -14,20 +14,23 @@ class UserConfigManager {
   }
 
   getConfig(): GlobalConfig {
-    return {
-      auth_token: this.store.get('auth_token', USER_DEFAULT_CONFIG.auth_token),
-      hotkey_configs: this.store.get(
-        'hotkey_configs',
-        USER_DEFAULT_CONFIG.hotkey_configs,
-      ),
-      user: this.store.get('user', USER_DEFAULT_CONFIG.user),
-    }
+    return this.store.store
   }
 
-  setConfig(config: GlobalConfig): void {
-    this.store.set('auth_token', config.auth_token)
-    this.store.set('hotkey_configs', config.hotkey_configs)
-    this.store.set('user', config.user)
+  setConfig(config: Partial<GlobalConfig>): void {
+    Object.entries(config).forEach(([key, value]) => {
+      if (value !== undefined) {
+        this.store.set(key as keyof StoreSchema, value)
+      }
+    })
+  }
+
+  get<K extends keyof GlobalConfig>(key: K): GlobalConfig[K] {
+    return this.store.get(key, USER_DEFAULT_CONFIG[key])
+  }
+
+  set<K extends keyof GlobalConfig>(key: K, value: GlobalConfig[K]): void {
+    this.store.set(key, value)
   }
 
   updateHotkeyConfig(mode: string, hotkey_combination: string[]): void {
