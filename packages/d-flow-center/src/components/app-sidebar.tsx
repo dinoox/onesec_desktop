@@ -35,7 +35,7 @@ const AppSidebar: React.FC = () => {
       {!sidebarCollapsed && (
         <div className="p-3 pt-5 transition-colors duration-300">
           <div className="flex items-center gap-2 px-2 py-2">
-            <span className="font-semibold">秒言</span>
+            <span className="text-base font-semibold">秒言</span>
             <Badge
               variant="outline"
               className="border-black text-black text-[10px] rounded-xl bg-ripple-green dark:bg-ripple-yellow"

@@ -25,12 +25,13 @@ export const useCreateHotWordQuery = () => {
   return useMutation({
     mutationFn: createHotWord,
     onSuccess: async (resp) => {
-      toast.success(resp.message || '热词创建成功')
-      // 刷新列表
-      await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
-    },
-    onError: (error: any) => {
-      toast.error(error?.message || '创建失败，请重试')
+      if (resp.success) {
+        toast.success('热词创建成功')
+        await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
+        return
+      }
+
+      toast.error(resp.message || '创建热词失败，请重试')
     },
   })
 }
@@ -43,12 +44,12 @@ export const useUpdateHotWordQuery = () => {
     mutationFn: ({ hotword_id, hotword }: { hotword_id: number; hotword: string }) =>
       updateHotWord(hotword_id, hotword),
     onSuccess: async (resp) => {
-      toast.success(resp.message || '热词更新成功')
-      // 刷新列表
-      await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
-    },
-    onError: (error: any) => {
-      toast.error(error?.message || '更新失败，请重试')
+      if (resp.success) {
+        toast.success('热词创建成功')
+        await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
+        return
+      }
+      toast.error(resp.message || '更新热词失败，请重试')
     },
   })
 }
@@ -60,12 +61,12 @@ export const useDeleteHotWordQuery = () => {
   return useMutation({
     mutationFn: deleteHotWord,
     onSuccess: async (resp) => {
-      toast.success(resp.message || '热词删除成功')
-      // 刷新列表
-      await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
-    },
-    onError: (error: any) => {
-      toast.error(error?.message || '删除失败，请重试')
+      if (resp.success) {
+        toast.success('热词删除成功')
+        await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
+        return
+      }
+      toast.error(resp.message || '删除热词失败，请重试')
     },
   })
 }

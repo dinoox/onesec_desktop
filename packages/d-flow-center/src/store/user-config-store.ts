@@ -11,15 +11,21 @@ interface UserConfigStore {
   }
 }
 
-const useUserConfigStore = create<UserConfigStore>((set, get) => ({
+const useUserConfigStore = create<UserConfigStore>((set, _) => ({
   shortcutKeys: [],
   shortcutCommandKeys: [],
   showComparison: true,
+  systemType: null,
+  hostSystems: {},
   actions: {
     loadUserConfig: async () => {
       const config = await UserService.getConfig()
-      const normalConfig = config.hotkey_configs?.find((item) => item.mode === 'normal')
-      const commandConfig = config.hotkey_configs?.find((item) => item.mode === 'command')
+      const normalConfig = config.hotkey_configs?.find(
+        (item: any) => item.mode === 'normal',
+      )
+      const commandConfig = config.hotkey_configs?.find(
+        (item: any) => item.mode === 'command',
+      )
       set({
         shortcutKeys: normalConfig?.hotkey_combination || [],
         shortcutCommandKeys: commandConfig?.hotkey_combination || [],
@@ -27,8 +33,9 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
       })
     },
     setShowComparison: async (showComparison: boolean) => {
-      const config = await UserService.getConfig()
-      await UserService.setTranslationConfig(showComparison)
+      await UserService.setPartialConfig({
+        translation: { show_comparison: showComparison },
+      })
       set({ showComparison })
     },
   },

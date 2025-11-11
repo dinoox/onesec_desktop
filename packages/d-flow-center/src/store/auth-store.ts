@@ -10,6 +10,7 @@ interface AuthStore {
   actions: {
     initAuth: () => Promise<void>
     setAuthed: (user: User, accessToken: string) => Promise<void>
+    updateUser: (user: User) => Promise<void>
     logout: () => Promise<void>
   }
 }
@@ -30,9 +31,7 @@ const useAuthStore = create<AuthStore>((set) => ({
     },
 
     setAuthed: async (user, accessToken) => {
-      const config = await UserService.getConfig()
-      await UserService.setConfig({
-        ...config,
+      await UserService.setPartialConfig({
         auth_token: accessToken,
         user,
       })
@@ -46,12 +45,15 @@ const useAuthStore = create<AuthStore>((set) => ({
       await UserService.claimLogin()
     },
 
+    updateUser: async (user) => {
+      await UserService.setPartialConfig({ user })
+      set({ user })
+    },
+
     logout: async () => {
       await logout()
 
-      const config = await UserService.getConfig()
-      await UserService.setConfig({
-        ...config,
+      await UserService.setPartialConfig({
         auth_token: '',
         user: null,
       })

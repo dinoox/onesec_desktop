@@ -190,3 +190,7 @@
 @utility animate-spin-slow {
   animation: spin-slow 1.5s linear infinite;
 }
+
+body {
+    font-size: 14px;
+}

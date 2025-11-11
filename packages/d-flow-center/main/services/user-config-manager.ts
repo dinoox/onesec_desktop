@@ -1,5 +1,4 @@
 import Store from 'electron-store'
-import { GlobalConfig } from '../types/message'
 import { StoreSchema, USER_DEFAULT_CONFIG } from '../types/config.ts'
 
 class UserConfigManager {
@@ -13,24 +12,16 @@ class UserConfigManager {
     })
   }
 
-  getConfig(): GlobalConfig {
+  getConfig(): StoreSchema {
     return this.store.store
   }
 
-  setConfig(config: Partial<GlobalConfig>): void {
+  setConfig(config: Partial<StoreSchema>): void {
     Object.entries(config).forEach(([key, value]) => {
       if (value !== undefined) {
         this.store.set(key as keyof StoreSchema, value)
       }
     })
-  }
-
-  get<K extends keyof GlobalConfig>(key: K): GlobalConfig[K] {
-    return this.store.get(key, USER_DEFAULT_CONFIG[key])
-  }
-
-  set<K extends keyof GlobalConfig>(key: K, value: GlobalConfig[K]): void {
-    this.store.set(key, value)
   }
 
   updateHotkeyConfig(mode: string, hotkey_combination: string[]): void {

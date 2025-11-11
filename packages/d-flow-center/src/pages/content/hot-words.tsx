@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Loader2, PopcornIcon, Search, EllipsisVerticalIcon } from 'lucide-react'
+import { Loader2, PopcornIcon, Search, EllipsisVerticalIcon, Plus } from 'lucide-react'
 import {
   useCreateHotWordQuery,
   useDeleteHotWordQuery,
@@ -133,9 +133,12 @@ const ContestPage: React.FC = () => {
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button>添加常用词</Button>
+              <Button variant="secondary">
+                <Plus />
+                添加常用词
+              </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>添加新常用词</DialogTitle>
                 <DialogDescription>在这里添加您的常用词内容</DialogDescription>

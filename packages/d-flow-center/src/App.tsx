@@ -23,8 +23,7 @@ function App() {
   const initAuth = useAuthStore((state) => state.actions.initAuth)
 
   useEffect(() => {
-    // 应用启动时从 electron-store 恢复认证状态
-    initAuth()
+    initAuth().then()
   }, [initAuth])
 
   return (

@@ -1,5 +1,15 @@
-import { GlobalConfig, HotkeyConfig } from './message'
+import { HotkeyConfig } from './message'
 import { User } from '@/types/user.ts'
+
+// export type SystemFamily = 'debian' | 'redhat';
+export enum SystemFamily {
+  Debian = 'debian',
+  RedHat = 'red_hat',
+}
+
+export interface EnvironmentPreferences {
+  preferred_system: SystemFamily | null
+}
 
 interface StoreSchema {
   auth_token: string
@@ -8,7 +18,7 @@ interface StoreSchema {
   translation: { show_comparison: boolean }
 }
 
-const USER_DEFAULT_CONFIG: GlobalConfig = {
+const USER_DEFAULT_CONFIG: StoreSchema = {
   auth_token: '',
   hotkey_configs: [
     {

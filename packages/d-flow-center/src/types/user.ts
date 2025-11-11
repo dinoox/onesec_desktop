@@ -10,6 +10,7 @@ export type User = {
   user_name: string
   phone: string
   is_active: string
+  preferred_linux_distro?: string | null
 }
 
 export type LoginResp = {

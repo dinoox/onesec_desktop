@@ -37,13 +37,6 @@ export interface HotkeyConfig {
   hotkey_combination: string[]
 }
 
-export interface GlobalConfig {
-  auth_token: string
-  hotkey_configs: HotkeyConfig[]
-  user: User | null
-  translation: { show_comparison: boolean }
-}
-
 export interface IPCMessage {
   id: string
   type: 'request' | 'response' | 'event' | 'ready'
@@ -73,7 +66,7 @@ const DEFAULT_IPC_CHANNEL = 'default_ipc_channel'
 const IPC_USER_LOGIN_CHANNEL = 'user_login_channel'
 const IPC_USER_LOGOUT_CHANNEL = 'user_logout_channel'
 const IPC_USER_CONFIG_GET_CHANNEL = 'user_config_get_channel'
-const IPC_USER_CONFIG_SET_CHANNEL = 'user_config_set_channel'
+const IPC_USER_CONFIG_SET_PARTIAL_CHANNEL = 'user_config_set_partial_channel'
 // External URL
 const IPC_OPEN_EXTERNAL_URL_CHANNEL = 'open_external_url_channel'
 
@@ -82,6 +75,6 @@ export {
   IPC_USER_LOGIN_CHANNEL,
   IPC_USER_LOGOUT_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
-  IPC_USER_CONFIG_SET_CHANNEL,
+  IPC_USER_CONFIG_SET_PARTIAL_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
 }

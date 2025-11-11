@@ -5,6 +5,7 @@ import { Languages, Globe, Terminal } from 'lucide-react'
 import { toast } from 'sonner'
 import useUserConfigStore from '@/store/user-config-store.ts'
 import { getKeyDisplayText } from '@/lib/utils.ts'
+import CurrencyRipple from '@/components/currency-ripple.tsx'
 
 const exampleList = [
   {
@@ -42,8 +43,8 @@ const ContestPage: React.FC = () => {
   return (
     <div className="max-w-9/12 flex flex-col justify-between gap-5">
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
-        <div className="flex flex-col justify-center  space-y-2">
-          <span className="text-base font-medium">如何使用</span>
+        <div className="flex flex-col justify-center  space-y-1">
+          <span className="font-medium">如何使用</span>
           <span className="text-sm text-muted-foreground">
             按住快捷键说话，松开后内容自动输入到当前光标位置
           </span>
@@ -111,8 +112,8 @@ const ContestPage: React.FC = () => {
       </div>
 
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
-        <div className="flex flex-col justify-center  space-y-2">
-          <span className="text-base font-medium">试试下面的例子</span>
+        <div className="flex flex-col justify-center  space-y-1">
+          <span className="font-medium">试试下面的例子</span>
           <span className="text-sm text-muted-foreground">
             按住快捷键说话，松开后内容自动输入到当前光标位置
           </span>
