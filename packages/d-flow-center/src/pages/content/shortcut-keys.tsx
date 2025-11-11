@@ -86,7 +86,7 @@ const ContestPage: React.FC = () => {
       <Alert className="max-w-md my-2 border-ripple-green dark:border-ripple-yellow/30 opacity-90">
         <PopcornIcon className="text-ripple-green! dark:text-ripple-yellow!" />
         <AlertDescription className="text-ripple-green dark:text-ripple-yellow">
-          可点击屏幕底部的状态区，配置快捷键
+          可点击屏幕底部状态区，配置快捷键
         </AlertDescription>
       </Alert>
     </div>

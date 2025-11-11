@@ -9,8 +9,8 @@ import useAuthStore from '@/store/auth-store'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false,
-      throwOnError: true,
+      retry: 1,
+      throwOnError: false,
     },
     mutations: {
       retry: false,

@@ -26,7 +26,7 @@ export const navMain: NavItem[] = [
     icon: PuzzleIcon,
   },
   {
-    title: '快捷键设置',
+    title: '快捷键',
     url: '/content/shortcut-keys',
     icon: LucideShell,
   },

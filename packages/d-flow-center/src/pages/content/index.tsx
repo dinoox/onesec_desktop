@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import { Item, ItemContent } from '@/components/ui/item.tsx'
 import { Kbd, KbdGroup } from '@/components/ui/kbd.tsx'
-import { Languages, Globe, Terminal } from 'lucide-react'
+import { Languages, Globe, Terminal, MonitorCog } from 'lucide-react'
 import { toast } from 'sonner'
 import useUserConfigStore from '@/store/user-config-store.ts'
 import { getKeyDisplayText } from '@/lib/utils.ts'
 import CurrencyRipple from '@/components/currency-ripple.tsx'
+import { Label } from '@/components/ui/label'
 
 const exampleList = [
   {
@@ -44,76 +45,80 @@ const ContestPage: React.FC = () => {
     <div className="max-w-9/12 flex flex-col justify-between gap-5">
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
         <div className="flex flex-col justify-center  space-y-1">
-          <span className="font-medium">如何使用</span>
+          <span className="text-[15px] font-medium">如何使用</span>
           <span className="text-sm text-muted-foreground">
             按住快捷键说话，松开后内容自动输入到当前光标位置
           </span>
         </div>
-        <Item
-          variant="muted"
-          className="hover:border-border transition-all duration-300 cursor-pointer"
-        >
-          <ItemContent className="flex flex-col gap-2">
-            <div className="text-sm font-medium">
-              <div className="flex flex-col gap-4">
-                <p>
-                  长按{' '}
-                  <KbdGroup className="mx-1">
-                    {shortcutKeys.length > 0 ? (
-                      shortcutKeys.map((key, index) => (
-                        <Kbd key={index}>{getKeyDisplayText(key)}</Kbd>
-                      ))
-                    ) : (
-                      <>
-                        <Kbd>fn</Kbd>
-                        <Kbd>Opt⌥</Kbd>
-                      </>
-                    )}
-                  </KbdGroup>{' '}
-                  开启普通模式
-                </p>
+
+        <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
+          <div className="flex items-center px-2">
+            <div className="flex flex-col space-y-2">
+              <Label>
+                <div className="text-sm font-medium">
+                  <div className="flex flex-col gap-4">
+                    <p>
+                      长按{' '}
+                      <KbdGroup className="mx-1">
+                        {shortcutKeys.length > 0 ? (
+                          shortcutKeys.map((key, index) => (
+                            <Kbd key={index}>{getKeyDisplayText(key)}</Kbd>
+                          ))
+                        ) : (
+                          <>
+                            <Kbd>fn</Kbd>
+                            <Kbd>Opt⌥</Kbd>
+                          </>
+                        )}
+                      </KbdGroup>{' '}
+                      开启普通模式
+                    </p>
+                  </div>
+                </div>
+              </Label>
+              <div className="text-sm text-muted-foreground">
+                语音识别：自动识别使用场景，让识别更准确，输出更清晰
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              语音识别：自动识别使用场景，让识别更准确，输出更清晰
-            </div>
-          </ItemContent>
-        </Item>
-        <Item
-          variant="muted"
-          className="hover:border-border transition-all duration-300 cursor-pointer"
-        >
-          <ItemContent className="flex flex-col gap-2">
-            <div className="text-sm font-medium">
-              <div className="flex flex-col gap-4">
-                <p>
-                  长按{' '}
-                  <KbdGroup className="mx-1">
-                    {shortcutCommandKeys.length > 0 ? (
-                      shortcutCommandKeys.map((key, index) => (
-                        <Kbd key={index}>{getKeyDisplayText(key)}</Kbd>
-                      ))
-                    ) : (
-                      <>
-                        <Kbd>fn</Kbd>
-                        <Kbd>cmd⌥</Kbd>
-                      </>
-                    )}
-                  </KbdGroup>{' '}
-                  开启命令模式
-                </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
+          <div className="flex items-center px-2">
+            <div className="flex flex-col space-y-2">
+              <Label>
+                <div className="text-sm font-medium">
+                  <div className="flex flex-col gap-4">
+                    <p>
+                      长按{' '}
+                      <KbdGroup className="mx-1">
+                        {shortcutCommandKeys.length > 0 ? (
+                          shortcutCommandKeys.map((key, index) => (
+                            <Kbd key={index}>{getKeyDisplayText(key)}</Kbd>
+                          ))
+                        ) : (
+                          <>
+                            <Kbd>fn</Kbd>
+                            <Kbd>cmd⌥</Kbd>
+                          </>
+                        )}
+                      </KbdGroup>{' '}
+                      开启命令模式
+                    </p>
+                  </div>
+                </div>
+              </Label>
+              <div className="text-sm text-muted-foreground">
+                语音命令：支持命令识别和智能交互
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              语音命令：支持命令识别和智能交互
-            </div>
-          </ItemContent>
-        </Item>
+          </div>
+        </div>
       </div>
 
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
         <div className="flex flex-col justify-center  space-y-1">
-          <span className="font-medium">试试下面的例子</span>
+          <span className="text-[15px] font-medium">试试下面的例子</span>
           <span className="text-sm text-muted-foreground">
             按住快捷键说话，松开后内容自动输入到当前光标位置
           </span>

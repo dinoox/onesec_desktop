@@ -22,13 +22,14 @@ export const useBindTerminal = () => {
 
   return useMutation({
     mutationFn: bindTerminal,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['terminals'] })
-      toast.success('添加成功')
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '添加失败')
-    },
+    onSuccess: (resp) => {
+      if (resp.success) {
+        queryClient.invalidateQueries({ queryKey: ['terminals'] })
+        toast.success('添加成功')
+        return
+      }
+      toast.error(resp.message || '添加失败')
+    }
   })
 }
 
@@ -37,13 +38,14 @@ export const useUpdateTerminal = () => {
 
   return useMutation({
     mutationFn: updateTerminal,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['terminals'] })
-      toast.success('更新成功')
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '更新失败')
-    },
+    onSuccess: (resp) => {
+      if (resp.success) {
+        queryClient.invalidateQueries({ queryKey: ['terminals'] })
+        toast.success('更新成功')
+        return
+      }
+      toast.error(resp.message || '更新失败')
+    }
   })
 }
 
@@ -52,13 +54,14 @@ export const useDeleteTerminal = () => {
 
   return useMutation({
     mutationFn: deleteTerminal,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['terminals'] })
-      toast.success('删除成功')
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '删除失败')
-    },
+    onSuccess: (resp) => {
+      if (resp.success) {
+        queryClient.invalidateQueries({ queryKey: ['terminals'] })
+        toast.success('删除成功')
+        return
+      }
+      toast.error(resp.message || '删除失败')
+    }
   })
 }
 

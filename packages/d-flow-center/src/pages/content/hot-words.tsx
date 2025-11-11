@@ -8,7 +8,6 @@ import {
   ItemTitle,
 } from '@/components/ui/item'
 import React, { useMemo, useState } from 'react'
-import { Edit, HamburgerMenu, Trash } from 'iconsax-reactjs'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import {
   Dialog,
@@ -30,13 +29,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Loader2, PopcornIcon, Search, EllipsisVerticalIcon, Plus } from 'lucide-react'
+import { Loader2, PopcornIcon, Search, EllipsisVerticalIcon, Plus, AlertCircle } from 'lucide-react'
 import {
   useCreateHotWordQuery,
   useDeleteHotWordQuery,
   useHotWordListQuery,
   useUpdateHotWordQuery,
 } from '@/services/queries/hotword-query'
+import { IconAdjustmentsHorizontal, IconEdit, IconTrash } from '@tabler/icons-react'
 import { HotWord } from '@/services/api/hotword-api'
 import { Spinner } from '@/components/ui/spinner'
 import { Empty, EmptyDescription } from '@/components/ui/empty'
@@ -52,7 +52,7 @@ const ContestPage: React.FC = () => {
   const [showAlert, setShowAlert] = useState(true)
 
   // 获取热词列表
-  const { data: hotWords = [], isLoading } = useHotWordListQuery()
+  const { data: hotWords = [], isLoading, isError, error } = useHotWordListQuery()
   const createHotWordMutation = useCreateHotWordQuery()
   const updateHotWordMutation = useUpdateHotWordQuery()
   const deleteHotWordMutation = useDeleteHotWordQuery()
@@ -194,7 +194,15 @@ const ContestPage: React.FC = () => {
       )}
 
       <div className="flex w-full max-w-md flex-col gap-6 my-4">
-        {isLoading ? (
+        {isError ? (
+          <Alert variant="destructive">
+            <AlertCircle />
+            <AlertTitle>连接失败</AlertTitle>
+            <AlertDescription>
+              无法连接到服务器，请检查网络连接或稍后重试
+            </AlertDescription>
+          </Alert>
+        ) : isLoading ? (
           <div className="flex justify-center items-center py-8">
             <Spinner className="size-6 text-muted-foreground" />
           </div>
@@ -224,7 +232,7 @@ const ContestPage: React.FC = () => {
                       <Button variant="ghost" size="icon" className="rounded-full">
                         <DropdownMenu>
                           <DropdownMenuTrigger>
-                            <EllipsisVerticalIcon />
+                            <IconAdjustmentsHorizontal />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-56" align="start">
                             <DropdownMenuLabel>提示词操作</DropdownMenuLabel>
@@ -232,7 +240,7 @@ const ContestPage: React.FC = () => {
                               <DropdownMenuItem onClick={() => openEditDialog(item)}>
                                 编辑
                                 <DropdownMenuShortcut>
-                                  <Edit />
+                                  <IconEdit />
                                 </DropdownMenuShortcut>
                               </DropdownMenuItem>
                             </DropdownMenuGroup>
@@ -243,7 +251,7 @@ const ContestPage: React.FC = () => {
                             >
                               删除
                               <DropdownMenuShortcut>
-                                <Trash />
+                                <IconTrash />
                               </DropdownMenuShortcut>
                             </DropdownMenuItem>
                           </DropdownMenuContent>

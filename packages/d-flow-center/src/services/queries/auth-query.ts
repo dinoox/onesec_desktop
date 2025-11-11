@@ -15,12 +15,13 @@ export const useLoginQuery = () => {
   return useMutation({
     mutationFn: login,
     onSuccess: async (resp) => {
-      try {
+      if (resp.success) {
         await handleAuthSuccess(resp)
         toast.success(resp.message)
-      } catch (error) {
-        toast.error(`${resp.message}`)
+        return
       }
+
+      toast.error(`${resp.message}`)
     },
   })
 }
@@ -29,12 +30,13 @@ export const useRegisterQuery = () => {
   return useMutation({
     mutationFn: register,
     onSuccess: async (resp) => {
-      try {
+      if (resp.success) {
         await handleAuthSuccess(resp)
         toast.success(resp.message)
-      } catch (error) {
-        toast.error('注册失败')
+        return
       }
+
+      toast.error(`${resp.message}`)
     },
   })
 }
@@ -65,6 +67,10 @@ export const useLogoutQuery = () =>
     onSuccess: async (resp) => {
       await authStore.getState().actions.logout()
       useStatusStore.getState().actions.setAuthTokenInvalid(true)
-      toast.success(resp.message)
+      if (resp.success) {
+        toast.success('退出成功')
+        return
+      }
+      toast.error(resp.message)
     },
   })
