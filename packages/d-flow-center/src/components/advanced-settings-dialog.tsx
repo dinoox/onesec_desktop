@@ -1,15 +1,19 @@
-import React, {useState} from 'react'
-import {Button} from '@/components/ui/button.tsx'
-import {Input} from '@/components/ui/input.tsx'
-import {Label} from '@radix-ui/react-label'
-import {MonitorCog, Plus, Trash2, X} from 'lucide-react'
-import {NativeSelect, NativeSelectOption} from '@/components/ui/native-select.tsx'
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover.tsx'
-import useUIStore, {useUIActions} from '@/store/ui-store.ts'
-import {useBindTerminal, useDeleteTerminal, useListTerminals,} from '@/services/queries/terminal-query.ts'
-import {Separator} from '@radix-ui/react-select'
-import {AnimatePresence, motion} from 'framer-motion'
-import {SystemFamily} from "@/types/terminal.ts";
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button.tsx'
+import { Input } from '@/components/ui/input.tsx'
+import { Label } from '@radix-ui/react-label'
+import { MonitorCog, Plus, Trash2, X } from 'lucide-react'
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select.tsx'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx'
+import useUIStore, { useUIActions } from '@/store/ui-store.ts'
+import {
+  useBindTerminal,
+  useDeleteTerminal,
+  useListTerminals,
+} from '@/services/queries/terminal-query.ts'
+import { Separator } from '@radix-ui/react-select'
+import { AnimatePresence, motion } from 'framer-motion'
+import { SystemFamily } from '@/types/terminal.ts'
 
 export const AdvancedSettingsDialog: React.FC = () => {
   const advancedSettingsOpen = useUIStore((state) => state.advancedSettingsOpen)
@@ -20,7 +24,9 @@ export const AdvancedSettingsDialog: React.FC = () => {
   const deleteTerminalMutation = useDeleteTerminal()
 
   const [newHostname, setNewHostname] = useState('')
-  const [newSystemFamily, setNewSystemFamily] = useState<SystemFamily>(SystemFamily.Debian)
+  const [newSystemFamily, setNewSystemFamily] = useState<SystemFamily>(
+    SystemFamily.Debian,
+  )
   const [popoverOpen, setPopoverOpen] = useState(false)
 
   const handleAddHostSystem = async () => {

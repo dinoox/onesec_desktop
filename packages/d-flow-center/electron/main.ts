@@ -1,10 +1,9 @@
-import { app, BrowserWindow, screen, nativeTheme } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import windowManager, { WINDOW_CONTENT_ID } from '../main/services/window-manager.ts'
 import processManager from '../main/process-manager.ts'
 import menuService from '../main/services/menu-service.ts'
-import log from 'electron-log'
 import userConfigManager from '../main/services/user-config-manager.ts'
 
 // Disable HTTPS Cert Verification（only dev）
@@ -25,7 +24,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, 'public')
   : RENDERER_DIST
 
-let win, statusWin: BrowserWindow | null
+let win: BrowserWindow | null = null
 
 function createWindow(onWebLoaded: Function = () => {}) {
   const isDarkMode = userConfigManager.getConfig().theme === 'dark'
@@ -39,9 +38,14 @@ function createWindow(onWebLoaded: Function = () => {}) {
     titleBarStyle: 'hidden',
     trafficLightPosition: { x: 10, y: 10 },
     backgroundColor: isDarkMode ? '#1A1A1A' : '#FFFFFF',
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
+  })
+
+  win.once('ready-to-show', () => {
+    win?.show()
   })
 
   win.webContents.once('did-finish-load', async () => {
