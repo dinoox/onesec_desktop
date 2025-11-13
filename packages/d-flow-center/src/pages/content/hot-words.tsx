@@ -29,7 +29,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Loader2, PopcornIcon, Search, EllipsisVerticalIcon, Plus, AlertCircle } from 'lucide-react'
+import {
+  Loader2,
+  PopcornIcon,
+  Search,
+  EllipsisVerticalIcon,
+  Plus,
+  AlertCircle,
+} from 'lucide-react'
 import {
   useCreateHotWordQuery,
   useDeleteHotWordQuery,

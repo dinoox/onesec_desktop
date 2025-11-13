@@ -1,9 +1,14 @@
+export enum SystemFamily {
+  Debian = 'debian',
+  RedHat = 'red_hat',
+}
+
 export interface TerminalBinding {
   id: number
   bundle_id: string
   app_name: string
   endpoint_identifier: string
-  linux_distro: 'debian' | 'red_hat'
+  linux_distro: SystemFamily
   linux_version: string
   hostname?: string
   bound_at: string
@@ -16,7 +21,7 @@ export interface TerminalBindingListResponse {
 
 export interface BindTerminalParams {
   endpoint_identifier: string
-  linux_distro: 'debian' | 'red_hat'
+  linux_distro: SystemFamily
   linux_version?: string
   bundle_id?: string
   app_name?: string
@@ -26,7 +31,7 @@ export interface BindTerminalParams {
 export interface UpdateTerminalParams {
   binding_id: number
   endpoint_identifier?: string
-  linux_distro?: 'debian' | 'red_hat'
+  linux_distro?: SystemFamily
   linux_version?: string
   bundle_id?: string
   app_name?: string
@@ -39,4 +44,3 @@ export interface DeleteTerminalParams {
 export interface ListTerminalParams {
   endpoint_identifier?: string
 }
-

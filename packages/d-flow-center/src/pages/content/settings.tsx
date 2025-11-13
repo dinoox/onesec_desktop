@@ -1,28 +1,34 @@
 import React from 'react'
-import {Label} from '@radix-ui/react-label'
-import {Input} from '@/components/ui/input.tsx'
+import { Label } from '@radix-ui/react-label'
+import { Input } from '@/components/ui/input.tsx'
 import useAuthStore from '@/store/auth-store.ts'
-import {Button} from '@/components/ui/button.tsx'
-import {useLogoutQuery} from '@/services/queries/auth-query.ts'
-import {Spinner} from '@/components/ui/spinner.tsx'
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/pure-select.tsx'
-import {useTheme} from '@/components/theme-provider.tsx'
-import useUserConfigStore, {useUserConfigActions} from '@/store/user-config-store.ts'
-import {useUIActions} from '@/store/ui-store.ts'
-import {SystemFamily} from '../../../main/types/config.ts'
-import {useGetUserInfo, useUpdateUserInfo} from '@/services/queries/user-query.ts'
-import {IconGitBranch} from "@tabler/icons-react"
-import {AdvancedSettingsDialog} from '@/components/advanced-settings-dialog.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import { useLogoutQuery } from '@/services/queries/auth-query.ts'
+import { Spinner } from '@/components/ui/spinner.tsx'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/pure-select.tsx'
+import { useTheme } from '@/components/theme-provider.tsx'
+import useUserConfigStore, { useUserConfigActions } from '@/store/user-config-store.ts'
+import { useUIActions } from '@/store/ui-store.ts'
+import { useGetUserInfo, useUpdateUserInfo } from '@/services/queries/user-query.ts'
+import { IconGitBranch } from '@tabler/icons-react'
+import { AdvancedSettingsDialog } from '@/components/advanced-settings-dialog.tsx'
+import { SystemFamily } from '@/types/terminal.ts'
 
 const ContestPage: React.FC = () => {
   const user = useAuthStore((state) => state.user)
   const mutation = useLogoutQuery()
   useGetUserInfo()
   const updateUserMutation = useUpdateUserInfo()
-  const {theme, setTheme} = useTheme()
+  const { theme, setTheme } = useTheme()
   const showComparison = useUserConfigStore((state) => state.showComparison)
-  const {setShowComparison} = useUserConfigActions()
-  const {setAdvancedSettingsOpen} = useUIActions()
+  const { setShowComparison } = useUserConfigActions()
+  const { setAdvancedSettingsOpen } = useUIActions()
 
   async function logout() {
     await mutation.mutateAsync()
@@ -35,13 +41,11 @@ const ContestPage: React.FC = () => {
       preferred_linux_distro = value
     }
 
-    await updateUserMutation.mutateAsync({preferred_linux_distro})
+    await updateUserMutation.mutateAsync({ preferred_linux_distro })
   }
 
   return (
     <div className="max-w-1/2 space-y-3">
-
-
       <div className=" flex flex-col justify-between self-start space-y-2 gap-x-4">
         <div className="text-[15px]">基础设置</div>
         <div className="flex items-center justify-between w-full bg-setting rounded-xl px-3 py-3">
@@ -63,7 +67,7 @@ const ContestPage: React.FC = () => {
           <Label htmlFor="picture">主题</Label>
           <Select value={theme} onValueChange={setTheme}>
             <SelectTrigger>
-              <SelectValue placeholder="选择主题"/>
+              <SelectValue placeholder="选择主题" />
               <span></span>
             </SelectTrigger>
             <SelectContent>
@@ -73,7 +77,6 @@ const ContestPage: React.FC = () => {
             </SelectContent>
           </Select>
         </div>
-
       </div>
 
       <div className="my-6 flex flex-col justify-between self-start space-y-2 gap-x-4">
@@ -88,7 +91,7 @@ const ContestPage: React.FC = () => {
             onValueChange={(value) => setShowComparison(value === 'appear')}
           >
             <SelectTrigger className="py-4">
-              <SelectValue placeholder="选择模式"/>
+              <SelectValue placeholder="选择模式" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="appear">自动显示</SelectItem>
@@ -97,11 +100,9 @@ const ContestPage: React.FC = () => {
           </Select>
         </div>
 
-
         {/* 常用系统 */}
         {user?.preferred_linux_distro && (
           <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3 animate-in fade-in duration-300">
-
             <div className="flex flex-col space-y-1">
               <Label>常用系统</Label>
               <span className="text-muted-foreground">终端连接远程主机常用系统</span>
@@ -111,7 +112,8 @@ const ContestPage: React.FC = () => {
                 size="sm"
                 onClick={() => setAdvancedSettingsOpen(true)}
               >
-                <IconGitBranch />配置
+                <IconGitBranch />
+                配置
               </Button>
             </div>
 
@@ -121,7 +123,7 @@ const ContestPage: React.FC = () => {
               disabled={updateUserMutation.isPending}
             >
               <SelectTrigger className="py-4">
-                <SelectValue placeholder="选择系统"/>
+                <SelectValue placeholder="选择系统" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">未设置</SelectItem>
@@ -139,7 +141,7 @@ const ContestPage: React.FC = () => {
         onClick={logout}
         disabled={mutation.isPending}
       >
-        {mutation.isPending ? <Spinner/> : null}
+        {mutation.isPending ? <Spinner /> : null}
         退出登录
       </Button>
 

@@ -35,7 +35,5 @@ export const useUpdateUserInfo = () => {
       }
       toast.error(resp?.message || '更新失败')
     },
-
   })
 }
-

@@ -1,21 +1,13 @@
 import { HotkeyConfig } from './message'
 import { User } from '@/types/user.ts'
-
-// export type SystemFamily = 'debian' | 'redhat';
-export enum SystemFamily {
-  Debian = 'debian',
-  RedHat = 'red_hat',
-}
-
-export interface EnvironmentPreferences {
-  preferred_system: SystemFamily | null
-}
+import { Theme } from '@/components/theme-provider.tsx'
 
 interface StoreSchema {
   auth_token: string
   hotkey_configs: HotkeyConfig[]
   user: User | null
   translation: { show_comparison: boolean }
+  theme: Theme
 }
 
 const USER_DEFAULT_CONFIG: StoreSchema = {
@@ -29,6 +21,7 @@ const USER_DEFAULT_CONFIG: StoreSchema = {
   ],
   user: null,
   translation: { show_comparison: true },
+  theme: 'system',
 }
 
 export { USER_DEFAULT_CONFIG }

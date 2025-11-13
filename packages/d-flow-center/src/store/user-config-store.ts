@@ -15,8 +15,6 @@ const useUserConfigStore = create<UserConfigStore>((set, _) => ({
   shortcutKeys: [],
   shortcutCommandKeys: [],
   showComparison: true,
-  systemType: null,
-  hostSystems: {},
   actions: {
     loadUserConfig: async () => {
       const config = await UserService.getConfig()

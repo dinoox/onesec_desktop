@@ -1,9 +1,11 @@
-import { app, BrowserWindow, screen } from 'electron'
+import { app, BrowserWindow, screen, nativeTheme } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import windowManager, { WINDOW_CONTENT_ID } from '../main/services/window-manager.ts'
 import processManager from '../main/process-manager.ts'
 import menuService from '../main/services/menu-service.ts'
+import log from 'electron-log'
+import userConfigManager from '../main/services/user-config-manager.ts'
 
 // Disable HTTPS Cert Verification（only dev）
 app.commandLine.appendSwitch('--ignore-certificate-errors')
@@ -26,6 +28,8 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win, statusWin: BrowserWindow | null
 
 function createWindow(onWebLoaded: Function = () => {}) {
+  const isDarkMode = userConfigManager.getConfig().theme === 'dark'
+
   win = new BrowserWindow({
     title: '秒言',
     width: 1024,
@@ -34,6 +38,7 @@ function createWindow(onWebLoaded: Function = () => {}) {
     minHeight: 710,
     titleBarStyle: 'hidden',
     trafficLightPosition: { x: 10, y: 10 },
+    backgroundColor: isDarkMode ? '#1A1A1A' : '#FFFFFF',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },

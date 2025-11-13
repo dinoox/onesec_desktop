@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { UserService } from '@/services/user-service.ts'
 
-type Theme = 'dark' | 'light' | 'system'
+export type Theme = 'dark' | 'light' | 'system'
 
 type ThemeProviderProps = {
   children: React.ReactNode
@@ -64,6 +65,9 @@ export function ThemeProvider({
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme)
       setTheme(theme)
+      UserService.setPartialConfig({ theme }).catch((err) => {
+        console.error('Failed to save theme to electron store:', err)
+      })
     },
   }
 

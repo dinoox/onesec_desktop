@@ -29,7 +29,7 @@ export const useBindTerminal = () => {
         return
       }
       toast.error(resp.message || '添加失败')
-    }
+    },
   })
 }
 
@@ -45,7 +45,7 @@ export const useUpdateTerminal = () => {
         return
       }
       toast.error(resp.message || '更新失败')
-    }
+    },
   })
 }
 
@@ -61,7 +61,6 @@ export const useDeleteTerminal = () => {
         return
       }
       toast.error(resp.message || '删除失败')
-    }
+    },
   })
 }
-

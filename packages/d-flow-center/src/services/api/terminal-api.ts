@@ -48,4 +48,3 @@ export const deleteTerminal = async (params: DeleteTerminalParams) => {
     },
   })
 }
-
