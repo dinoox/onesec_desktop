@@ -142,7 +142,7 @@ class NativeProcessManager {
   private buildNativeProcessArgs(): string[] {
     const config = userConfigManager.getConfig()
 
-    // 1. 获取或生成 auth token
+    // 1. 获取 Auth token
     const authToken = config.auth_token
 
     // 2. 获取 UDS channel 路径
@@ -152,17 +152,6 @@ class NativeProcessManager {
     const url = new URL(import.meta.env.VITE_API_BASEURL || 'https://114.55.98.75:443')
     const server = url.host
 
-    // 4. 获取快捷键配置
-    const normalKeysConfig = config.hotkey_configs.find((c) => c.mode === 'normal')
-    const commandKeysConfig = config.hotkey_configs.find((c) => c.mode === 'command')
-
-    const normalKeys = normalKeysConfig
-      ? normalKeysConfig.hotkey_combination.join('+')
-      : 'Fn'
-    const commandKeys = commandKeysConfig
-      ? commandKeysConfig.hotkey_combination.join('+')
-      : 'Fn+Cmd'
-
     return [
       '--uds-channel',
       udsChannel,
@@ -170,25 +159,23 @@ class NativeProcessManager {
       server,
       '--auth-token',
       authToken,
-      '--debug-mode',
-      'true',
-      '--normal-keys',
-      normalKeys,
-      '--command-keys',
-      commandKeys,
     ]
+  }
+
+  async sendAuthTokenFailed() {
+    udsService.broadcast({
+      type: MessageTypes.AUTH_TOKEN_FAILED,
+      timestamp: Date.now(),
+      data: {}
+    })
   }
 
   async syncUserConfigToNativeProcess() {
     const config = userConfigManager.getConfig()
-
     udsService.broadcast({
       type: MessageTypes.UPDATE_CONFIG,
       timestamp: Date.now(),
-      data: {
-        auth_token: config.auth_token,
-        hotkey_configs: config.hotkey_configs,
-      },
+      data: {}
     })
 
     log.info(`Update Native Config: ${JSON.stringify(config)}`)

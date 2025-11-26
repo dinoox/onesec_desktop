@@ -1,4 +1,5 @@
 import {
+  IPC_AUTH_TOKEN_FAILED_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_PARTIAL_CHANNEL,
   IPC_USER_LOGIN_CHANNEL,
@@ -21,5 +22,9 @@ export class UserService {
 
   static async claimLogout() {
     return window.ipcRenderer.invoke(IPC_USER_LOGOUT_CHANNEL)
+  }
+
+  static async claimAuthTokenFailed() {
+    return window.ipcRenderer.invoke(IPC_AUTH_TOKEN_FAILED_CHANNEL)
   }
 }

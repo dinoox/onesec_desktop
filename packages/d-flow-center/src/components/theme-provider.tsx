@@ -33,19 +33,23 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-    root.classList.remove('light', 'dark')
-
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
-
-      root.classList.add(systemTheme)
-      return
+    const applyTheme = () => {
+      root.classList.remove('light', 'dark')
+      if (theme === 'system') {
+        root.classList.add(mediaQuery.matches ? 'dark' : 'light')
+      } else {
+        root.classList.add(theme)
+      }
     }
 
-    root.classList.add(theme)
+    applyTheme()
+
+    if (theme === 'system') {
+      mediaQuery.addEventListener('change', applyTheme)
+      return () => mediaQuery.removeEventListener('change', applyTheme)
+    }
   }, [theme])
 
   // 跨窗口主题同步

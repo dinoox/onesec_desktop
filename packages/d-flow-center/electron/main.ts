@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, nativeTheme } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import windowManager, { WINDOW_CONTENT_ID } from '../main/services/window-manager.ts'
@@ -27,7 +27,8 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win: BrowserWindow | null = null
 
 function createWindow(onWebLoaded: Function = () => {}) {
-  const isDarkMode = userConfigManager.getConfig().theme === 'dark'
+  const theme = userConfigManager.getConfig().theme
+  const isDarkMode = theme === 'system' ? nativeTheme.shouldUseDarkColors : theme === 'dark'
 
   win = new BrowserWindow({
     title: '秒言',

@@ -65,6 +65,7 @@ const DEFAULT_IPC_CHANNEL = 'default_ipc_channel'
 // User
 const IPC_USER_LOGIN_CHANNEL = 'user_login_channel'
 const IPC_USER_LOGOUT_CHANNEL = 'user_logout_channel'
+const IPC_AUTH_TOKEN_FAILED_CHANNEL = 'auth_token_failed_channel'
 const IPC_USER_CONFIG_GET_CHANNEL = 'user_config_get_channel'
 const IPC_USER_CONFIG_SET_PARTIAL_CHANNEL = 'user_config_set_partial_channel'
 // External URL
@@ -74,6 +75,7 @@ export {
   DEFAULT_IPC_CHANNEL,
   IPC_USER_LOGIN_CHANNEL,
   IPC_USER_LOGOUT_CHANNEL,
+  IPC_AUTH_TOKEN_FAILED_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_PARTIAL_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,

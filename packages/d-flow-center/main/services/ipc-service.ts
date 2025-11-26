@@ -3,7 +3,7 @@ import {
   IPC_USER_CONFIG_SET_PARTIAL_CHANNEL,
   IPC_USER_LOGIN_CHANNEL,
   IPC_USER_LOGOUT_CHANNEL,
-  IPC_OPEN_EXTERNAL_URL_CHANNEL,
+  IPC_OPEN_EXTERNAL_URL_CHANNEL, IPC_AUTH_TOKEN_FAILED_CHANNEL,
 } from '../types/message'
 import userConfigManager from './user-config-manager'
 import nativeProcessManager from './native-process-manager'
@@ -17,6 +17,7 @@ class IPCService {
     ipcMain.handle(IPC_USER_CONFIG_SET_PARTIAL_CHANNEL, this.handleSetPartialUserConfig)
     ipcMain.handle(IPC_USER_LOGIN_CHANNEL, this.handleUserLogin)
     ipcMain.handle(IPC_USER_LOGOUT_CHANNEL, this.handleUserLogout)
+    ipcMain.handle(IPC_AUTH_TOKEN_FAILED_CHANNEL, this.handleAuthTokenFailed)
     ipcMain.handle(IPC_OPEN_EXTERNAL_URL_CHANNEL, this.handleOpenExternalUrl)
   }
 
@@ -32,6 +33,9 @@ class IPCService {
   private handleUserLogin = async () => {}
 
   private handleUserLogout = async () => {}
+  private handleAuthTokenFailed = async () => {
+    await nativeProcessManager.sendAuthTokenFailed()
+  }
 
   // External URL
   private handleOpenExternalUrl = async (_: any, url: string) => {

@@ -25,8 +25,8 @@ const useUserConfigStore = create<UserConfigStore>((set, _) => ({
         (item: any) => item.mode === 'command',
       )
       set({
-        shortcutKeys: normalConfig?.hotkey_combination || [],
-        shortcutCommandKeys: commandConfig?.hotkey_combination || [],
+        shortcutKeys: normalConfig?.hotkey_combination || ['Fn'],
+        shortcutCommandKeys: commandConfig?.hotkey_combination || ['Fn', "LCmd"],
         showComparison: config.translation?.show_comparison ?? true,
       })
     },

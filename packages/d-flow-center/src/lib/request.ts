@@ -1,5 +1,7 @@
 import queryString from 'query-string'
 import authStore from '@/store/auth-store.ts'
+import useStatusStore from "@/store/status-store.ts";
+import {UserService} from "@/services/user-service.ts";
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 type Config = { cache: 'no-store' } | { cache: 'force-cache' }
@@ -59,23 +61,24 @@ class Request {
    * 响应拦截器
    */
   async interceptorsResponse<T>(res: Response): Promise<T> {
-    return new Promise((resolve, reject) => {
-      const requestUrl = res.url
-      if (res.ok) {
-        return resolve(res.json() as Promise<T>)
-      } else {
-        res
-          .clone()
-          .text()
-          .then((text) => {
-            try {
-              return resolve(JSON.parse(text))
-            } catch {
-              return reject({ code: 500, message: text, url: requestUrl })
-            }
-          })
+    const requestUrl = res.url
+    if (res.ok) {
+      const data = await res.json()
+      if (data.error_code === 'TOKEN_MISMATCH' || data.code === 401) {
+        const { setAuthTokenInvalid } = useStatusStore.getState().actions
+        setAuthTokenInvalid(true)
+        await UserService.claimAuthTokenFailed()
+        console.log('TOKEN_MISMATCH', data)
       }
-    })
+      return data as T
+    } else {
+      const text = await res.clone().text()
+      try {
+        return JSON.parse(text)
+      } catch {
+        return Promise.reject({ code: 500, message: text, url: requestUrl })
+      }
+    }
   }
 
   async httpFactory<T>({ url = '', params = {}, method }: Props): Promise<T> {
