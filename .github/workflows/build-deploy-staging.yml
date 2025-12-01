@@ -6,7 +6,6 @@ on:
       - main
       - staging
 
-
 env:
   APP_NAME: com.ripplestar.miaoyan
 
@@ -14,10 +13,10 @@ jobs:
   deploy:
     runs-on: macos-14
     env:
-      ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
-      ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
       ALIYUN_REGION: ${{ vars.ALIYUN_REGION }}
       ALIYUN_OSS_BUCKET_NAME: ${{ vars.ALIYUN_OSS_BUCKET_NAME }}
+      ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+      ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
       # Apple
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
