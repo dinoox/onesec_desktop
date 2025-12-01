@@ -3,11 +3,15 @@ import {
   IPC_USER_CONFIG_SET_PARTIAL_CHANNEL,
   IPC_USER_LOGIN_CHANNEL,
   IPC_USER_LOGOUT_CHANNEL,
-  IPC_OPEN_EXTERNAL_URL_CHANNEL, IPC_AUTH_TOKEN_FAILED_CHANNEL,
+  IPC_OPEN_EXTERNAL_URL_CHANNEL,
+  IPC_QUIT_AND_INSTALL_CHANNEL,
+  IPC_AUTH_TOKEN_FAILED_CHANNEL,
 } from '../types/message'
 import userConfigManager from './user-config-manager'
 import nativeProcessManager from './native-process-manager'
 import { ipcMain, shell } from 'electron'
+import autoUpdater from '../../electron/updater'
+import log from 'electron-log'
 
 class IPCService {
   constructor() {}
@@ -19,6 +23,7 @@ class IPCService {
     ipcMain.handle(IPC_USER_LOGOUT_CHANNEL, this.handleUserLogout)
     ipcMain.handle(IPC_AUTH_TOKEN_FAILED_CHANNEL, this.handleAuthTokenFailed)
     ipcMain.handle(IPC_OPEN_EXTERNAL_URL_CHANNEL, this.handleOpenExternalUrl)
+    ipcMain.handle(IPC_QUIT_AND_INSTALL_CHANNEL, this.handleQuitAndInstall)
   }
 
   // User Config
@@ -40,6 +45,12 @@ class IPCService {
   // External URL
   private handleOpenExternalUrl = async (_: any, url: string) => {
     return await shell.openExternal(url)
+  }
+
+  // Quit and Install
+  private handleQuitAndInstall = () => {
+    log.info('Quit and Install')
+    autoUpdater.quitAndInstall()
   }
 }
 

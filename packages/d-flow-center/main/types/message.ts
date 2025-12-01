@@ -6,6 +6,13 @@ export const MessageTypes = {
   UPDATE_CONFIG: 'config_updated',
   CONNECTED: 'connected',
   AUTH_TOKEN_FAILED: 'auth_token_failed',
+  // App Update
+  APP_UPDATE_CHECKING: 'app_update_checking',
+  APP_UPDATE_AVAILABLE: 'app_update_available',
+  APP_UPDATE_NOT_AVAILABLE: 'app_update_not_available',
+  APP_UPDATE_ERROR: 'app_update_error',
+  APP_UPDATE_PROGRESS: 'app_update_progress',
+  APP_UPDATE_DOWNLOADED: 'app_update_downloaded',
 } as const
 
 export type MessageType = (typeof MessageTypes)[keyof typeof MessageTypes]
@@ -19,7 +26,7 @@ export interface ClientInfo {
 
 export interface Message {
   type: MessageType
-  timestamp: number
+  timestamp?: number
   data?: Record<string, any>
 }
 
@@ -39,21 +46,15 @@ export interface HotkeyConfig {
 
 export interface IPCMessage {
   id: string
-  type: 'request' | 'response' | 'event' | 'ready'
   action?: string
   data?: Message
   error?: string | null
   timestamp?: number
 }
 
-export function buildIPCMessage(
-  action: string,
-  data?: Message,
-  type: 'request' | 'response' | 'event' | 'ready' = 'event',
-): IPCMessage {
+export function buildIPCMessage(action: string, data?: Message): IPCMessage {
   return {
     id: `event_${Date.now()}`,
-    type,
     action,
     data,
     error: null,
@@ -70,6 +71,8 @@ const IPC_USER_CONFIG_GET_CHANNEL = 'user_config_get_channel'
 const IPC_USER_CONFIG_SET_PARTIAL_CHANNEL = 'user_config_set_partial_channel'
 // External URL
 const IPC_OPEN_EXTERNAL_URL_CHANNEL = 'open_external_url_channel'
+// Update
+const IPC_QUIT_AND_INSTALL_CHANNEL = 'quit_and_install_channel'
 
 export {
   DEFAULT_IPC_CHANNEL,
@@ -79,4 +82,5 @@ export {
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_PARTIAL_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
+  IPC_QUIT_AND_INSTALL_CHANNEL,
 }

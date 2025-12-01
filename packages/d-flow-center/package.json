@@ -3,7 +3,7 @@
   "author": "Onesec Developer",
   "description": "The implementation of miaoyan electron desktop",
   "private": true,
-  "version": "1.0.1",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -34,6 +34,7 @@
     "crypto-js": "^4.2.0",
     "electron-log": "^5.4.3",
     "electron-store": "^11.0.2",
+    "electron-updater": "^6.6.2",
     "framer-motion": "^12.23.22",
     "gsap": "^3.13.0",
     "lucide-react": "^0.544.0",

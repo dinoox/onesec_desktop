@@ -1,10 +1,11 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import windowManager, { WINDOW_CONTENT_ID } from '../main/services/window-manager.ts'
 import processManager from '../main/process-manager.ts'
 import menuService from '../main/services/menu-service.ts'
 import userConfigManager from '../main/services/user-config-manager.ts'
+import { checkForUpdates } from './updater.ts'
 
 // Disable HTTPS Cert Verification（only dev）
 app.commandLine.appendSwitch('--ignore-certificate-errors')
@@ -28,7 +29,8 @@ let win: BrowserWindow | null = null
 
 function createWindow(onWebLoaded: Function = () => {}) {
   const theme = userConfigManager.getConfig().theme
-  const isDarkMode = theme === 'system' ? nativeTheme.shouldUseDarkColors : theme === 'dark'
+  const isDarkMode =
+    theme === 'system' ? nativeTheme.shouldUseDarkColors : theme === 'dark'
 
   win = new BrowserWindow({
     title: '秒言',
@@ -97,8 +99,10 @@ app.whenReady().then(async () => {
       '秒言是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
     website: 'https://miaoyan.app',
   })
+
   createWindow()
   await processManager.initialize()
+  await checkForUpdates()
 })
 
 export { createWindow }

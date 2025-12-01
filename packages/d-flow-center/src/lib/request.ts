@@ -1,7 +1,7 @@
 import queryString from 'query-string'
 import authStore from '@/store/auth-store.ts'
-import useStatusStore from "@/store/status-store.ts";
-import {UserService} from "@/services/user-service.ts";
+import useStatusStore from '@/store/status-store.ts'
+import { UserService } from '@/services/user-service.ts'
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 type Config = { cache: 'no-store' } | { cache: 'force-cache' }

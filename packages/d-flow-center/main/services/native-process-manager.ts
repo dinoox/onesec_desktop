@@ -152,21 +152,14 @@ class NativeProcessManager {
     const url = new URL(import.meta.env.VITE_API_BASEURL || 'https://114.55.98.75:443')
     const server = url.host
 
-    return [
-      '--uds-channel',
-      udsChannel,
-      '--server',
-      server,
-      '--auth-token',
-      authToken,
-    ]
+    return ['--uds-channel', udsChannel, '--server', server, '--auth-token', authToken]
   }
 
   async sendAuthTokenFailed() {
     udsService.broadcast({
       type: MessageTypes.AUTH_TOKEN_FAILED,
       timestamp: Date.now(),
-      data: {}
+      data: {},
     })
   }
 
@@ -175,7 +168,7 @@ class NativeProcessManager {
     udsService.broadcast({
       type: MessageTypes.UPDATE_CONFIG,
       timestamp: Date.now(),
-      data: {}
+      data: {},
     })
 
     log.info(`Update Native Config: ${JSON.stringify(config)}`)

@@ -27,6 +27,14 @@
       {
         "target": "dmg",
         "arch": "x64"
+      },
+      {
+        "target": "zip",
+        "arch": "arm64"
+      },
+      {
+        "target": "zip",
+        "arch": "x64"
       }
     ],
     "notarize": {
@@ -63,6 +71,12 @@
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": false
   },
+  "publish": [
+    {
+      "provider": "generic",
+      "url": "https://release-ripplestar-cn.oss-cn-beijing.aliyuncs.com/apps/com.ripplestar.miaoyan"
+    }
+  ],
   "linux": {
     "target": [
       "AppImage"

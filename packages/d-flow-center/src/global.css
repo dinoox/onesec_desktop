@@ -43,6 +43,7 @@
 
   --color-ripple-green: var(--ripple-green-brand);
   --color-ripple-yellow: var(--ripple-yellow-brand);
+  --color-ripple-brand: var(--ripple-brand);
   --color-setting: var(--setting);
 }
 

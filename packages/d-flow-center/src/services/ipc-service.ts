@@ -24,7 +24,7 @@ class IPCService {
   async handleIPCMessage(message: IPCMessage) {
     console.log(`[IPCService] ${JSON.stringify(message)}`)
 
-    const { setAuthTokenInvalid } = useStatusStore.getState().actions
+    const { setAuthTokenInvalid, setUpdateInfo } = useStatusStore.getState().actions
     const { loadUserConfig } = useUserConfigStore.getState().actions
     const action = message.action as MessageType
 
@@ -35,6 +35,12 @@ class IPCService {
 
     if (action === 'hotkey_setting_result') {
       await loadUserConfig()
+      return
+    }
+
+    if (action === 'app_update_downloaded') {
+      const { version, releaseDate } = message.data?.data || {}
+      setUpdateInfo({ version, releaseDate })
       return
     }
   }
