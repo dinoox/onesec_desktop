@@ -13,13 +13,11 @@ env:
 jobs:
   deploy:
     runs-on: macos-14
-    environment: staging
     env:
       ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
       ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
       ALIYUN_REGION: ${{ vars.ALIYUN_REGION }}
       ALIYUN_OSS_BUCKET_NAME: ${{ vars.ALIYUN_OSS_BUCKET_NAME }}
-
       # Apple
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -38,6 +36,12 @@ jobs:
 
       - name: Install Pnpm
         uses: pnpm/action-setup@v4
+
+      - name: Import Code Signing Certificates
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          p12-file-base64: ${{ secrets.MACOS_DEVELOPER_ID_CERTIFICATE }}
+          p12-password: ${{ secrets.MACOS_DEVELOPER_ID_CERTIFICATE_PASSWORD }}
 
       - uses: aliyun/setup-aliyun-cli-action@v1
       - name: Setup aliyun cli
