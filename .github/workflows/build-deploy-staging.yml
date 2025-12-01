@@ -38,8 +38,6 @@ jobs:
 
       - name: Install Pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: aliyun/setup-aliyun-cli-action@v1
       - name: Setup aliyun cli
