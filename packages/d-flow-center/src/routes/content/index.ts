@@ -24,5 +24,5 @@ export const ContentRoutes: RouteObject[] = [
   {
     path: '/content/settings',
     Component: SettingsPage,
-  }
+  },
 ]

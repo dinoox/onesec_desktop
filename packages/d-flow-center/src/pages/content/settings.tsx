@@ -102,7 +102,10 @@ const ContestPage: React.FC = () => {
 
         {/* 常用系统 */}
         {user?.preferred_linux_distro && (
-          <div data-theme-transition className="flex items-center justify-between w-full bg-setting rounded-xl p-3 animate-in fade-in duration-300">
+          <div
+            data-theme-transition
+            className="flex items-center justify-between w-full bg-setting rounded-xl p-3 animate-in fade-in duration-300"
+          >
             <div className="flex flex-col space-y-1">
               <Label>常用系统</Label>
               <span className="text-muted-foreground">终端连接远程主机常用系统</span>

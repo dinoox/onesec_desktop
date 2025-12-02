@@ -95,9 +95,7 @@ const AppSidebar: React.FC = () => {
                     className={`w-4 h-4 ${isActive && 'text-ripple-brand-text flash-icon'}`}
                   />
                 )}
-                <span
-                  className={`text-sm ${isActive && 'text-ripple-brand-text'}`}
-                >
+                <span className={`text-sm ${isActive && 'text-ripple-brand-text'}`}>
                   {item.title}
                 </span>
               </Link>

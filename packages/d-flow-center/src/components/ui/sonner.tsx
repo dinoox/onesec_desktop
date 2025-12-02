@@ -1,4 +1,4 @@
-import { CheckIcon, ShieldXIcon } from 'lucide-react'
+import { OctagonAlert, CheckIcon, ShieldXIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
 
@@ -12,6 +12,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       icons={{
         success: <CheckIcon size={20} />,
         error: <ShieldXIcon size={20} />,
+        warning: <OctagonAlert size={20} />,
       }}
       toastOptions={{
         classNames: {
@@ -26,6 +27,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
           '--success-bg': 'var(--background)',
           '--success-text': 'var(--ripple-brand-text)',
           '--success-border': 'var(--border)',
+          '--warning-bg': 'var(--background)',
+          '--warning-text': 'var(--ripple-brand-text)',
+          '--warning-border': 'var(--border)',
           '--error-bg': 'var(--background)',
           '--error-text': 'var(--ripple-error-text)',
           '--error-border': 'var(--border)',

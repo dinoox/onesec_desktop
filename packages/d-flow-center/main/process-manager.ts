@@ -53,21 +53,6 @@ class ProcessManager {
       return
     }
 
-    if (message.action === 'hotkey_setting_result') {
-      const { mode, hotkey_combination } = message.data?.data || {}
-      if (!mode || !hotkey_combination) return
-
-      userConfigManager.updateHotkeyConfig(mode, hotkey_combination)
-
-      // 通知前端配置已更新
-      const updateMessage = buildIPCMessage(MessageTypes.HOTKEY_SETTING_RESULT, {
-        type: MessageTypes.HOTKEY_SETTING_RESULT,
-        timestamp: Date.now(),
-        data: { mode, hotkey_combination },
-      })
-      windowManager.broadcast(DEFAULT_IPC_CHANNEL, updateMessage)
-    }
-
     if (message.action === MessageTypes.UPDATE_CONFIG) {
       const { preferred_linux_distro } = message.data?.data || {}
       if (!preferred_linux_distro) return

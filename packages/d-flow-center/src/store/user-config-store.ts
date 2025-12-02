@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { UserService } from '@/services/user-service.ts'
 
+import { HotkeyMode } from '../../main/types/message.ts'
+
 interface UserConfigStore {
   shortcutKeys: string[]
   shortcutCommandKeys: string[]
@@ -8,6 +10,9 @@ interface UserConfigStore {
   actions: {
     loadUserConfig: () => Promise<void>
     setShowComparison: (showComparison: boolean) => Promise<void>
+    setShortcutKeys: (keys: string[]) => void
+    setShortcutCommandKeys: (keys: string[]) => void
+    updateHotkeyConfig: (mode: HotkeyMode, keys: string[]) => Promise<void>
   }
 }
 
@@ -35,6 +40,11 @@ const useUserConfigStore = create<UserConfigStore>((set, _) => ({
         translation: { show_comparison: showComparison },
       })
       set({ showComparison })
+    },
+    setShortcutKeys: (keys: string[]) => set({ shortcutKeys: keys }),
+    setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys }),
+    updateHotkeyConfig: async (_mode: HotkeyMode, _keys: string[]) => {
+      // TODO: implement
     },
   },
 }))

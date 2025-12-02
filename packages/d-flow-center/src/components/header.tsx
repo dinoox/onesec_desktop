@@ -87,8 +87,7 @@ const Header: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>发现新版本</AlertDialogTitle>
             <AlertDialogDescription>
-              新版本 {updateInfo?.version} 已下载完成
-              ，是否立即重启更新？
+              新版本 {updateInfo?.version} 已下载完成 ，是否立即重启更新？
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

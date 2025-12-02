@@ -2,7 +2,6 @@ import * as net from 'net'
 import { User } from '@/types/user.ts'
 
 export const MessageTypes = {
-  HOTKEY_SETTING_RESULT: 'hotkey_setting_result',
   UPDATE_CONFIG: 'config_updated',
   CONNECTED: 'connected',
   AUTH_TOKEN_FAILED: 'auth_token_failed',
@@ -13,6 +12,11 @@ export const MessageTypes = {
   APP_UPDATE_ERROR: 'app_update_error',
   APP_UPDATE_PROGRESS: 'app_update_progress',
   APP_UPDATE_DOWNLOADED: 'app_update_downloaded',
+  // Hot Key Setting
+  HOTKEY_SETTING_START: 'hotkey_setting_start',
+  HOTKEY_SETTING_UPDATE: 'hotkey_setting_update',
+  HOTKEY_SETTING_RESULT: 'hotkey_setting_result',
+  HOTKEY_SETTING_END: 'hotkey_setting_end',
 } as const
 
 export type MessageType = (typeof MessageTypes)[keyof typeof MessageTypes]
@@ -73,6 +77,10 @@ const IPC_USER_CONFIG_SET_PARTIAL_CHANNEL = 'user_config_set_partial_channel'
 const IPC_OPEN_EXTERNAL_URL_CHANNEL = 'open_external_url_channel'
 // Update
 const IPC_QUIT_AND_INSTALL_CHANNEL = 'quit_and_install_channel'
+//
+const IPC_HOT_KEY_SETTING_START_CHANNEL = 'hot_key_setting_start_channel'
+const IPC_HOT_KEY_SETTING_RESULT_CHANNEL = 'hot_key_setting_result_channel'
+const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
 
 export {
   DEFAULT_IPC_CHANNEL,
@@ -81,6 +89,9 @@ export {
   IPC_AUTH_TOKEN_FAILED_CHANNEL,
   IPC_USER_CONFIG_GET_CHANNEL,
   IPC_USER_CONFIG_SET_PARTIAL_CHANNEL,
+  IPC_HOT_KEY_SETTING_START_CHANNEL,
+  IPC_HOT_KEY_SETTING_RESULT_CHANNEL,
+  IPC_HOT_KEY_SETTING_END_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
   IPC_QUIT_AND_INSTALL_CHANNEL,
 }

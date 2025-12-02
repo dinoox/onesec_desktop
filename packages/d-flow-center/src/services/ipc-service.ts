@@ -1,5 +1,8 @@
 import {
   DEFAULT_IPC_CHANNEL,
+  HotkeyMode,
+  IPC_HOT_KEY_SETTING_END_CHANNEL,
+  IPC_HOT_KEY_SETTING_START_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
   IPCMessage,
   MessageType,
@@ -24,17 +27,19 @@ class IPCService {
   async handleIPCMessage(message: IPCMessage) {
     console.log(`[IPCService] ${JSON.stringify(message)}`)
 
-    const { setAuthTokenInvalid, setUpdateInfo } = useStatusStore.getState().actions
+    const { setAuthTokenInvalid, setUpdateInfo, setHotkeySettingStatus, setIPCMessage } =
+      useStatusStore.getState().actions
     const { loadUserConfig } = useUserConfigStore.getState().actions
     const action = message.action as MessageType
 
+    setIPCMessage(message)
     if (action === 'auth_token_failed') {
       setAuthTokenInvalid(true)
       return
     }
 
-    if (action === 'hotkey_setting_result') {
-      await loadUserConfig()
+    if (action === 'hotkey_setting_update' || action === 'hotkey_setting_result') {
+      setHotkeySettingStatus(action)
       return
     }
 
@@ -48,6 +53,15 @@ class IPCService {
   // External URL
   async openExternalUrl(url: string) {
     return await window.ipcRenderer.invoke(IPC_OPEN_EXTERNAL_URL_CHANNEL, url)
+  }
+
+  // Hotkey Setting
+  async startHotkeySetting(mode: HotkeyMode) {
+    return await window.ipcRenderer.invoke(IPC_HOT_KEY_SETTING_START_CHANNEL, mode)
+  }
+
+  async endHotkeySetting(mode: HotkeyMode) {
+    return await window.ipcRenderer.invoke(IPC_HOT_KEY_SETTING_END_CHANNEL, mode)
   }
 }
 

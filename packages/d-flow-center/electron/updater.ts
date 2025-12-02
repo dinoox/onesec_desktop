@@ -10,9 +10,9 @@ import windowManager from '../main/services/window-manager.ts'
 import { app } from 'electron'
 
 autoUpdater.logger = log
-if (!app.isPackaged) {
-  autoUpdater.forceDevUpdateConfig = true
-}
+// if (!app.isPackaged) {
+//   autoUpdater.forceDevUpdateConfig = true
+// }
 
 autoUpdater.on('checking-for-update', () => {
   console.log('checking-for-update')
