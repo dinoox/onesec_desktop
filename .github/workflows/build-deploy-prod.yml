@@ -1,10 +1,10 @@
-name: Build and Deploy to staging
+name: Build and Deploy to OSS
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
-      - staging
+    tags:
+      - "v*"
 
 env:
   APP_NAME: com.ripplestar.miaoyan
