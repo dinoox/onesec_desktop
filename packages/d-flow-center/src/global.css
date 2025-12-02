@@ -42,8 +42,12 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   --color-ripple-green: var(--ripple-green-brand);
+  --color-ripple-green-text: var(--ripple-green-text);
   --color-ripple-yellow: var(--ripple-yellow-brand);
+  --color-ripple-yellow-text: var(--ripple-yellow-text);
+  --color-ripple-error-text: var(--ripple-error-text);
   --color-ripple-brand: var(--ripple-brand);
+  --color-ripple-brand-text: var(--ripple-brand-text);
   --color-setting: var(--setting);
 }
 
@@ -86,6 +90,12 @@
   --ripple-green-brand: #2EDDA8;
   --ripple-yellow-brand: #ffcc00;
   --ripple-brand: #2EDDA8;
+
+  --ripple-green-text: oklch(0.684 0.175 139.008);
+  --ripple-yellow-text: oklch(0.832 0.165 86.343);
+  --ripple-error-text: oklch(0.578 0.203 24.8);
+
+  --ripple-brand-text: oklch(0.684 0.175 139.008);
 }
 
 .dark {
@@ -126,6 +136,11 @@
   --ripple-green-brand: #2EDDA8;
   --ripple-yellow-brand: #ffcc00;
   --ripple-brand: #ffcc00;
+
+  --ripple-green-text: oklch(0.684 0.175 139.008);
+  --ripple-yellow-text: oklch(0.832 0.165 86.343);
+  --ripple-error-text: oklch(0.578 0.203 24.8);
+  --ripple-brand-text: oklch(0.832 0.165 86.343);
 }
 
 @layer base {
@@ -163,6 +178,11 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* 主题切换时禁用特定元素的过渡 */
+.no-transitions [data-theme-transition] {
+  transition: none !important;
 }
 
 /* Electron 窗口拖动区域 */

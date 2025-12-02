@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { toast } from 'sonner'
 
 function checkIsActive(href: string, item: NavItem) {
   if (matchPath({ path: item.url, end: true }, href)) return true
@@ -38,7 +39,7 @@ const AppSidebar: React.FC = () => {
             <span className="text-base font-semibold">秒言</span>
             <Badge
               variant="outline"
-              className="border-black text-black text-[10px] rounded-xl bg-ripple-green/60 dark:bg-ripple-yellow/80"
+              className="border-border text-ripple-brand-text text-[11px] rounded-xl bg-sidebar-accent"
             >
               试用版
             </Badge>
@@ -82,6 +83,7 @@ const AppSidebar: React.FC = () => {
               <Link
                 key={item.url}
                 to={item.url}
+                data-theme-transition
                 className={`flex items-center gap-3 px-3 py-2 rounded-md mb-1 transition-colors duration-300 ${
                   isActive
                     ? 'bg-sidebar-accent text-sidebar-accent-foreground'
@@ -90,11 +92,11 @@ const AppSidebar: React.FC = () => {
               >
                 {item.icon && (
                   <item.icon
-                    className={`w-4 h-4 ${isActive && 'text-foreground dark:text-ripple-yellow flash-icon'}`}
+                    className={`w-4 h-4 ${isActive && 'text-ripple-brand-text flash-icon'}`}
                   />
                 )}
                 <span
-                  className={`text-sm ${isActive && 'text-foreground dark:text-ripple-yellow'}`}
+                  className={`text-sm ${isActive && 'text-ripple-brand-text'}`}
                 >
                   {item.title}
                 </span>

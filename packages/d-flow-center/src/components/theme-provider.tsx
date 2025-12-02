@@ -36,12 +36,15 @@ export function ThemeProvider({
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
     const applyTheme = () => {
+      root.classList.add('no-transitions')
       root.classList.remove('light', 'dark')
       if (theme === 'system') {
         root.classList.add(mediaQuery.matches ? 'dark' : 'light')
       } else {
         root.classList.add(theme)
       }
+      root.offsetHeight
+      root.classList.remove('no-transitions')
     }
 
     applyTheme()

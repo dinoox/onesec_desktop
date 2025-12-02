@@ -24,8 +24,8 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
         // Focus state.
         // 'has-[[data-slot=input-group-control]:focus-visible]:border-primary/30',
         // 'dark:has-[[data-slot=input-group-control]:focus-visible]:border-primary/30',
-        'has-[[data-slot=input-group-control]:focus-visible]:border-[var(--ripple-green-brand)]/50',
-        'dark:has-[[data-slot=input-group-control]:focus-visible]:border-[var(--ripple-yellow-brand)]/50',
+        'has-[[data-slot=input-group-control]:focus-visible]:border-[var(--ripple-brand-text)]/50',
+        'dark:has-[[data-slot=input-group-control]:focus-visible]:border-[var(--ripple-brand-text)]/50',
 
         // Error state.
         'has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',

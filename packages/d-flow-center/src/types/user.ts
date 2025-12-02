@@ -11,6 +11,7 @@ export type User = {
   phone: string
   is_active: string
   preferred_linux_distro?: string | null
+  share_code: string
 }
 
 export type LoginResp = {
