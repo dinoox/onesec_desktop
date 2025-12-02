@@ -83,14 +83,11 @@ const Header: React.FC = () => {
       </header>
 
       <AlertDialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[400px]!">
           <AlertDialogHeader>
             <AlertDialogTitle>发现新版本</AlertDialogTitle>
             <AlertDialogDescription>
               新版本 {updateInfo?.version} 已下载完成
-              {updateInfo?.releaseDate && (
-                <>（{new Date(updateInfo.releaseDate).toLocaleDateString('zh-CN')}）</>
-              )}
               ，是否立即重启更新？
             </AlertDialogDescription>
           </AlertDialogHeader>
