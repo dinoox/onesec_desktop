@@ -12,7 +12,6 @@ interface UserConfigStore {
     setShowComparison: (showComparison: boolean) => Promise<void>
     setShortcutKeys: (keys: string[]) => void
     setShortcutCommandKeys: (keys: string[]) => void
-    updateHotkeyConfig: (mode: HotkeyMode, keys: string[]) => Promise<void>
   }
 }
 
@@ -42,10 +41,7 @@ const useUserConfigStore = create<UserConfigStore>((set, _) => ({
       set({ showComparison })
     },
     setShortcutKeys: (keys: string[]) => set({ shortcutKeys: keys }),
-    setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys }),
-    updateHotkeyConfig: async (_mode: HotkeyMode, _keys: string[]) => {
-      // TODO: implement
-    },
+    setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys })
   },
 }))
 

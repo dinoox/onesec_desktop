@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react'
 import { gsap } from 'gsap'
 import { InertiaPlugin } from 'gsap/InertiaPlugin'
 
@@ -40,8 +40,17 @@ export interface DotGridProps {
   style?: React.CSSProperties
 }
 
+function resolveColor(color: string): string {
+  if (color.startsWith('var(')) {
+    const varName = color.slice(4, -1).split(',')[0].trim()
+    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+  }
+  return color
+}
+
 function hexToRgb(hex: string) {
-  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
+  const resolved = resolveColor(hex)
+  const m = resolved.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
   if (!m) return { r: 0, g: 0, b: 0 }
   return {
     r: parseInt(m[1], 16),
@@ -79,8 +88,16 @@ const DotGrid: React.FC<DotGridProps> = ({
     lastY: 0,
   })
 
-  const baseRgb = useMemo(() => hexToRgb(baseColor), [baseColor])
-  const activeRgb = useMemo(() => hexToRgb(activeColor), [activeColor])
+  const [themeKey, setThemeKey] = useState(0)
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => setThemeKey((k) => k + 1))
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+
+  const baseRgb = useMemo(() => hexToRgb(baseColor), [baseColor, themeKey])
+  const activeRgb = useMemo(() => hexToRgb(activeColor), [activeColor, themeKey])
 
   const circlePath = useMemo(() => {
     if (typeof window === 'undefined' || !window.Path2D) return null

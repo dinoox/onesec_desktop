@@ -81,6 +81,9 @@ const IPC_QUIT_AND_INSTALL_CHANNEL = 'quit_and_install_channel'
 const IPC_HOT_KEY_SETTING_START_CHANNEL = 'hot_key_setting_start_channel'
 const IPC_HOT_KEY_SETTING_RESULT_CHANNEL = 'hot_key_setting_result_channel'
 const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
+// First Launch
+const IPC_IS_FIRST_LAUNCH_CHANNEL = 'is_first_launch_channel'
+const IPC_MARK_AS_LAUNCHED_CHANNEL = 'mark_as_launched_channel'
 
 export {
   DEFAULT_IPC_CHANNEL,
@@ -94,4 +97,6 @@ export {
   IPC_HOT_KEY_SETTING_END_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
   IPC_QUIT_AND_INSTALL_CHANNEL,
+  IPC_IS_FIRST_LAUNCH_CHANNEL,
+  IPC_MARK_AS_LAUNCHED_CHANNEL,
 }

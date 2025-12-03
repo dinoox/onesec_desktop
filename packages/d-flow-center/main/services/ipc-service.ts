@@ -9,6 +9,8 @@ import {
   IPC_HOT_KEY_SETTING_START_CHANNEL,
   IPC_HOT_KEY_SETTING_RESULT_CHANNEL,
   IPC_HOT_KEY_SETTING_END_CHANNEL,
+  IPC_IS_FIRST_LAUNCH_CHANNEL,
+  IPC_MARK_AS_LAUNCHED_CHANNEL,
   MessageTypes,
 } from '../types/message'
 import userConfigManager from './user-config-manager'
@@ -31,6 +33,8 @@ class IPCService {
     ipcMain.handle(IPC_QUIT_AND_INSTALL_CHANNEL, this.handleQuitAndInstall)
     ipcMain.handle(IPC_HOT_KEY_SETTING_START_CHANNEL, this.handleHotKeySettingStart)
     ipcMain.handle(IPC_HOT_KEY_SETTING_END_CHANNEL, this.handleHotKeySettingEnd)
+    ipcMain.handle(IPC_IS_FIRST_LAUNCH_CHANNEL, this.handleIsFirstLaunch)
+    ipcMain.handle(IPC_MARK_AS_LAUNCHED_CHANNEL, this.handleMarkAsLaunched)
   }
 
   // User Config
@@ -42,7 +46,11 @@ class IPCService {
   }
 
   // User Auth
-  private handleUserLogin = async () => {}
+  private handleUserLogin = async () => {
+    if (await userConfigManager.isFirstLaunch()) {
+      await userConfigManager.markAsLaunched()
+    }
+  }
 
   private handleUserLogout = async () => {}
   private handleAuthTokenFailed = async () => {
@@ -80,6 +88,10 @@ class IPCService {
       data: { mode },
     })
   }
+
+  // First Launch
+  private handleIsFirstLaunch = () => userConfigManager.isFirstLaunch()
+  private handleMarkAsLaunched = () => userConfigManager.markAsLaunched()
 }
 
 export default new IPCService()

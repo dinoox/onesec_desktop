@@ -1,12 +1,6 @@
 import { Button } from '@/components/ui/button'
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemGroup,
-  ItemSeparator,
-  ItemTitle,
-} from '@/components/ui/item'
+import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
 import React, { useMemo, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import {
@@ -29,14 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import {
-  Loader2,
-  PopcornIcon,
-  Search,
-  EllipsisVerticalIcon,
-  Plus,
-  AlertCircle,
-} from 'lucide-react'
+import { Loader2, PopcornIcon, Search, Plus, AlertCircle } from 'lucide-react'
 import {
   useCreateHotWordQuery,
   useDeleteHotWordQuery,
@@ -45,11 +32,10 @@ import {
 } from '@/services/queries/hotword-query'
 import { IconAdjustmentsHorizontal, IconEdit, IconTrash } from '@tabler/icons-react'
 import { HotWord } from '@/services/api/hotword-api'
-import { Spinner } from '@/components/ui/spinner'
 import { Empty, EmptyDescription } from '@/components/ui/empty'
 import { AnimatePresence, motion } from 'framer-motion'
 
-const ContestPage: React.FC = () => {
+const ContentPage: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
@@ -210,8 +196,10 @@ const ContestPage: React.FC = () => {
             </AlertDescription>
           </Alert>
         ) : isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <Spinner className="size-6 text-muted-foreground" />
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-xl" />
+            ))}
           </div>
         ) : filteredHotWords.length === 0 ? (
           <Empty>
@@ -220,57 +208,57 @@ const ContestPage: React.FC = () => {
             </EmptyDescription>
           </Empty>
         ) : (
-          <ItemGroup className="border border-border rounded-md">
-            <AnimatePresence mode="popLayout">
-              {filteredHotWords.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  layout
-                >
-                  <Item className="p-2 px-4">
-                    <ItemContent className="gap-1">
-                      <ItemTitle>{item.hotword}</ItemTitle>
-                    </ItemContent>
-                    <ItemActions>
-                      <Button variant="ghost" size="icon" className="rounded-full">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>
+          <div className="border rounded-md">
+            <Table>
+            <TableBody>
+              <AnimatePresence mode="popLayout">
+                {filteredHotWords.map((item) => (
+                  <motion.tr
+                    key={item.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    layout
+                    className="border-b transition-colors hover:bg-muted/50"
+                  >
+                    <TableCell className="pl-3 font-medium">{item.hotword}</TableCell>
+                    <TableCell className="text-right w-12">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="rounded-full">
                             <IconAdjustmentsHorizontal />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-56" align="start">
-                            <DropdownMenuLabel>提示词操作</DropdownMenuLabel>
-                            <DropdownMenuGroup>
-                              <DropdownMenuItem onClick={() => openEditDialog(item)}>
-                                编辑
-                                <DropdownMenuShortcut>
-                                  <IconEdit />
-                                </DropdownMenuShortcut>
-                              </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(item.id)}
-                              disabled={deleteHotWordMutation.isPending}
-                            >
-                              删除
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56" align="end">
+                          <DropdownMenuLabel>提示词操作</DropdownMenuLabel>
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem onClick={() => openEditDialog(item)}>
+                              编辑
                               <DropdownMenuShortcut>
-                                <IconTrash />
+                                <IconEdit />
                               </DropdownMenuShortcut>
                             </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </Button>
-                    </ItemActions>
-                  </Item>
-                  {index !== filteredHotWords.length - 1 && <ItemSeparator />}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </ItemGroup>
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(item.id)}
+                            disabled={deleteHotWordMutation.isPending}
+                          >
+                            删除
+                            <DropdownMenuShortcut>
+                              <IconTrash />
+                            </DropdownMenuShortcut>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </TableBody>
+          </Table>
+          </div>
         )}
       </div>
 
@@ -319,4 +307,4 @@ const ContestPage: React.FC = () => {
   )
 }
 
-export default ContestPage
+export default ContentPage

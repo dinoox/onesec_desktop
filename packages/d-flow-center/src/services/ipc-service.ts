@@ -4,6 +4,8 @@ import {
   IPC_HOT_KEY_SETTING_END_CHANNEL,
   IPC_HOT_KEY_SETTING_START_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
+  IPC_IS_FIRST_LAUNCH_CHANNEL,
+  IPC_MARK_AS_LAUNCHED_CHANNEL,
   IPCMessage,
   MessageType,
 } from '../../main/types/message.ts'
@@ -62,6 +64,15 @@ class IPCService {
 
   async endHotkeySetting(mode: HotkeyMode) {
     return await window.ipcRenderer.invoke(IPC_HOT_KEY_SETTING_END_CHANNEL, mode)
+  }
+
+  // First Launch
+  async isFirstLaunch(): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_IS_FIRST_LAUNCH_CHANNEL)
+  }
+
+  async markAsLaunched(): Promise<void> {
+    return await window.ipcRenderer.invoke(IPC_MARK_AS_LAUNCHED_CHANNEL)
   }
 }
 

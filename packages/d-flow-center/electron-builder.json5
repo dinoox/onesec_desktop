@@ -37,7 +37,9 @@
         "arch": "x64"
       }
     ],
-    "notarize": true,
+    "notarize": {
+      teamId: "PNG2RBG62Z"
+    },
     "artifactName": "${productName}-Mac-${arch}-${version}-Installer.${ext}",
     "identity": "Hangzhou RippleStar Technology Co., Ltd. (PNG2RBG62Z)",
     "type": "distribution",

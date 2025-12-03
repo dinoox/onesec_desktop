@@ -1,25 +1,13 @@
 import request from '@/lib/request'
-import { generateSignature } from '@/services/sign-service.ts'
 import type { User } from '@/types/user'
 
-export const updateUserInfo = async (params: {
+export const updateUserInfo = (params: {
   user_name?: string
   preferred_linux_distro?: string | null
 }) => {
-  const signature = await generateSignature(params)
-  return request.post<User>('/user/update', {
-    params: {
-      ...params,
-      ...signature,
-    },
-  })
+  return request.post<User>('/user/update', { params })
 }
 
-export const getUserInfo = async () => {
-  const signature = await generateSignature({})
-  return request.post<User>('/user/info', {
-    params: {
-      ...signature,
-    },
-  })
+export const getUserInfo = () => {
+  return request.post<User>('/user/info')
 }

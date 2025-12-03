@@ -42,7 +42,7 @@ const exampleList = [
   },
 ]
 
-const ContestPage: React.FC = () => {
+const ContentPage: React.FC = () => {
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
   const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
   const { loadUserConfig } = useUserConfigStore((state) => state.actions)
@@ -153,4 +153,4 @@ const ContestPage: React.FC = () => {
   )
 }
 
-export default ContestPage
+export default ContentPage

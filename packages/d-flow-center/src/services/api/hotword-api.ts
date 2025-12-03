@@ -1,7 +1,5 @@
 import request from '@/lib/request'
-import { generateSignature } from '@/services/sign-service.ts'
 
-// 热词数据类型
 export interface HotWord {
   id: number
   hotword: string
@@ -10,50 +8,18 @@ export interface HotWord {
   updated_at: string
 }
 
-// 获取热词列表
-export const getHotWordList = async () => {
-  const params = {}
-  const signature = await generateSignature(params)
-  return request.post<HotWord[]>('/hotword/list', {
-    params: {
-      ...params,
-      ...signature,
-    },
-  })
+export const getHotWordList = () => {
+  return request.post<HotWord[]>('/hotword/list')
 }
 
-// 创建热词
-export const createHotWord = async (hotword: string) => {
-  const params = { hotword }
-  const signature = await generateSignature(params)
-  return request.post<HotWord>('/hotword/create', {
-    params: {
-      ...params,
-      ...signature,
-    },
-  })
+export const createHotWord = (hotword: string) => {
+  return request.post<HotWord>('/hotword/create', { params: { hotword } })
 }
 
-// 更新热词
-export const updateHotWord = async (hotword_id: number, hotword: string) => {
-  const params = { hotword_id, hotword }
-  const signature = await generateSignature(params)
-  return request.post<HotWord>('/hotword/update', {
-    params: {
-      ...params,
-      ...signature,
-    },
-  })
+export const updateHotWord = (hotword_id: number, hotword: string) => {
+  return request.post<HotWord>('/hotword/update', { params: { hotword_id, hotword } })
 }
 
-// 删除热词
-export const deleteHotWord = async (hotword_id: number) => {
-  const params = { hotword_id }
-  const signature = await generateSignature(params)
-  return request.post<null>('/hotword/delete', {
-    params: {
-      ...params,
-      ...signature,
-    },
-  })
+export const deleteHotWord = (hotword_id: number) => {
+  return request.post<null>('/hotword/delete', { params: { hotword_id } })
 }

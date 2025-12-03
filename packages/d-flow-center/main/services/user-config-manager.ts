@@ -1,15 +1,19 @@
+import fs from 'fs'
+import path from 'path'
 import Store from 'electron-store'
 import { StoreSchema, USER_DEFAULT_CONFIG } from '../types/config.ts'
 
 class UserConfigManager {
   private store: Store<StoreSchema>
+  private launchMarkerPath: string
 
   constructor() {
     this.store = new Store<StoreSchema>({
       name: 'config',
       defaults: USER_DEFAULT_CONFIG,
-      clearInvalidConfig: true, // 配置文件损坏，自动清除并使用默认配置
+      clearInvalidConfig: true,
     })
+    this.launchMarkerPath = path.join(path.dirname(this.store.path), '.launched')
   }
 
   getConfig(): StoreSchema {
@@ -24,17 +28,12 @@ class UserConfigManager {
     })
   }
 
-  updateHotkeyConfig(mode: string, hotkey_combination: string[]): void {
-    const configs = this.store.get('hotkey_configs', USER_DEFAULT_CONFIG.hotkey_configs)
-    const index = configs.findIndex((c) => c.mode === mode)
+  isFirstLaunch(): boolean {
+    return !fs.existsSync(this.launchMarkerPath)
+  }
 
-    if (index !== -1) {
-      configs[index].hotkey_combination = hotkey_combination
-    } else {
-      configs.push({ mode: mode as any, hotkey_combination })
-    }
-
-    this.store.set('hotkey_configs', configs)
+  markAsLaunched(): void {
+    fs.writeFileSync(this.launchMarkerPath, '')
   }
 }
 

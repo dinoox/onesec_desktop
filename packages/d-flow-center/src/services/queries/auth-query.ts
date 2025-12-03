@@ -3,6 +3,7 @@ import { login, logout, sendVerificationCode, register } from '@/services/api/au
 import authStore from '@/store/auth-store.ts'
 import { toast } from 'sonner'
 import useStatusStore from '@/store/status-store.ts'
+import ipcService from '@/services/ipc-service.ts'
 
 const handleAuthSuccess = async (resp: any) => {
   await authStore
@@ -43,13 +44,7 @@ export const useRegisterQuery = () => {
 
 export const useVerificationCodeQuery = () => {
   return useMutation({
-    mutationFn: ({
-      phone,
-      invitation_code,
-    }: {
-      phone: string
-      invitation_code?: string
-    }) => sendVerificationCode(phone, invitation_code),
+    mutationFn: (phone: string) => sendVerificationCode(phone),
     onSuccess: async (resp) => {
       if (resp.success) {
         toast.success('获取验证码成功')

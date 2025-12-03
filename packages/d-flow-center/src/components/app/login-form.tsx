@@ -32,8 +32,8 @@ import { Spinner } from '@/components/ui/spinner.tsx'
 import { data } from 'react-router'
 import IPCService from '@/services/ipc-service.ts'
 
-export function LoginForm({}: { className?: string }) {
-  const [isRegisterMode, setIsRegisterMode] = useState(false)
+export function LoginForm({ defaultRegister = false }: { className?: string; defaultRegister?: boolean }) {
+  const [isRegisterMode, setIsRegisterMode] = useState(defaultRegister)
   const [countdown, setCountdown] = useState(0)
 
   const form = useForm<z.infer<typeof LoginFormSchema>>({
@@ -41,7 +41,7 @@ export function LoginForm({}: { className?: string }) {
     defaultValues: {
       phone: '',
       verification_code: '',
-      invitation_code: '',
+      share_code: '',
     },
   })
 
@@ -63,7 +63,7 @@ export function LoginForm({}: { className?: string }) {
       ? {
           phone: data.phone,
           code: data.verification_code,
-          invitation_code: data.invitation_code,
+          share_code: data.share_code,
         }
       : { phone: data.phone, code: data.verification_code }
     await mutation.mutateAsync(params)
@@ -80,16 +80,7 @@ export function LoginForm({}: { className?: string }) {
     }
 
     try {
-      if (isRegisterMode) {
-        const invitation_code = form.getValues('invitation_code')
-        if (!invitation_code) {
-          form.setError('invitation_code', { message: '请先输入内测码' })
-          return
-        }
-        await codeMutation.mutateAsync({ phone, invitation_code })
-      } else {
-        await codeMutation.mutateAsync({ phone })
-      }
+      await codeMutation.mutateAsync(phone)
       setCountdown(60)
     } catch (error) {
       console.error('获取验证码失败:', error)
@@ -138,13 +129,13 @@ export function LoginForm({}: { className?: string }) {
               {isRegisterMode && (
                 <FormField
                   control={form.control}
-                  name="invitation_code"
+                  name="share_code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="gap-0.5">内测码</FormLabel>
+                      <FormLabel className="gap-0.5">邀请码（选填）</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="请输入内测码"
+                          placeholder="请输入邀请码"
                           {...field}
                           onChange={(e) => {
                             field.onChange(e)

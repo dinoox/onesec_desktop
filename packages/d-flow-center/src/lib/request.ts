@@ -2,6 +2,7 @@ import queryString from 'query-string'
 import authStore from '@/store/auth-store.ts'
 import useStatusStore from '@/store/status-store.ts'
 import { UserService } from '@/services/user-service.ts'
+import { generateSignature } from '@/services/sign-service.ts'
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 type Config = { cache: 'no-store' } | { cache: 'force-cache' }
@@ -115,6 +116,15 @@ class Request {
     url: string,
     params?: Params,
   ): Promise<DataResponse<T>> {
+    // 非 GET 请求自动添加签名
+    if (method !== 'GET') {
+      const requestParams = params?.params ?? {}
+      const signature = await generateSignature(requestParams)
+      params = {
+        ...params,
+        params: { ...requestParams, ...signature },
+      }
+    }
     return this.httpFactory<DataResponse<T>>({ url, params, method })
   }
 

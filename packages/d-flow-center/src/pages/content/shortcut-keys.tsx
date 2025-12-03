@@ -9,11 +9,12 @@ import { toast } from 'sonner'
 import { HotkeyMode, MessageTypes } from '../../../main/types/message.ts'
 import { KeyMapper } from '@/utils/key.ts'
 
-const ContestPage: React.FC = () => {
+const ContentPage: React.FC = () => {
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
   const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
-  const { setShortcutKeys, setShortcutCommandKeys, loadUserConfig, updateHotkeyConfig } =
-    useUserConfigStore((state) => state.actions)
+  const { setShortcutKeys, setShortcutCommandKeys, loadUserConfig } = useUserConfigStore(
+    (state) => state.actions,
+  )
 
   const [editingMode, setEditingMode] = useState<'normal' | 'command' | null>(null)
 
@@ -51,8 +52,6 @@ const ContestPage: React.FC = () => {
         const { is_conflict } = holdIPCMessage.data.data
         if (is_conflict) {
           loadUserConfig().then(() => toast.warning('快捷键设置冲突，请重新设置'))
-        } else {
-          updateHotkeyConfig(mode, hotkey_combination).then()
         }
       }
     }
@@ -107,8 +106,8 @@ const ContestPage: React.FC = () => {
   return (
     <div className="max-w-1/2 flex flex-col justify-between gap-5">
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
-        <div className="flex flex-col justify-center space-y-2">
-          <span className="text-base font-medium">普通模式</span>
+        <div className="flex flex-col justify-center space-y-1">
+          <span className="text-[15px] font-medium">普通模式</span>
           <span className="text-sm text-muted-foreground">
             按住该快捷键会进入普通识别模式
           </span>
@@ -119,36 +118,59 @@ const ContestPage: React.FC = () => {
             await startHotKeySetting('normal')
           }}
           className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
-          style={isEditingNormal ? { borderColor: 'var(--color-ripple-green)' } : {}}
+          style={isEditingNormal ? { borderColor: 'var(--color-ripple-green-text)' } : {}}
           tabIndex={0}
         >
-          {isWaitingNormal ? (
-            <span className="text-muted-foreground text-sm">等待按键...</span>
-          ) : (
-            <KbdGroup>
-              <AnimatePresence mode="popLayout">
-                {formattedNormalKeys.map((key, index) => (
-                  <motion.div
-                    key={`${key}-${index}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    style={{ display: 'inline-flex' }}
-                  >
-                    <Kbd>{key}</Kbd>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </KbdGroup>
-          )}
-          <span className="text-muted-foreground text-sm ml-auto">点击修改</span>
+          <div className="grid [&>*]:col-start-1 [&>*]:row-start-1 items-center">
+            <AnimatePresence initial={false}>
+              {isWaitingNormal && (
+                <motion.span
+                  key="waiting-normal"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-muted-foreground text-sm"
+                >
+                  等待按键...
+                </motion.span>
+              )}
+              {!isWaitingNormal && (
+                <motion.div
+                  key="keys-normal"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <KbdGroup>
+                    {formattedNormalKeys.map((key, index) => (
+                      <Kbd key={`${key}-${index}`}>{key}</Kbd>
+                    ))}
+                  </KbdGroup>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <AnimatePresence>
+            {!isWaitingNormal && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="text-muted-foreground text-sm ml-auto"
+              >
+                点击修改
+              </motion.span>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
-        <div className="flex flex-col justify-center  space-y-2">
-          <span className="text-base font-medium">命令模式</span>
+        <div className="flex flex-col justify-center  space-y-1">
+          <span className="text-[15px] font-medium">命令模式</span>
           <span className="text-sm text-muted-foreground">
             按住该快捷键会进入命令识别和智能交互模式
           </span>
@@ -156,37 +178,62 @@ const ContestPage: React.FC = () => {
         <div
           ref={commandInputRef}
           className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
-          style={isEditingCommand ? { borderColor: 'var(--color-ripple-yellow)' } : {}}
+          style={
+            isEditingCommand ? { borderColor: 'var(--color-ripple-yellow-text)' } : {}
+          }
           tabIndex={0}
           onClick={async () => {
             await startHotKeySetting('command')
           }}
         >
-          {isWaitingCommand ? (
-            <span className="text-muted-foreground text-sm">等待按键...</span>
-          ) : (
-            <KbdGroup>
-              <AnimatePresence mode="popLayout">
-                {formattedCommandKeys.map((key, index) => (
-                  <motion.div
-                    key={`${key}-${index}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    style={{ display: 'inline-flex' }}
-                  >
-                    <Kbd>{key}</Kbd>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </KbdGroup>
-          )}
-          <span className="text-muted-foreground text-sm ml-auto">点击修改</span>
+          <div className="grid [&>*]:col-start-1 [&>*]:row-start-1 items-center">
+            <AnimatePresence initial={false}>
+              {isWaitingCommand && (
+                <motion.span
+                  key="waiting-command"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-muted-foreground text-sm"
+                >
+                  等待按键...
+                </motion.span>
+              )}
+              {!isWaitingCommand && (
+                <motion.div
+                  key="keys-command"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <KbdGroup>
+                    {formattedCommandKeys.map((key, index) => (
+                      <Kbd key={`${key}-${index}`}>{key}</Kbd>
+                    ))}
+                  </KbdGroup>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <AnimatePresence>
+            {!isWaitingCommand && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="text-muted-foreground text-sm ml-auto"
+              >
+                点击修改
+              </motion.span>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
   )
 }
 
-export default ContestPage
+export default ContentPage

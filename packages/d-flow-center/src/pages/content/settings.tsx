@@ -20,7 +20,7 @@ import { IconGitBranch } from '@tabler/icons-react'
 import { AdvancedSettingsDialog } from '@/components/advanced-settings-dialog.tsx'
 import { SystemFamily } from '@/types/terminal.ts'
 
-const ContestPage: React.FC = () => {
+const ContentPage: React.FC = () => {
   const user = useAuthStore((state) => state.user)
   const mutation = useLogoutQuery()
   useGetUserInfo()
@@ -153,4 +153,4 @@ const ContestPage: React.FC = () => {
   )
 }
 
-export default ContestPage
+export default ContentPage

@@ -1,52 +1,25 @@
 import request from '@/lib/request'
 import type { AccessToken, LoginResp } from '@/types/user'
-import { generateSignature } from '@/services/sign-service.ts'
 
-export const login = async (params: any) => {
-  const signature = await generateSignature(params)
-  return request.post<LoginResp>('/auth/login', {
-    params: {
-      ...params,
-      ...signature,
-    },
+export const login = (params: any) => {
+  return request.post<LoginResp>('/auth/login', { params })
+}
+
+export const register = (params: any) => {
+  return request.post<LoginResp>('/auth/register', { params })
+}
+
+export const sendVerificationCode = (phone: string) => {
+  return request.post<{ success: boolean; message: string }>('/auth/send-code', {
+    params: { phone },
   })
 }
 
-export const register = async (params: any) => {
-  const signature = await generateSignature(params)
-  return request.post<LoginResp>('/auth/register', {
-    params: {
-      ...params,
-      ...signature,
-    },
-  })
+export const logout = () => {
+  return request.post('/auth/logout')
 }
 
-export const sendVerificationCode = async (phone: string, invitation_code?: string) => {
-  const params = invitation_code ? { phone, invitation_code } : { phone }
-  const signature = await generateSignature(params)
-
-  return request.post<{
-    success: boolean
-    message: string
-  }>('/auth/send-code', {
-    params: {
-      ...params,
-      ...signature,
-    },
-  })
-}
-
-export const logout = async () => {
-  const signature = await generateSignature({})
-  return request.post('/auth/logout', {
-    params: {
-      ...signature,
-    },
-  })
-}
-
-export const refreshToken = async (refreshToken: string) => {
+export const refreshToken = (refreshToken: string) => {
   return request.post<AccessToken>('/auth/refreshToken', {
     params: { refreshToken },
   })

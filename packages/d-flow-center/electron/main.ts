@@ -35,9 +35,9 @@ function createWindow(onWebLoaded: Function = () => {}) {
   win = new BrowserWindow({
     title: '秒言',
     width: 1024,
-    height: 710,
+    height: 700,
     minWidth: 1024,
-    minHeight: 710,
+    minHeight: 700,
     titleBarStyle: 'hidden',
     trafficLightPosition: { x: 10, y: 10 },
     backgroundColor: isDarkMode ? '#1A1A1A' : '#FFFFFF',
