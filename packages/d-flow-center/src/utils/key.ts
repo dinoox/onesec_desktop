@@ -126,9 +126,17 @@ export class KeyMapper {
 
   // 获取按键的显示文本（简化符号）
   static getDisplayText(keyName: string): string {
-    if (keyName.includes('Command') || keyName.includes('⌘')) return '⌘'
-    if (keyName.includes('Option') || keyName.includes('⌥')) return '⌥'
-    if (keyName.includes('Control') || keyName.includes('⌃')) return '⌃'
+    if (keyName.includes('Command') || keyName.includes('⌘') || keyName.includes('Cmd'))
+      return '⌘'
+    if (
+      keyName.includes('Option') ||
+      keyName.includes('⌥') ||
+      keyName.includes('Opt') ||
+      keyName.includes('Alt')
+    )
+      return '⌥'
+    if (keyName.includes('Control') || keyName.includes('⌃') || keyName.includes('Ctrl'))
+      return '⌃'
     if (keyName.includes('Shift') || keyName.includes('⇧')) return '⇧'
     if (keyName === 'Space') return 'Space'
     if (keyName === 'Return') return '↩'

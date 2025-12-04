@@ -53,7 +53,7 @@ class ProcessManager {
       return
     }
 
-    if (message.action === MessageTypes.UPDATE_CONFIG) {
+    if (message.action === MessageTypes.CONFIG_UPDATED) {
       const { preferred_linux_distro } = message.data?.data || {}
       if (!preferred_linux_distro) return
 

@@ -108,7 +108,7 @@ const ContentPage: React.FC = () => {
               <Search />
             </InputGroupAddon>
             <InputGroupAddon align="inline-end">
-              <AnimatePresence mode="wait">
+              <AnimatePresence>
                 {filteredHotWords.length !== hotWords.length && (
                   <motion.span
                     key={filteredHotWords.length}
@@ -187,79 +187,114 @@ const ContentPage: React.FC = () => {
       )}
 
       <div className="flex w-full max-w-md flex-col gap-6 my-4">
-        {isError ? (
-          <Alert variant="destructive">
-            <AlertCircle />
-            <AlertTitle>连接失败</AlertTitle>
-            <AlertDescription>
-              无法连接到服务器，请检查网络连接或稍后重试
-            </AlertDescription>
-          </Alert>
-        ) : isLoading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full rounded-xl" />
-            ))}
-          </div>
-        ) : filteredHotWords.length === 0 ? (
-          <Empty>
-            <EmptyDescription>
-              {searchValue ? '未找到匹配的常用词' : '还没有添加常用词'}
-            </EmptyDescription>
-          </Empty>
-        ) : (
-          <div className="border rounded-md">
-            <Table>
-            <TableBody>
-              <AnimatePresence mode="popLayout">
-                {filteredHotWords.map((item) => (
-                  <motion.tr
-                    key={item.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    layout
-                    className="border-b transition-colors hover:bg-muted/50"
-                  >
-                    <TableCell className="pl-3 font-medium">{item.hotword}</TableCell>
-                    <TableCell className="text-right w-12">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="rounded-full">
-                            <IconAdjustmentsHorizontal />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56" align="end">
-                          <DropdownMenuLabel>提示词操作</DropdownMenuLabel>
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem onClick={() => openEditDialog(item)}>
-                              编辑
-                              <DropdownMenuShortcut>
-                                <IconEdit />
-                              </DropdownMenuShortcut>
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => handleDelete(item.id)}
-                            disabled={deleteHotWordMutation.isPending}
-                          >
-                            删除
-                            <DropdownMenuShortcut>
-                              <IconTrash />
-                            </DropdownMenuShortcut>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </motion.tr>
-                ))}
-              </AnimatePresence>
-            </TableBody>
-          </Table>
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {isError ? (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Alert variant="destructive">
+                <AlertCircle />
+                <AlertTitle>连接失败</AlertTitle>
+                <AlertDescription>
+                  无法连接到服务器，请检查网络连接或稍后重试
+                </AlertDescription>
+              </Alert>
+            </motion.div>
+          ) : isLoading ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-2"
+            >
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-[44px] w-full rounded-xl" />
+              ))}
+            </motion.div>
+          ) : filteredHotWords.length === 0 ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Empty>
+                <EmptyDescription>
+                  {searchValue ? '未找到匹配的常用词' : '还没有添加常用词'}
+                </EmptyDescription>
+              </Empty>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="list"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="border rounded-md"
+            >
+              <Table>
+                <TableBody>
+                  <AnimatePresence>
+                    {filteredHotWords.map((item) => (
+                      <motion.tr
+                        key={item.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="border-b transition-colors hover:bg-muted/50"
+                      >
+                        <TableCell className="pl-5 font-medium">{item.hotword}</TableCell>
+                        <TableCell className="text-right w-12">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full"
+                              >
+                                <IconAdjustmentsHorizontal />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" align="end">
+                              <DropdownMenuLabel>提示词操作</DropdownMenuLabel>
+                              <DropdownMenuGroup>
+                                <DropdownMenuItem onClick={() => openEditDialog(item)}>
+                                  编辑
+                                  <DropdownMenuShortcut>
+                                    <IconEdit />
+                                  </DropdownMenuShortcut>
+                                </DropdownMenuItem>
+                              </DropdownMenuGroup>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(item.id)}
+                                disabled={deleteHotWordMutation.isPending}
+                              >
+                                删除
+                                <DropdownMenuShortcut>
+                                  <IconTrash />
+                                </DropdownMenuShortcut>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* 编辑对话框 */}

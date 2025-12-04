@@ -8,14 +8,19 @@ import ipcService from '@/services/ipc-service.ts'
 const LoginPage: React.FC = () => {
   const isAuthed = useAuthStore((s) => s.isAuthed)
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null)
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.classList.contains('dark'),
+  )
 
   useEffect(() => {
     ipcService.isFirstLaunch().then(setIsFirstLaunch)
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains('dark'))
     })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
     return () => observer.disconnect()
   }, [])
 

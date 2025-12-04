@@ -11,6 +11,7 @@ import {
 } from '../../main/types/message.ts'
 import useStatusStore from '@/store/status-store.ts'
 import useUserConfigStore from '@/store/user-config-store.ts'
+import useAuthStore from '@/store/auth-store.ts'
 
 class IPCService {
   constructor() {}
@@ -37,6 +38,11 @@ class IPCService {
     setIPCMessage(message)
     if (action === 'auth_token_failed') {
       setAuthTokenInvalid(true)
+      return
+    }
+
+    if (action === 'config_updated') {
+      await useAuthStore.getState().actions.initAuth()
       return
     }
 

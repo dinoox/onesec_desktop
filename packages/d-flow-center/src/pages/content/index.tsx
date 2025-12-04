@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Kbd, KbdGroup } from '@/components/ui/kbd.tsx'
 import { Languages, Globe, Terminal, MonitorCog, LucideLogOut } from 'lucide-react'
 import { toast } from 'sonner'
@@ -17,6 +17,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
+import { KeyMapper } from '@/utils/key'
 
 const exampleList = [
   {
@@ -51,6 +52,15 @@ const ContentPage: React.FC = () => {
     loadUserConfig().then()
   }, [])
 
+  const formattedNormalKeys = useMemo(
+    () => KeyMapper.formatKeys(shortcutKeys),
+    [shortcutKeys],
+  )
+  const formattedCommandKeys = useMemo(
+    () => KeyMapper.formatKeys(shortcutCommandKeys),
+    [shortcutCommandKeys],
+  )
+
   return (
     <div className="max-w-9/12 flex flex-col justify-between gap-5">
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
@@ -74,16 +84,9 @@ const ContentPage: React.FC = () => {
               <div className="text-sm text-muted-foreground flex flex-row gap-1">
                 <span>长按</span>
                 <KbdGroup className="mx-1">
-                  {shortcutKeys.length > 0 ? (
-                    shortcutKeys.map((key, index) => (
-                      <Kbd key={index}>{getKeyDisplayText(key)}</Kbd>
-                    ))
-                  ) : (
-                    <>
-                      <Kbd>fn</Kbd>
-                      <Kbd>Opt⌥</Kbd>
-                    </>
-                  )}
+                  {formattedNormalKeys.map((key) => (
+                    <Kbd key={key}>{key}</Kbd>
+                  ))}
                 </KbdGroup>
                 <span>语音识别：自动识别使用场景，让识别更准确，输出更清晰</span>
               </div>
@@ -102,16 +105,9 @@ const ContentPage: React.FC = () => {
               <div className="text-sm text-muted-foreground flex flex-row gap-1">
                 <span>长按</span>
                 <KbdGroup className="mx-1">
-                  {shortcutCommandKeys.length > 0 ? (
-                    shortcutCommandKeys.map((key, index) => (
-                      <Kbd key={index}>{getKeyDisplayText(key)}</Kbd>
-                    ))
-                  ) : (
-                    <>
-                      <Kbd>fn</Kbd>
-                      <Kbd>cmd⌥</Kbd>
-                    </>
-                  )}
+                  {formattedCommandKeys.map((key) => (
+                    <Kbd key={key}>{key}</Kbd>
+                  ))}
                 </KbdGroup>
                 语音命令：支持命令识别和智能交互
               </div>

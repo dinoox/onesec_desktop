@@ -15,8 +15,6 @@ export const useGetUserInfo = () => {
       }
       return resp
     },
-    staleTime: 0,
-    gcTime: 0,
   })
 }
 

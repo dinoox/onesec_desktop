@@ -166,7 +166,7 @@ class NativeProcessManager {
   async syncUserConfigToNativeProcess() {
     const config = userConfigManager.getConfig()
     udsService.broadcast({
-      type: MessageTypes.UPDATE_CONFIG,
+      type: MessageTypes.CONFIG_UPDATED,
       timestamp: Date.now(),
       data: {},
     })

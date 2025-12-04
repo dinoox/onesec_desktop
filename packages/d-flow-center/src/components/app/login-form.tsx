@@ -5,14 +5,6 @@ import {
   useRegisterQuery,
   useVerificationCodeQuery,
 } from '@/services/queries/auth-query.ts'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card.tsx'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -27,12 +19,16 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Spinner } from '@/components/ui/spinner.tsx'
-import { data } from 'react-router'
 import IPCService from '@/services/ipc-service.ts'
 
-export function LoginForm({ defaultRegister = false }: { className?: string; defaultRegister?: boolean }) {
+export function LoginForm({
+  defaultRegister = false,
+}: {
+  className?: string
+  defaultRegister?: boolean
+}) {
   const [isRegisterMode, setIsRegisterMode] = useState(defaultRegister)
   const [countdown, setCountdown] = useState(0)
 
@@ -96,13 +92,13 @@ export function LoginForm({ defaultRegister = false }: { className?: string; def
   }
 
   return (
-    <Card className="w-[350px] bg-background  border border-border backdrop-blur">
-      <CardHeader className="flex flex-col items-center p-3">
+    <div className="w-[350px] bg-background border border-border/60 backdrop-blur rounded-2xl">
+      <div className="flex flex-col items-center p-5 mb-2">
         <LogoIcon />
-        <CardTitle className="text-xl">秒言</CardTitle>
-        <CardDescription className="text-base">从说到做，只需一秒</CardDescription>
-      </CardHeader>
-      <CardContent>
+        <h2 className="text-xl font-semibold">秒言</h2>
+        <p className="text-base text-muted-foreground">从说到做，只需一秒</p>
+      </div>
+      <div className="p-6 pt-0">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid w-full items-center gap-5">
@@ -126,28 +122,7 @@ export function LoginForm({ defaultRegister = false }: { className?: string; def
                   </FormItem>
                 )}
               />
-              {isRegisterMode && (
-                <FormField
-                  control={form.control}
-                  name="share_code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="gap-0.5">邀请码（选填）</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="请输入邀请码"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e)
-                            form.clearErrors()
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+
               <FormField
                 control={form.control}
                 name="verification_code"
@@ -186,6 +161,31 @@ export function LoginForm({ defaultRegister = false }: { className?: string; def
                   </FormItem>
                 )}
               />
+              {isRegisterMode && (
+                <FormField
+                  control={form.control}
+                  name="share_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="gap-0.5">邀请码</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="选择输入邀请码"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            form.clearErrors()
+                          }}
+                        />
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground">
+                        &nbsp;填入邀请码，双方各获得20积分
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <Button type="submit" className="w-full" disabled={mutation.isPending}>
                 {mutation.isPending ? <Spinner /> : null}
                 {mutation.isPending
@@ -199,8 +199,8 @@ export function LoginForm({ defaultRegister = false }: { className?: string; def
             </div>
           </form>
         </Form>
-      </CardContent>
-      <CardFooter className="flex flex-col gap-4">
+      </div>
+      <div className="flex flex-col gap-4 p-6 pt-0">
         <p className="text-xs text-center text-muted-foreground">
           {isRegisterMode ? '注册' : '登录'}即表示您同意我们的
           <button
@@ -234,7 +234,7 @@ export function LoginForm({ defaultRegister = false }: { className?: string; def
             {isRegisterMode ? '立即登录' : '现在就注册'}
           </Button>
         </p>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   )
 }

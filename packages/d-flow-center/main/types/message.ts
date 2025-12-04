@@ -2,7 +2,7 @@ import * as net from 'net'
 import { User } from '@/types/user.ts'
 
 export const MessageTypes = {
-  UPDATE_CONFIG: 'config_updated',
+  CONFIG_UPDATED: 'config_updated',
   CONNECTED: 'connected',
   AUTH_TOKEN_FAILED: 'auth_token_failed',
   // App Update

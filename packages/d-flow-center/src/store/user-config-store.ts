@@ -41,7 +41,7 @@ const useUserConfigStore = create<UserConfigStore>((set, _) => ({
       set({ showComparison })
     },
     setShortcutKeys: (keys: string[]) => set({ shortcutKeys: keys }),
-    setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys })
+    setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys }),
   },
 }))
 

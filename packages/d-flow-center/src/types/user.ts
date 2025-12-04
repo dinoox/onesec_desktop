@@ -13,6 +13,8 @@ export type User = {
   preferred_linux_distro?: string | null
   share_code: string
   points: number
+  membership_type: string
+  membership_expires_at: string | null
 }
 
 export type LoginResp = {

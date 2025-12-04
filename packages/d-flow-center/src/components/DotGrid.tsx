@@ -92,7 +92,10 @@ const DotGrid: React.FC<DotGridProps> = ({
 
   useEffect(() => {
     const observer = new MutationObserver(() => setThemeKey((k) => k + 1))
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
     return () => observer.disconnect()
   }, [])
 
