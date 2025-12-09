@@ -83,8 +83,8 @@ const ContentPage: React.FC = () => {
         <div className="text-[15px]">模式设置</div>
         <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
           <div className="flex flex-col space-y-1">
-            <Label htmlFor="mode">翻译模式</Label>
-            <span className="text-muted-foreground">自动显示翻译前后对比结果</span>
+            <Label htmlFor="mode">显示原文</Label>
+            <span className="text-muted-foreground">翻译时显示语音原文</span>
           </div>
           <Select
             value={showComparison ? 'appear' : 'not_appear'}
@@ -94,8 +94,8 @@ const ContentPage: React.FC = () => {
               <SelectValue placeholder="选择模式" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="appear">自动显示</SelectItem>
-              <SelectItem value="not_appear">不显示</SelectItem>
+              <SelectItem value="appear">开启</SelectItem>
+              <SelectItem value="not_appear">关闭</SelectItem>
             </SelectContent>
           </Select>
         </div>

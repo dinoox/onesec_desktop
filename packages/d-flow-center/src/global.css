@@ -91,11 +91,11 @@
   --ripple-yellow-brand: #ffcc00;
   --ripple-brand: #2EDDA8;
 
-  --ripple-green-text: oklch(0.684 0.175 139.008);
+  --ripple-green-text: oklch(0.703 0.143 167.842);
   --ripple-yellow-text: oklch(0.832 0.165 86.343);
   --ripple-error-text: oklch(0.578 0.203 24.8);
 
-  --ripple-brand-text: oklch(0.684 0.175 139.008);
+  --ripple-brand-text: oklch(0.703 0.143 167.842);
 }
 
 .dark {
@@ -137,7 +137,7 @@
   --ripple-yellow-brand: #ffcc00;
   --ripple-brand: #ffcc00;
 
-  --ripple-green-text: oklch(0.684 0.175 139.008);
+  --ripple-green-text: oklch(0.703 0.143 167.842);
   --ripple-yellow-text: oklch(0.832 0.165 86.343);
   --ripple-error-text: oklch(0.578 0.203 24.8);
   --ripple-brand-text: oklch(0.832 0.165 86.343);

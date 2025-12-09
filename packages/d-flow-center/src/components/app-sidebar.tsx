@@ -45,14 +45,7 @@ const AppSidebar: React.FC = () => {
         <div className="p-3 pt-5 transition-colors duration-300">
           <div className="flex items-center gap-2 px-2 py-2">
             <span className="text-base font-semibold">秒言</span>
-            {/*<Badge*/}
-            {/*  variant="outline"*/}
-            {/*  className="border-border text-ripple-brand-text text-[11px] rounded-xl bg-sidebar-accent"*/}
-            {/*>*/}
-            {/*  试用版*/}
-            {/*</Badge>*/}
-
-            {user && !sidebarCollapsed && (
+            {user && user.membership_type && !sidebarCollapsed && (
               <Badge variant="secondary" className="text-ripple-brand-text">
                 {membershipLabels[user.membership_type] || user.membership_type}
               </Badge>

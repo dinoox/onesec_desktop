@@ -26,9 +26,9 @@ const ContentPage: React.FC = () => {
 
   const handleCopyShareLink = async () => {
     const shareCode = user?.share_code ?? ''
-    const text = `秒言语音输入又快又准。注册即得一个月 pro 会员，立即开启高效输入！邀请链接：https://www.miaoyan.cn/download.html 邀请码：${shareCode}`
+    const text = `秒言语音输入又快又准。注册即得一个月 Pro 会员，立即开启高效输入！邀请链接：https://www.miaoyan.cn/download.html 邀请码：${shareCode}`
     await navigator.clipboard.writeText(text)
-    toast.success('已复制分享链接')
+    toast.success('已复制邀请链接')
   }
 
   const formatDate = (dateStr: string) => {
@@ -43,7 +43,7 @@ const ContentPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-5 max-w-3xl">
       {/* 积分区域 */}
-      <div className="space-y-2 border p-4 rounded-xl">
+      <div className="space-y-1 border p-4 rounded-xl">
         <div className="flex items-center gap-2 text-[15px] font-medium">
           <Gift className="w-5 h-5 text-ripple-brand-text" />
           <span>我的积分</span>
@@ -88,7 +88,7 @@ const ContentPage: React.FC = () => {
           </div>
           <Button size="sm" variant="outline" onClick={handleCopyShareLink}>
             <Copy className="w-4 h-4" />
-            <span>复制分享链接</span>
+            <span>复制邀请链接</span>
           </Button>
         </div>
       </div>
@@ -126,7 +126,7 @@ const ContentPage: React.FC = () => {
                         </p>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Badge variant={tx.points > 0 ? 'default' : 'secondary'}>
+                        <Badge variant="secondary">
                           {tx.points > 0 ? '+' : ''}
                           {tx.points}
                         </Badge>
@@ -150,11 +150,11 @@ const ContentPage: React.FC = () => {
               <IconTrophy className="w-5 h-5 text-ripple-brand-text" />
               <span>积分排行榜</span>
             </div>
-            {ranking?.current_user_rank && (
+            {/* {ranking?.current_user_rank && (
               <span className="text-xs text-muted-foreground">
-                第 {ranking.current_user_rank} 名
+                当前第 {ranking.current_user_rank} 名
               </span>
-            )}
+            )} */}
           </div>
           <div className="max-h-[211px] overflow-y-auto">
             {rankLoading ? (
@@ -199,6 +199,11 @@ const ContentPage: React.FC = () => {
               </div>
             )}
           </div>
+
+          <p className="text-xs text-muted-foreground mt-[-5px]">
+            累计积分 {ranking?.current_user_points ?? 0}, 当前第{' '}
+            {ranking?.current_user_rank ?? 0} 名
+          </p>
         </div>
       </div>
     </div>

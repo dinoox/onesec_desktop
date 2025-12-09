@@ -5,6 +5,7 @@ const ContentPage = lazy(() => import('@/pages/content'))
 const HotWordsPage = lazy(() => import('@/pages/content/hot-words.tsx'))
 const ShortcutKeysPage = lazy(() => import('@/pages/content/shortcut-keys'))
 const InviteRewardPage = lazy(() => import('@/pages/content/invite-reward'))
+const HistoryPage = lazy(() => import('@/pages/content/history'))
 const SettingsPage = lazy(() => import('@/pages/content/settings'))
 
 export const ContentRoutes: RouteObject[] = [
@@ -20,6 +21,10 @@ export const ContentRoutes: RouteObject[] = [
   {
     path: '/content/invite-reward',
     Component: InviteRewardPage,
+  },
+  {
+    path: '/content/history',
+    Component: HistoryPage,
   },
   {
     path: '/content/settings',

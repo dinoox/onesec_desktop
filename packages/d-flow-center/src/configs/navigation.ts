@@ -4,6 +4,7 @@ import {
   LucideShell,
   Settings,
   GiftIcon,
+  History,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -32,9 +33,14 @@ export const navMain: NavItem[] = [
     icon: LucideShell,
   },
   {
-    title: '邀请返利',
+    title: '邀请奖励',
     url: '/content/invite-reward',
     icon: GiftIcon,
+  },
+  {
+    title: '历史记录',
+    url: '/content/history',
+    icon: History,
   },
   {
     title: '设置',

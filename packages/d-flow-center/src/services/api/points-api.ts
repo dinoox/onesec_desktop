@@ -32,6 +32,7 @@ export interface RankingResponse {
   limit: number
   offset: number
   current_user_rank: number
+  current_user_points: number
 }
 
 export interface ExchangeResponse {

@@ -20,6 +20,10 @@ class UserConfigManager {
     return this.store.store
   }
 
+  getConfigPath(): string {
+    return this.store.path
+  }
+
   setConfig(config: Partial<StoreSchema>): void {
     Object.entries(config).forEach(([key, value]) => {
       if (value !== undefined) {
