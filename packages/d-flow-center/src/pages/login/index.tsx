@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
   if (isFirstLaunch === null) return null
 
   return (
-    <div className=" bg-background relative flex min-h-svh w-full items-center justify-center p-6">
+    <div className="bg-background relative flex min-h-svh w-full items-center justify-center p-6">
       <div className="absolute top-0 left-0 w-full h-full">
         <DotGrid
           dotSize={5}

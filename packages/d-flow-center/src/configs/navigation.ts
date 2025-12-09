@@ -23,6 +23,11 @@ export const navMain: NavItem[] = [
     icon: LucideHome,
   },
   {
+    title: '历史记录',
+    url: '/content/history',
+    icon: History,
+  },
+  {
     title: '常用词',
     url: '/content/hot-words',
     icon: PuzzleIcon,
@@ -36,11 +41,6 @@ export const navMain: NavItem[] = [
     title: '邀请奖励',
     url: '/content/invite-reward',
     icon: GiftIcon,
-  },
-  {
-    title: '历史记录',
-    url: '/content/history',
-    icon: History,
   },
   {
     title: '设置',

@@ -2,9 +2,9 @@ name: Build and Deploy to OSS
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*"
+#  push:
+#    tags:
+#      - "v*"
 
 env:
   APP_NAME: com.ripplestar.miaoyan

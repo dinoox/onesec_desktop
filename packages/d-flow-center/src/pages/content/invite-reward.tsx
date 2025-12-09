@@ -20,13 +20,26 @@ const ContentPage: React.FC = () => {
   const { data: ranking, isLoading: rankLoading } = useGetRanking(10, 0)
   const exchangeMutation = useExchangeMembership()
 
+  // 是否在注册30天内
+  const isWithin30Days = user?.created_at
+    ? Date.now() - new Date(user.created_at).getTime() < 30 * 24 * 60 * 60 * 1000
+    : false
+
+  // 是否已邀请过用户
+  const hasInvited = transactions?.transactions.some(
+    (tx) => tx.reason === '分享码被使用奖励',
+  )
+
+  // 新人专享条件：30天内 + 未邀请过
+  const isNewUserPromo = isWithin30Days && !hasInvited
+
   const handleExchange = async () => {
     await exchangeMutation.mutateAsync('pro')
   }
 
   const handleCopyShareLink = async () => {
     const shareCode = user?.share_code ?? ''
-    const text = `秒言语音输入又快又准。注册即得一个月 Pro 会员，立即开启高效输入！邀请链接：https://www.miaoyan.cn/download.html 邀请码：${shareCode}`
+    const text = `秒言语音输入又快又准。注册解锁专属会员权益，立即开启高效输入！邀请链接：https://www.miaoyan.cn/download.html 邀请码：${shareCode}`
     await navigator.clipboard.writeText(text)
     toast.success('已复制邀请链接')
   }
@@ -76,15 +89,19 @@ const ContentPage: React.FC = () => {
       <div className="space-y-2 border p-4 rounded-xl">
         <div className="flex items-center gap-2 text-[15px] font-medium">
           <IconShare className="w-5 h-5 text-ripple-brand-text" />
-          <span>邀请好友</span>
+          <span>{isNewUserPromo ? '新人专享' : '邀请好友'}</span>
         </div>
         <div className="flex items-center justify-between py-1">
           <div className="space-y-1">
             <p className="text-sm">
-              我的邀请码：
-              <span className="font-mono font-medium">{user?.share_code ?? '-'}</span>
+              {isNewUserPromo ? '限时: 邀请好友注册,解锁23天会员!' : '我的邀请码：'}
+              {!isNewUserPromo && (
+                <span className="font-mono font-medium">{user?.share_code ?? '-'}</span>
+              )}
             </p>
-            <p className="text-xs text-muted-foreground">邀请好友注册可获得积分奖励</p>
+            <p className="text-xs text-muted-foreground">
+              {isNewUserPromo ? '任务自注册日起30天有效' : '邀请好友注册可获得积分奖励'}
+            </p>
           </div>
           <Button size="sm" variant="outline" onClick={handleCopyShareLink}>
             <Copy className="w-4 h-4" />
@@ -100,7 +117,7 @@ const ContentPage: React.FC = () => {
             <IconHistory className="w-5 h-5 text-ripple-brand-text" />
             积分记录
           </div>
-          <div className="max-h-[211px] overflow-y-auto">
+          <div className="max-h-[185px] overflow-y-auto">
             {txLoading ? (
               <div className="space-y-2 animate-in fade-in duration-300">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -156,7 +173,7 @@ const ContentPage: React.FC = () => {
               </span>
             )} */}
           </div>
-          <div className="max-h-[211px] overflow-y-auto">
+          <div className="max-h-[185px] overflow-y-auto">
             {rankLoading ? (
               <div className="space-y-2 animate-in fade-in duration-300">
                 {Array.from({ length: 4 }).map((_, i) => (

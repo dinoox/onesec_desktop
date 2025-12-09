@@ -83,17 +83,17 @@ const HistoryPage: React.FC = () => {
         <span className="text-[15px] font-medium">历史记录</span>
       </div>
 
-      <div className="space-y-3">
-        <div className="flex items-center  bg-setting rounded-xl px-4 py-4">
-          <LockIcon className="w-4 h-4  mr-3" />
-          <div className="flex flex-col gap-1">
-            <span>您的数据保持私密</span>
-            <p className="text-sm text-muted-foreground">
-              您的语音口述是私密的，零数据保留。它们仅存储在您的设备上，无法从其他地方访问
-            </p>
-          </div>
-        </div>
-      </div>
+      {/*<div className="space-y-3">*/}
+      {/*  <div className="flex items-center  bg-setting rounded-xl px-4 py-4">*/}
+      {/*    <LockIcon className="w-4 h-4  mr-3" />*/}
+      {/*    <div className="flex flex-col gap-1">*/}
+      {/*      <span>您的数据保持私密</span>*/}
+      {/*      <p className="text-sm text-muted-foreground">*/}
+      {/*        您的语音口述是私密的，零数据保留。它们仅存储在您的设备上，无法从其他地方访问*/}
+      {/*      </p>*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*</div>*/}
 
       <div className="space-y-6 mt-6 relative">
         <div

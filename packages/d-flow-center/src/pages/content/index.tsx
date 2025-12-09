@@ -25,14 +25,15 @@ const exampleList = [
     icon: Languages,
     iconColor: 'text-ripple-brand-text',
     title: '文本翻译',
-    description: '选中文本后使用命令模式，说 "帮我翻译成英文"',
+    description:
+      '选中文本后使用命令模式，说 "帮我翻译成英文"，或者点击底部圆形图标并开启翻译模式。',
   },
   {
     id: 2,
     icon: Globe,
     iconColor: 'text-ripple-brand-text',
     title: '网址搜索',
-    description: '在浏览器地址栏使用命令模式，说 "我要访问全球最大的编程社区"',
+    description: '在浏览器地址栏使用命令模式，说 "帮我打开在线去水印的网站"',
   },
   {
     id: 3,
@@ -118,9 +119,15 @@ const ContentPage: React.FC = () => {
 
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
         <div className="flex flex-col justify-center  space-y-1">
-          <span className="text-[15px] font-medium">试试下面的例子</span>
+          <span className="text-[15px] font-medium">试试下面的[命令模式]例子</span>
           <span className="text-sm text-muted-foreground">
-            按住快捷键说话，松开后内容自动输入到当前光标位置
+            按住快捷键
+            <KbdGroup className="mx-1">
+              {formattedCommandKeys.map((key) => (
+                <Kbd key={key}>{key}</Kbd>
+              ))}
+            </KbdGroup>
+            说话，松开后内容自动输入到当前光标位置
           </span>
         </div>
         <div className="border border-border rounded-xl">

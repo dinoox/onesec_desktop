@@ -59,7 +59,7 @@ export function LoginForm({
       ? {
           phone: data.phone,
           code: data.verification_code,
-          share_code: data.share_code,
+          ...(data.share_code && { share_code: data.share_code }),
         }
       : { phone: data.phone, code: data.verification_code }
     await mutation.mutateAsync(params)

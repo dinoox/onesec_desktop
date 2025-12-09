@@ -52,14 +52,16 @@ class NativeProcessManager {
 
       const childProcess = this.nativeProcess
 
-      childProcess.on('error', (error: Error) => {
+      childProcess.on('error', async (error: Error) => {
         log.error('[NativeProcess] Process error:', error)
         this.nativeProcess = null
+        await this.restart()
       })
 
-      childProcess.on('exit', (code: number | null, signal: string | null) => {
+      childProcess.on('exit', async (code: number | null, signal: string | null) => {
         log.info(`[NativeProcess] Process exited with code: ${code}, signal: ${signal}`)
         this.nativeProcess = null
+        await this.restart()
       })
 
       if (childProcess.stdout) {

@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 export const useGetTransactions = (limit = 20, offset = 0) => {
   return useQuery({
     queryKey: ['transactions', limit, offset],
+    staleTime: 0,
     queryFn: async () => {
       const resp = await getTransactions({ limit, offset })
       if (!resp.success) throw new Error(resp.message)
@@ -20,6 +21,7 @@ export const useGetTransactions = (limit = 20, offset = 0) => {
 export const useGetRanking = (limit = 10, offset = 0) => {
   return useQuery({
     queryKey: ['ranking', limit, offset],
+    staleTime: 0,
     queryFn: async () => {
       const resp = await getRanking({ limit, offset })
       if (!resp.success) throw new Error(resp.message)

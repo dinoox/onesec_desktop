@@ -15,6 +15,7 @@ export type User = {
   points: number
   membership_type: string
   membership_expires_at: string | null
+  created_at: string
 }
 
 export type LoginResp = {
