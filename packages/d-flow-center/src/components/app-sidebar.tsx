@@ -127,7 +127,7 @@ const AppSidebar: React.FC = () => {
                   {Math.max(
                     0,
                     Math.ceil(
-                      (new Date(user.membership_expires_at).getTime() - Date.now()) /
+                      (user.membership_expires_at * 1000 - Date.now()) /
                         (1000 * 60 * 60 * 24),
                     ),
                   )}{' '}

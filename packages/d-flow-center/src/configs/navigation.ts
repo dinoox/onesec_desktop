@@ -5,6 +5,7 @@ import {
   Settings,
   GiftIcon,
   History,
+  BookA,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -30,7 +31,7 @@ export const navMain: NavItem[] = [
   {
     title: '常用词',
     url: '/content/hot-words',
-    icon: PuzzleIcon,
+    icon: BookA,
   },
   {
     title: '快捷键',

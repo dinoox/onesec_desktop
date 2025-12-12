@@ -22,7 +22,7 @@ const ContentPage: React.FC = () => {
 
   // 是否在注册30天内
   const isWithin30Days = user?.created_at
-    ? Date.now() - new Date(user.created_at).getTime() < 30 * 24 * 60 * 60 * 1000
+    ? Date.now() - Number(user.created_at) * 1000 < 30 * 24 * 60 * 60 * 1000
     : false
 
   // 是否已邀请过用户
@@ -44,8 +44,8 @@ const ContentPage: React.FC = () => {
     toast.success('已复制邀请链接')
   }
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('zh-CN', {
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp * 1000).toLocaleDateString('zh-CN', {
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
@@ -94,13 +94,13 @@ const ContentPage: React.FC = () => {
         <div className="flex items-center justify-between py-1">
           <div className="space-y-1">
             <p className="text-sm">
-              {isNewUserPromo ? '限时: 邀请好友注册,解锁23天会员!' : '我的邀请码：'}
+              {isNewUserPromo ? '限时: 邀请好友注册,解锁 23 天会员!' : '我的邀请码：'}
               {!isNewUserPromo && (
                 <span className="font-mono font-medium">{user?.share_code ?? '-'}</span>
               )}
             </p>
             <p className="text-xs text-muted-foreground">
-              {isNewUserPromo ? '任务自注册日起30天有效' : '邀请好友注册可获得积分奖励'}
+              {isNewUserPromo ? '任务自注册日起 30 天有效' : '邀请好友注册可获得积分奖励'}
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={handleCopyShareLink}>

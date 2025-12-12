@@ -5,8 +5,10 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 import { useGetRecentRecords } from '@/services/queries/audio-query'
 import { AudioRecord } from '@/services/api/audio-api'
 
-const formatDateGroup = (dateStr: string): string => {
-  const date = new Date(dateStr)
+const toDate = (timestamp: number): Date => new Date(timestamp * 1000)
+
+const formatDateGroup = (timestamp: number): string => {
+  const date = toDate(timestamp)
   const today = new Date()
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
@@ -25,8 +27,8 @@ const formatDateGroup = (dateStr: string): string => {
   })
 }
 
-const formatTime = (dateStr: string): string => {
-  const date = new Date(dateStr)
+const formatTime = (timestamp: number): string => {
+  const date = toDate(timestamp)
   return date.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
@@ -34,8 +36,8 @@ const formatTime = (dateStr: string): string => {
   })
 }
 
-const getDateKey = (dateStr: string): string => {
-  const date = new Date(dateStr)
+const getDateKey = (timestamp: number): string => {
+  const date = toDate(timestamp)
   return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
 }
 

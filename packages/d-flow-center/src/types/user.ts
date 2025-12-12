@@ -14,8 +14,8 @@ export type User = {
   share_code: string
   points: number
   membership_type: string
-  membership_expires_at: string | null
-  created_at: string
+  membership_expires_at: number
+  created_at: number
 }
 
 export type LoginResp = {

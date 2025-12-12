@@ -27,7 +27,8 @@ const ContentPage: React.FC = () => {
   const updateUserMutation = useUpdateUserInfo()
   const { theme, setTheme } = useTheme()
   const showComparison = useUserConfigStore((state) => state.showComparison)
-  const { setShowComparison } = useUserConfigActions()
+  const hideFloatingPanel = useUserConfigStore((state) => state.hideFloatingPanel)
+  const { setShowComparison, setHideFloatingPanel } = useUserConfigActions()
   const { setAdvancedSettingsOpen } = useUIActions()
 
   async function logout() {
@@ -68,12 +69,30 @@ const ContentPage: React.FC = () => {
           <Select value={theme} onValueChange={setTheme}>
             <SelectTrigger>
               <SelectValue placeholder="选择主题" />
-              <span></span>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="light">浅色</SelectItem>
               <SelectItem value="dark">深色</SelectItem>
               <SelectItem value="system">跟随系统</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
+          <div className="flex flex-col space-y-1">
+            <Label htmlFor="hide-floating-panel">隐藏悬浮框</Label>
+            <span className="text-muted-foreground">未录音时隐藏悬浮框</span>
+          </div>
+          <Select
+            value={hideFloatingPanel ? 'enabled' : 'disabled'}
+            onValueChange={(value) => setHideFloatingPanel(value === 'enabled')}
+          >
+            <SelectTrigger className="py-4">
+              <SelectValue placeholder="选择模式" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="enabled">开启</SelectItem>
+              <SelectItem value="disabled">关闭</SelectItem>
             </SelectContent>
           </Select>
         </div>

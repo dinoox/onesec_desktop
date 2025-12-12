@@ -179,7 +179,7 @@ export function LoginForm({
                         />
                       </FormControl>
                       <p className="text-xs text-muted-foreground">
-                        &nbsp;填入邀请码，双方各获得20积分
+                        &nbsp;填入邀请码，双方各获得10积分
                       </p>
                       <FormMessage />
                     </FormItem>

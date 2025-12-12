@@ -10,7 +10,7 @@ export interface Transaction {
   points: number
   reason: string
   related_user_id: number | null
-  created_at: string
+  created_at: number
 }
 
 export interface TransactionsResponse {

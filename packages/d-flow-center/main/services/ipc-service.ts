@@ -47,8 +47,8 @@ class IPCService {
 
   // User Auth
   private handleUserLogin = async () => {
-    if (await userConfigManager.isFirstLaunch()) {
-      await userConfigManager.markAsLaunched()
+    if (userConfigManager.isFirstLaunch()) {
+      userConfigManager.markAsLaunched()
     }
   }
 

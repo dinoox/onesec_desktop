@@ -7,21 +7,25 @@ interface UserConfigStore {
   shortcutKeys: string[]
   shortcutCommandKeys: string[]
   showComparison: boolean
+  hideFloatingPanel: boolean
   actions: {
     loadUserConfig: () => Promise<void>
     setShowComparison: (showComparison: boolean) => Promise<void>
+    setHideFloatingPanel: (hideFloatingPanel: boolean) => Promise<void>
     setShortcutKeys: (keys: string[]) => void
     setShortcutCommandKeys: (keys: string[]) => void
   }
 }
 
-const useUserConfigStore = create<UserConfigStore>((set, _) => ({
+const useUserConfigStore = create<UserConfigStore>((set, get) => ({
   shortcutKeys: [],
   shortcutCommandKeys: [],
   showComparison: true,
+  hideFloatingPanel: false,
   actions: {
     loadUserConfig: async () => {
       const config = await UserService.getConfig()
+      const settings = config.setting
       const normalConfig = config.hotkey_configs?.find(
         (item: any) => item.mode === 'normal',
       )
@@ -31,14 +35,27 @@ const useUserConfigStore = create<UserConfigStore>((set, _) => ({
       set({
         shortcutKeys: normalConfig?.hotkey_combination || ['Fn'],
         shortcutCommandKeys: commandConfig?.hotkey_combination || ['Fn', 'LCmd'],
-        showComparison: config.translation?.show_comparison ?? true,
+        showComparison: settings?.show_comparison ?? true,
+        hideFloatingPanel: settings?.hide_floating_panel ?? false,
       })
     },
     setShowComparison: async (showComparison: boolean) => {
       await UserService.setPartialConfig({
-        translation: { show_comparison: showComparison },
+        setting: {
+          show_comparison: showComparison,
+          hide_floating_panel: get().hideFloatingPanel,
+        },
       })
       set({ showComparison })
+    },
+    setHideFloatingPanel: async (hideFloatingPanel: boolean) => {
+      await UserService.setPartialConfig({
+        setting: {
+          show_comparison: get().showComparison,
+          hide_floating_panel: hideFloatingPanel,
+        },
+      })
+      set({ hideFloatingPanel })
     },
     setShortcutKeys: (keys: string[]) => set({ shortcutKeys: keys }),
     setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys }),

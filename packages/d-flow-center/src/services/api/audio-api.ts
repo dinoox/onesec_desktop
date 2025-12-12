@@ -4,7 +4,7 @@ export interface AudioRecord {
   id: number
   recognized_text: string | null
   model_processed_text: string | null
-  created_at: string
+  created_at: number
 }
 
 interface RecentRecordsResponse {
