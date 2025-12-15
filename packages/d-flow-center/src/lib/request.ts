@@ -91,23 +91,6 @@ class Request {
       headers: params.headers,
     })
     let res = await fetch(req.url, req.options)
-    // if (res.status === 401 && authStore.getState().refreshToken) {
-    //   const resp = await refreshToken(authStore.getState().refreshToken!)
-    //   if (!resp.success) {
-    //     authStore.getState().actions.logout()
-    //   } else {
-    //     authStore.getState().actions.setAccessToken(resp.data.access_token)
-    //     authStore.getState().actions.setRefreshToken(resp.data.refresh_token)
-    //     const options = {
-    //       ...req.options,
-    //       headers: {
-    //         ...req.options.headers,
-    //         Authorization: `Bearer ${resp.data.access_token}`,
-    //       },
-    //     }
-    //     res = await fetch(req.url, options)
-    //   }
-    // }
     return this.interceptorsResponse<T>(res)
   }
 

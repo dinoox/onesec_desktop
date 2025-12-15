@@ -27,8 +27,8 @@ const ContentPage: React.FC = () => {
   const updateUserMutation = useUpdateUserInfo()
   const { theme, setTheme } = useTheme()
   const showComparison = useUserConfigStore((state) => state.showComparison)
-  const hideFloatingPanel = useUserConfigStore((state) => state.hideFloatingPanel)
-  const { setShowComparison, setHideFloatingPanel } = useUserConfigActions()
+  const hideStatusPanel = useUserConfigStore((state) => state.hideStatusPanel)
+  const { setShowComparison, setHideStatusPanel } = useUserConfigActions()
   const { setAdvancedSettingsOpen } = useUIActions()
 
   async function logout() {
@@ -80,12 +80,14 @@ const ContentPage: React.FC = () => {
 
         <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
           <div className="flex flex-col space-y-1">
-            <Label htmlFor="hide-floating-panel">隐藏悬浮框</Label>
-            <span className="text-muted-foreground">未录音时隐藏悬浮框</span>
+            <Label htmlFor="hide-floating-panel">始终显示悬浮图标</Label>
+            <span className="text-muted-foreground">
+              关闭后，悬浮图标只会在录音时显示
+            </span>
           </div>
           <Select
-            value={hideFloatingPanel ? 'enabled' : 'disabled'}
-            onValueChange={(value) => setHideFloatingPanel(value === 'enabled')}
+            value={hideStatusPanel ? 'disabled' : 'enabled'}
+            onValueChange={(value) => setHideStatusPanel(value !== 'enabled')}
           >
             <SelectTrigger className="py-4">
               <SelectValue placeholder="选择模式" />

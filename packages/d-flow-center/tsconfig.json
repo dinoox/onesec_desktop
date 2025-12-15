@@ -23,7 +23,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    "esModuleInterop": true,
   },
   "include": ["src", "electron"],
   "references": [{ "path": "./tsconfig.node.json" }]

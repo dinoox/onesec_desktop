@@ -7,11 +7,13 @@ interface UserConfigStore {
   shortcutKeys: string[]
   shortcutCommandKeys: string[]
   showComparison: boolean
-  hideFloatingPanel: boolean
+  hideStatusPanel: boolean
+  historyRetention: string
   actions: {
     loadUserConfig: () => Promise<void>
     setShowComparison: (showComparison: boolean) => Promise<void>
-    setHideFloatingPanel: (hideFloatingPanel: boolean) => Promise<void>
+    setHideStatusPanel: (hideStatusPanel: boolean) => Promise<void>
+    setHistoryRetention: (historyRetention: string) => Promise<void>
     setShortcutKeys: (keys: string[]) => void
     setShortcutCommandKeys: (keys: string[]) => void
   }
@@ -21,7 +23,8 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
   shortcutKeys: [],
   shortcutCommandKeys: [],
   showComparison: true,
-  hideFloatingPanel: false,
+  hideStatusPanel: false,
+  historyRetention: 'forever',
   actions: {
     loadUserConfig: async () => {
       const config = await UserService.getConfig()
@@ -36,26 +39,39 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
         shortcutKeys: normalConfig?.hotkey_combination || ['Fn'],
         shortcutCommandKeys: commandConfig?.hotkey_combination || ['Fn', 'LCmd'],
         showComparison: settings?.show_comparison ?? true,
-        hideFloatingPanel: settings?.hide_floating_panel ?? false,
+        hideStatusPanel: settings?.hide_status_panel ?? false,
+        historyRetention: settings?.history_retention ?? 'forever',
       })
     },
     setShowComparison: async (showComparison: boolean) => {
       await UserService.setPartialConfig({
         setting: {
           show_comparison: showComparison,
-          hide_floating_panel: get().hideFloatingPanel,
+          hide_status_panel: get().hideStatusPanel,
+          history_retention: get().historyRetention,
         },
       })
       set({ showComparison })
     },
-    setHideFloatingPanel: async (hideFloatingPanel: boolean) => {
+    setHideStatusPanel: async (hideStatusPanel: boolean) => {
       await UserService.setPartialConfig({
         setting: {
           show_comparison: get().showComparison,
-          hide_floating_panel: hideFloatingPanel,
+          hide_status_panel: hideStatusPanel,
+          history_retention: get().historyRetention,
         },
       })
-      set({ hideFloatingPanel })
+      set({ hideStatusPanel })
+    },
+    setHistoryRetention: async (historyRetention: string) => {
+      await UserService.setPartialConfig({
+        setting: {
+          show_comparison: get().showComparison,
+          hide_status_panel: get().hideStatusPanel,
+          history_retention: historyRetention,
+        },
+      })
+      set({ historyRetention })
     },
     setShortcutKeys: (keys: string[]) => set({ shortcutKeys: keys }),
     setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys }),

@@ -6,12 +6,20 @@ import {
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
   IPC_IS_FIRST_LAUNCH_CHANNEL,
   IPC_MARK_AS_LAUNCHED_CHANNEL,
+  IPC_GET_AUDIOS_CHANNEL,
+  IPC_DOWNLOAD_AUDIO_CHANNEL,
+  IPC_DELETE_AUDIO_CHANNEL,
+  IPC_READ_AUDIO_FILE_CHANNEL,
+  IPC_UPDATE_AUDIO_CHANNEL,
+  IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
   IPCMessage,
   MessageType,
 } from '../../main/types/message.ts'
 import useStatusStore from '@/store/status-store.ts'
 import useUserConfigStore from '@/store/user-config-store.ts'
 import useAuthStore from '@/store/auth-store.ts'
+import { Audios } from '../../main/services/database-service'
+import router from '@/routes'
 
 class IPCService {
   constructor() {}
@@ -56,6 +64,11 @@ class IPCService {
       setUpdateInfo({ version, releaseDate })
       return
     }
+
+    if (action === 'recording_interrupted') {
+      router.navigate('/content/history')
+      return
+    }
   }
 
   // External URL
@@ -79,6 +92,38 @@ class IPCService {
 
   async markAsLaunched(): Promise<void> {
     return await window.ipcRenderer.invoke(IPC_MARK_AS_LAUNCHED_CHANNEL)
+  }
+
+  // Audios
+  async getAudios(): Promise<Audios[]> {
+    return await window.ipcRenderer.invoke(IPC_GET_AUDIOS_CHANNEL)
+  }
+
+  async downloadAudio(filename: string): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_DOWNLOAD_AUDIO_CHANNEL, filename)
+  }
+
+  async deleteAudio(filename: string): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_DELETE_AUDIO_CHANNEL, filename)
+  }
+
+  async readAudioFile(filename: string): Promise<string> {
+    return await window.ipcRenderer.invoke(IPC_READ_AUDIO_FILE_CHANNEL, filename)
+  }
+
+  async updateAudio(
+    id: string,
+    content: string,
+    error: string | null = null,
+  ): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_UPDATE_AUDIO_CHANNEL, id, content, error)
+  }
+
+  async deleteAudiosByRetention(retention: string): Promise<number> {
+    return await window.ipcRenderer.invoke(
+      IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
+      retention,
+    )
   }
 }
 

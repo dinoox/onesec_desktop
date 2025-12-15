@@ -1,16 +1,25 @@
-import { useQuery } from '@tanstack/react-query'
-import { getRecentRecords } from '@/services/api/audio-api'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { getAudios, reconvertAudio } from '@/services/api/audio-api'
+import { toast } from 'sonner'
 
-export const useGetRecentRecords = () => {
+export const useGetAudios = () => {
   return useQuery({
-    queryKey: ['recent-records'],
+    queryKey: ['audios'],
     staleTime: 0,
-    queryFn: async () => {
-      const resp = await getRecentRecords()
-      if (!resp.success) throw new Error(resp.message)
-      return resp.data?.records || []
-    },
+    queryFn: getAudios,
+    placeholderData: [],
   })
 }
 
-
+export const useReconvertAudio = () => {
+  return useMutation({
+    mutationFn: (audioData: string) => reconvertAudio(audioData),
+    onSuccess: (resp) => {
+      if (resp.success) {
+        toast.success('转换成功')
+      } else {
+        toast.error('转换失败')
+      }
+    },
+  })
+}

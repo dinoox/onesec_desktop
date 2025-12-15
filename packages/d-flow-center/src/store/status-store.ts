@@ -18,11 +18,13 @@ interface StatusStore {
   updateInfo: UpdateInfo | null
   hotKeySettingStatus: HotkeySettingStatus
   holdIPCMessage: IPCMessage | null
+  reconvertingId: string | null
   actions: {
     setAuthTokenInvalid: (value: boolean) => void
     setUpdateInfo: (info: UpdateInfo) => void
     setHotkeySettingStatus: (status: HotkeySettingStatus) => void
     setIPCMessage: (message: IPCMessage | null) => void
+    setReconvertingId: (id: string | null) => void
   }
 }
 
@@ -32,6 +34,7 @@ const useStatusStore = create<StatusStore>((set) => ({
   updateInfo: null,
   hotKeySettingStatus: 'idle',
   holdIPCMessage: null,
+  reconvertingId: null,
   actions: {
     setAuthTokenInvalid: (authTokenInvalid) => set({ authTokenInvalid }),
     setUpdateInfo: (updateInfo) => set({ updateDownloaded: true, updateInfo }),
@@ -39,6 +42,7 @@ const useStatusStore = create<StatusStore>((set) => ({
     setIPCMessage: (holdIPCMessage) => {
       set({ holdIPCMessage })
     },
+    setReconvertingId: (reconvertingId) => set({ reconvertingId }),
   },
 }))
 

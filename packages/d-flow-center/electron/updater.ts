@@ -9,6 +9,14 @@ import {
 import windowManager from '../main/services/window-manager.ts'
 import { app } from 'electron'
 
+log.transports.file.format = (message) => {
+  return message.data.map((item) => {
+    if (typeof item === 'string') {
+      return item.replace(/\x1b\[[0-9;]*m/g, '')
+    }
+    return item
+  })
+}
 autoUpdater.logger = log
 // if (!app.isPackaged) {
 //   autoUpdater.forceDevUpdateConfig = true

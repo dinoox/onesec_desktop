@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { TruncatedText } from '@/components/ui/truncated-text'
 import { Loader2, PopcornIcon, Search, Plus, AlertCircle } from 'lucide-react'
 import {
   useCreateHotWordQuery,
@@ -178,11 +179,8 @@ const ContentPage: React.FC = () => {
           <PopcornIcon />
           <AlertTitle>让秒言更懂你</AlertTitle>
           <AlertDescription>
-            添加常用的人名、地名或术语，系统会优先识别，避免识别错误或遗漏。
+            添加常用的人名、地名或术语，系统会优先识别，避免识别错误或遗漏
           </AlertDescription>
-          {/* <button className="absolute top-3 right-3" onClick={() => setShowAlert(false)}>
-                  <X className="h-4 w-4" />
-                </button> */}
         </Alert>
       )}
 
@@ -252,7 +250,9 @@ const ContentPage: React.FC = () => {
                         transition={{ duration: 0.2 }}
                         className="border-b transition-colors hover:bg-muted/50"
                       >
-                        <TableCell className="pl-5 font-medium">{item.hotword}</TableCell>
+                        <TableCell className="pl-5 font-medium max-w-xs">
+                          <TruncatedText text={item.hotword} />
+                        </TableCell>
                         <TableCell className="text-right w-12">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -264,7 +264,7 @@ const ContentPage: React.FC = () => {
                                 <IconAdjustmentsHorizontal />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56" align="end">
+                            <DropdownMenuContent className="" align="end">
                               <DropdownMenuLabel>提示词操作</DropdownMenuLabel>
                               <DropdownMenuGroup>
                                 <DropdownMenuItem onClick={() => openEditDialog(item)}>

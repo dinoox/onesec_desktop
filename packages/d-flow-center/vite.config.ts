@@ -6,6 +6,9 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    __BUILD_DATE__: JSON.stringify(process.env.BUILD_DATE),
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -13,6 +16,13 @@ export default defineConfig({
       main: {
         // Shortcut of `build.lib.entry`.
         entry: 'electron/main.ts',
+        vite: {
+          build: {
+            rollupOptions: {
+              external: ['better-sqlite3'],
+            },
+          },
+        },
       },
 
       preload: {

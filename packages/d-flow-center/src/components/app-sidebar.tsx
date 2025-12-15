@@ -112,39 +112,42 @@ const AppSidebar: React.FC = () => {
       </nav>
 
       {/* 会员信息 */}
-      {user && user.membership_type != 'normal' && !sidebarCollapsed && (
-        <div className="p-2">
-          <div className="flex items-center px-3 py-2 gap-2 text-sm bg-sidebar-accent/40 rounded-md">
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-ripple-brand-text">
-                {membershipLabels[user.membership_type] || user.membership_type}
-              </Badge>
+      {user &&
+        user.membership_type &&
+        user.membership_type != 'normal' &&
+        !sidebarCollapsed && (
+          <div className="p-2">
+            <div className="flex items-center px-3 py-2 gap-2 text-sm bg-sidebar-accent/40 rounded-md">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-ripple-brand-text">
+                  {membershipLabels[user.membership_type] || user.membership_type}
+                </Badge>
+              </div>
+              {user.membership_expires_at && (
+                <>
+                  <div className="text-xs">
+                    还剩{' '}
+                    {Math.max(
+                      0,
+                      Math.ceil(
+                        (user.membership_expires_at * 1000 - Date.now()) /
+                          (1000 * 60 * 60 * 24),
+                      ),
+                    )}{' '}
+                    天到期
+                  </div>
+                  {/*<Button*/}
+                  {/*  variant="outline"*/}
+                  {/*  size="sm"*/}
+                  {/*  className="w-fit text-xs px-2 bg-sidebar-accent text-ripple-brand-text hover:text-ripple-brand-text"*/}
+                  {/*>*/}
+                  {/*  升级*/}
+                  {/*</Button>*/}
+                </>
+              )}
             </div>
-            {user.membership_expires_at && (
-              <>
-                <div className="text-xs">
-                  还剩{' '}
-                  {Math.max(
-                    0,
-                    Math.ceil(
-                      (user.membership_expires_at * 1000 - Date.now()) /
-                        (1000 * 60 * 60 * 24),
-                    ),
-                  )}{' '}
-                  天到期
-                </div>
-                {/*<Button*/}
-                {/*  variant="outline"*/}
-                {/*  size="sm"*/}
-                {/*  className="w-fit text-xs px-2 bg-sidebar-accent text-ripple-brand-text hover:text-ripple-brand-text"*/}
-                {/*>*/}
-                {/*  升级*/}
-                {/*</Button>*/}
-              </>
-            )}
           </div>
-        </div>
-      )}
+        )}
     </div>
   )
 }

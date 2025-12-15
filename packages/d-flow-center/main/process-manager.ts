@@ -1,6 +1,7 @@
 import log from 'electron-log'
 import windowManager, { WINDOW_CONTENT_ID } from './services/window-manager.ts'
 import udsService from './services/uds-service.ts'
+import databaseService from './services/database-service.ts'
 import nativeProcessManager from './services/native-process-manager.ts'
 import {
   buildIPCMessage,
@@ -43,28 +44,42 @@ class ProcessManager {
     })
   }
 
-  async ipcInterceptor(message: IPCMessage) {
-    if (message.action === 'auth_token_failed') {
-      if (!userConfigManager.getConfig().auth_token) return
-      if (!windowManager.getContentWindow()) {
-        createWindow(() => windowManager.broadcast(DEFAULT_IPC_CHANNEL, message))
-      }
-      windowManager.getWindow(WINDOW_CONTENT_ID)?.show()
-      return
+  ensureContentWindowAndShow(message: IPCMessage) {
+    if (!windowManager.getContentWindow()) {
+      createWindow(() => {
+        windowManager.broadcast(DEFAULT_IPC_CHANNEL, message)
+      })
     }
+    windowManager.getWindow(WINDOW_CONTENT_ID)?.show()
+  }
 
-    if (message.action === MessageTypes.CONFIG_UPDATED) {
-      const { preferred_linux_distro } = message.data?.data || {}
-      if (!preferred_linux_distro) return
+  async ipcInterceptor(message: IPCMessage) {
+    switch (message.action) {
+      case 'auth_token_failed': {
+        if (!userConfigManager.getConfig().auth_token) return
+        this.ensureContentWindowAndShow(message)
+        return
+      }
 
-      const currentUser = userConfigManager.getConfig().user
-      if (currentUser) {
+      case MessageTypes.RECORDING_INTERRUPTED: {
+        this.ensureContentWindowAndShow(message)
+        return
+      }
+
+      case MessageTypes.CONFIG_UPDATED: {
+        const { preferred_linux_distro } = message.data?.data || {}
+        if (!preferred_linux_distro) return
+
+        const currentUser = userConfigManager.getConfig().user
+        if (!currentUser) return
+
         userConfigManager.setConfig({
           user: {
             ...currentUser,
             preferred_linux_distro,
           },
         })
+        return
       }
     }
   }

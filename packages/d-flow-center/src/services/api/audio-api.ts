@@ -1,17 +1,15 @@
+import ipcService from '@/services/ipc-service'
+import { Audios } from '../../../main/services/database-service'
 import request from '@/lib/request'
 
-export interface AudioRecord {
-  id: number
-  recognized_text: string | null
-  model_processed_text: string | null
-  created_at: number
+export const getAudios = async (): Promise<Audios[]> => {
+  return await ipcService.getAudios()
 }
 
-interface RecentRecordsResponse {
-  records: AudioRecord[]
-  count: number
-}
-
-export const getRecentRecords = () => {
-  return request.post<RecentRecordsResponse>('/audio/recent-records')
+export const reconvertAudio = async (audioData: string) => {
+  return await request.post(`/audio/recognize-file`, {
+    params: {
+      audioData: audioData,
+    },
+  })
 }

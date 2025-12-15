@@ -7,6 +7,8 @@ import menuService from '../main/services/menu-service.ts'
 import userConfigManager from '../main/services/user-config-manager.ts'
 import { checkForUpdates } from './updater.ts'
 
+import { version } from '../package.json'
+
 // Disable HTTPS Cert Verification（only dev）
 app.commandLine.appendSwitch('--ignore-certificate-errors')
 app.commandLine.appendSwitch('--ignore-ssl-errors')
@@ -93,11 +95,11 @@ app.on('activate', () => {
 app.whenReady().then(async () => {
   app.setAboutPanelOptions({
     applicationName: '秒言',
-    applicationVersion: '1.0.0',
-    copyright: '© 2024 秒言团队',
+    applicationVersion: version,
+    copyright: `© 杭州点动星河科技有限公司`,
     credits:
       '秒言是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
-    website: 'https://miaoyan.app',
+    website: 'https://miaoyan.cn',
   })
 
   createWindow()

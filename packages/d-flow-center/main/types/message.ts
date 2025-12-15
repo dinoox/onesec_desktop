@@ -17,6 +17,9 @@ export const MessageTypes = {
   HOTKEY_SETTING_UPDATE: 'hotkey_setting_update',
   HOTKEY_SETTING_RESULT: 'hotkey_setting_result',
   HOTKEY_SETTING_END: 'hotkey_setting_end',
+  //
+  USER_AUDIO_SAVED: 'user_audio_saved',
+  RECORDING_INTERRUPTED: 'recording_interrupted',
 } as const
 
 export type MessageType = (typeof MessageTypes)[keyof typeof MessageTypes]
@@ -84,6 +87,13 @@ const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
 // First Launch
 const IPC_IS_FIRST_LAUNCH_CHANNEL = 'is_first_launch_channel'
 const IPC_MARK_AS_LAUNCHED_CHANNEL = 'mark_as_launched_channel'
+// Audios
+const IPC_GET_AUDIOS_CHANNEL = 'get_audios_channel'
+const IPC_DOWNLOAD_AUDIO_CHANNEL = 'download_audio_channel'
+const IPC_DELETE_AUDIO_CHANNEL = 'delete_audio_channel'
+const IPC_READ_AUDIO_FILE_CHANNEL = 'read_audio_file_channel'
+const IPC_UPDATE_AUDIO_CHANNEL = 'update_audio_channel'
+const IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL = 'delete_audios_by_retention_channel'
 
 export {
   DEFAULT_IPC_CHANNEL,
@@ -99,4 +109,10 @@ export {
   IPC_QUIT_AND_INSTALL_CHANNEL,
   IPC_IS_FIRST_LAUNCH_CHANNEL,
   IPC_MARK_AS_LAUNCHED_CHANNEL,
+  IPC_GET_AUDIOS_CHANNEL,
+  IPC_DOWNLOAD_AUDIO_CHANNEL,
+  IPC_DELETE_AUDIO_CHANNEL,
+  IPC_READ_AUDIO_FILE_CHANNEL,
+  IPC_UPDATE_AUDIO_CHANNEL,
+  IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
 }

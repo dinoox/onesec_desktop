@@ -6,7 +6,11 @@ interface StoreSchema {
   auth_token: string
   hotkey_configs: HotkeyConfig[]
   user: User | null
-  setting: { show_comparison: boolean; hide_floating_panel: boolean }
+  setting: {
+    show_comparison: boolean
+    hide_status_panel: boolean
+    history_retention: string
+  }
   theme: Theme
 }
 
@@ -20,7 +24,11 @@ const USER_DEFAULT_CONFIG: StoreSchema = {
     { mode: 'command', hotkey_combination: ['Fn', 'LCmd'] },
   ],
   user: null,
-  setting: { show_comparison: true, hide_floating_panel: false },
+  setting: {
+    show_comparison: true,
+    hide_status_panel: false,
+    history_retention: 'forever',
+  },
   theme: 'system',
 }
 
