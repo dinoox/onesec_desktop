@@ -169,25 +169,30 @@ class IPCService {
   }
 
   private handleDeleteAudiosByRetention = async (_: any, retention: string) => {
-    const audiosToDelete = databaseService.getAudios()
-    const deletedCount = databaseService.deleteAudiosByRetention(retention)
+    try {
+      const audiosToDelete = databaseService.getAudios()
+      const deletedCount = databaseService.deleteAudiosByRetention(retention)
 
-    if (deletedCount > 0) {
-      const configDir = path.dirname(userConfigManager.getConfigPath())
-      const remainingAudios = databaseService.getAudios()
-      const remainingFilenames = new Set(remainingAudios.map((a) => a.filename))
+      if (deletedCount > 0) {
+        const configDir = path.dirname(userConfigManager.getConfigPath())
+        const remainingAudios = databaseService.getAudios()
+        const remainingFilenames = new Set(remainingAudios.map((a) => a.filename))
 
-      audiosToDelete.forEach((audio) => {
-        if (!remainingFilenames.has(audio.filename)) {
-          const audioPath = path.join(configDir, 'audios', audio.filename)
-          if (fs.existsSync(audioPath)) {
-            fs.unlinkSync(audioPath)
+        audiosToDelete.forEach((audio) => {
+          if (!remainingFilenames.has(audio.filename)) {
+            const audioPath = path.join(configDir, 'audios', audio.filename)
+            if (fs.existsSync(audioPath)) {
+              fs.unlinkSync(audioPath)
+            }
           }
-        }
-      })
-    }
+        })
+      }
 
-    return deletedCount
+      return deletedCount
+    } catch (error) {
+      log.debug("handleDeleteAudiosByRetention: ", error)
+      throw error
+    }
   }
 }
 

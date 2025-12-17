@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "tsc && vite build && electron-builder --mac",
     "build:x64": "tsc && vite build && electron-builder --mac --x64",
-    "build:arm64": "tsc && vite build && BUILD_DATE=$(date +%Y%m%d) electron-builder --mac --arm64",
+    "build:arm64": "tsc && vite build && electron-builder --mac --arm64",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier -w '**/*.{js,jsx,ts,tsx}'"
   },
