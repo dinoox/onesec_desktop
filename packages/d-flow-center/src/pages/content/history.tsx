@@ -102,7 +102,6 @@ const HistoryPage: React.FC = () => {
       if (result.success) {
         const content = (result.data as any)?.text || ''
         await ipcService.updateAudio(id, content, null)
-        toast.success('转录成功')
       } else {
         const error = result.message || '转录失败'
         await ipcService.updateAudio(id, '', error)
@@ -112,7 +111,6 @@ const HistoryPage: React.FC = () => {
       await loadAudios()
     } catch (error) {
       console.error('重新转录失败:', error)
-      toast.error('转录失败')
     } finally {
       setReconvertingId(null)
     }
