@@ -51,8 +51,7 @@ jobs:
       - name: Build
         run: |
           rm -rf release
-          pnpm config set node-linker hoisted && pnpm i --frozen-lockfile
-          cd packages/d-flow-center && pnpm build
+          cd packages/d-flow-center && pnpm config set node-linker hoisted && pnpm i && pnpm build
 
       # Upload Artifact
       - name: Upload artifact to OSS
