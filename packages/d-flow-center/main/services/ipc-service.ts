@@ -190,7 +190,7 @@ class IPCService {
 
       return deletedCount
     } catch (error) {
-      log.debug("handleDeleteAudiosByRetention: ", error)
+      log.debug('handleDeleteAudiosByRetention: ', error)
       throw error
     }
   }

@@ -12,34 +12,39 @@ import { app } from 'electron'
 log.transports.file.format = (message) => {
   return message.data.map((item) => {
     if (typeof item === 'string') {
+      // eslint-disable-next-line no-control-regex
       return item.replace(/\x1b\[[0-9;]*m/g, '')
     }
     return item
   })
 }
+
 autoUpdater.logger = log
-// if (!app.isPackaged) {
-//   autoUpdater.forceDevUpdateConfig = true
-// }
+let updateCheckTimer: NodeJS.Timeout | null = null
+const CHECK_INTERVAL = 24 * 60 * 60 * 1000 // 1 day
+
+if (!app.isPackaged) {
+  autoUpdater.forceDevUpdateConfig = true
+}
 
 autoUpdater.on('checking-for-update', () => {
-  console.log('checking-for-update')
+  log.info('checking-for-update')
 })
 
 autoUpdater.on('update-available', (info) => {
-  console.log('发现新版本')
+  log.info('发现新版本')
 })
 
 autoUpdater.on('update-not-available', (info) => {
-  console.log('当前已是最新版本')
+  log.info('当前已是最新版本')
 })
 
 autoUpdater.on('error', (err) => {
-  console.log('更新错误:', err)
+  log.info('更新错误:', err)
 })
 
 autoUpdater.on('download-progress', (progressObj) => {
-  console.log(`下载进度: ${progressObj.percent}%`)
+  log.info(`下载进度: ${progressObj.percent}%`)
 })
 
 autoUpdater.on('update-downloaded', (info) => {
@@ -47,14 +52,26 @@ autoUpdater.on('update-downloaded', (info) => {
     type: MessageTypes.APP_UPDATE_DOWNLOADED,
     data: info,
   })
-
   windowManager.broadcast(DEFAULT_IPC_CHANNEL, ipcMessage)
-  console.log('更新下载完成')
+  log.info('更新下载完成')
 })
 
-export const checkForUpdates = async () => {
+const checkForUpdates = async () => {
   await new Promise((resolve) => setTimeout(resolve, 3000))
   await autoUpdater.checkForUpdatesAndNotify()
 }
 
+const startPeriodicUpdateCheck = async () => {
+  if (updateCheckTimer) {
+    clearInterval(updateCheckTimer)
+  }
+
+  await checkForUpdates()
+
+  updateCheckTimer = setInterval(() => {
+    checkForUpdates()
+  }, CHECK_INTERVAL)
+}
+
 export default autoUpdater
+export { startPeriodicUpdateCheck }

@@ -13,7 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import useStatusStore from '@/store/status-store'
+import useStatusStore, { useStatusActions } from '@/store/status-store'
 import { IPC_QUIT_AND_INSTALL_CHANNEL } from '../../main/types/message.ts'
 
 const Header: React.FC = () => {
@@ -23,6 +23,7 @@ const Header: React.FC = () => {
 
   const updateDownloaded = useStatusStore((state) => state.updateDownloaded)
   const updateInfo = useStatusStore((state) => state.updateInfo)
+  const { setUpdateInfo } = useStatusActions()
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
 
   useEffect(() => {
@@ -33,6 +34,13 @@ const Header: React.FC = () => {
 
   const handleUpdate = () => {
     window.ipcRenderer.invoke(IPC_QUIT_AND_INSTALL_CHANNEL)
+  }
+
+  const handleDialogChange = (open: boolean) => {
+    setShowUpdateDialog(open)
+    if (!open) {
+      setUpdateInfo(false, null)
+    }
   }
 
   return (
@@ -82,7 +90,7 @@ const Header: React.FC = () => {
         </div>
       </header>
 
-      <AlertDialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
+      <AlertDialog open={showUpdateDialog} onOpenChange={handleDialogChange}>
         <AlertDialogContent className="max-w-[400px]!">
           <AlertDialogHeader>
             <AlertDialogTitle>发现新版本</AlertDialogTitle>

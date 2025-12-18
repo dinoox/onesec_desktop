@@ -61,7 +61,7 @@ class IPCService {
 
     if (action === 'app_update_downloaded') {
       const { version, releaseDate } = message.data?.data || {}
-      setUpdateInfo({ version, releaseDate })
+      setUpdateInfo(true, { version, releaseDate })
       return
     }
 

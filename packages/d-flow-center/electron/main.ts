@@ -5,7 +5,7 @@ import windowManager, { WINDOW_CONTENT_ID } from '../main/services/window-manage
 import processManager from '../main/process-manager.ts'
 import menuService from '../main/services/menu-service.ts'
 import userConfigManager from '../main/services/user-config-manager.ts'
-import { checkForUpdates } from './updater.ts'
+import { startPeriodicUpdateCheck } from './updater.ts'
 
 import { version } from '../package.json'
 
@@ -104,7 +104,7 @@ app.whenReady().then(async () => {
 
   createWindow()
   await processManager.initialize()
-  await checkForUpdates()
+  await startPeriodicUpdateCheck()
 })
 
 export { createWindow }
