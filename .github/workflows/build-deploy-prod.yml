@@ -56,4 +56,4 @@ jobs:
       # Upload Artifact
       - name: Upload artifact to OSS
         run: |
-          aliyun oss cp packages/d-flow-center/release/ oss://$ALIYUN_OSS_BUCKET_NAME/apps/$APP_NAME/ --recursive
+          aliyun oss cp -f packages/d-flow-center/release/ oss://$ALIYUN_OSS_BUCKET_NAME/apps/$APP_NAME/ --recursive
