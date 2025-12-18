@@ -23,9 +23,9 @@ autoUpdater.logger = log
 let updateCheckTimer: NodeJS.Timeout | null = null
 const CHECK_INTERVAL = 24 * 60 * 60 * 1000 // 1 day
 
-if (!app.isPackaged) {
-  autoUpdater.forceDevUpdateConfig = true
-}
+// if (!app.isPackaged) {
+//   autoUpdater.forceDevUpdateConfig = true
+// }
 
 autoUpdater.on('checking-for-update', () => {
   log.info('checking-for-update')

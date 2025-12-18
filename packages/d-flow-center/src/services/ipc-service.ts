@@ -12,6 +12,7 @@ import {
   IPC_READ_AUDIO_FILE_CHANNEL,
   IPC_UPDATE_AUDIO_CHANNEL,
   IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
+  IPC_GET_SYSTEM_INFO_CHANNEL,
   IPCMessage,
   MessageType,
 } from '../../main/types/message.ts'
@@ -20,6 +21,9 @@ import useUserConfigStore from '@/store/user-config-store.ts'
 import useAuthStore from '@/store/auth-store.ts'
 import { Audios } from '../../main/services/database-service'
 import router from '@/routes'
+import { SystemInfo } from 'electron/system.ts'
+import { updateDeviceInfo } from '@/services/api/user-api'
+import { log } from 'console'
 
 class IPCService {
   constructor() {}
@@ -62,6 +66,7 @@ class IPCService {
     if (action === 'app_update_downloaded') {
       const { version, releaseDate } = message.data?.data || {}
       setUpdateInfo(true, { version, releaseDate })
+      await updateDeviceInfo(await this.getSystemInfo())
       return
     }
 
@@ -96,6 +101,7 @@ class IPCService {
 
   // Audios
   async getAudios(): Promise<Audios[]> {
+    await updateDeviceInfo(await this.getSystemInfo())
     return await window.ipcRenderer.invoke(IPC_GET_AUDIOS_CHANNEL)
   }
 
@@ -124,6 +130,11 @@ class IPCService {
       IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
       retention,
     )
+  }
+
+  // System
+  async getSystemInfo(): Promise<SystemInfo> {
+    return await window.ipcRenderer.invoke(IPC_GET_SYSTEM_INFO_CHANNEL)
   }
 }
 

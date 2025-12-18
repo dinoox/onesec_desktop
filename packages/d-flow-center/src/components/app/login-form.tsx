@@ -145,7 +145,7 @@ export function LoginForm({
                           variant="outline"
                           onClick={onRequestCode}
                           disabled={codeMutation.isPending || countdown > 0}
-                          className={`${countdown > 0 ? 'w-[146px]' : ''}`}
+                          className={`${countdown > 0 ? 'w-[146px]' : ''} h-9`}
                         >
                           {codeMutation.isPending ? (
                             <Spinner />

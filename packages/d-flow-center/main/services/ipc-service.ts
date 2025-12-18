@@ -17,6 +17,7 @@ import {
   IPC_READ_AUDIO_FILE_CHANNEL,
   IPC_UPDATE_AUDIO_CHANNEL,
   IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
+  IPC_GET_SYSTEM_INFO_CHANNEL,
   MessageTypes,
 } from '../types/message'
 import userConfigManager from './user-config-manager'
@@ -29,6 +30,7 @@ import databaseService from './database-service'
 import path from 'path'
 import fs from 'fs'
 import windowManager from './window-manager'
+import { getSystemInfo } from '../../electron/system'
 
 class IPCService {
   constructor() {}
@@ -54,6 +56,7 @@ class IPCService {
       IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
       this.handleDeleteAudiosByRetention,
     )
+    ipcMain.handle(IPC_GET_SYSTEM_INFO_CHANNEL, this.handleGetSystemInfo)
   }
 
   // User Config
@@ -193,6 +196,11 @@ class IPCService {
       log.debug('handleDeleteAudiosByRetention: ', error)
       throw error
     }
+  }
+
+  // System
+  private handleGetSystemInfo = async () => {
+    return await getSystemInfo()
   }
 }
 

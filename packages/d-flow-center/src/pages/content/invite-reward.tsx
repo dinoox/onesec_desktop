@@ -219,7 +219,9 @@ const ContentPage: React.FC = () => {
 
           <p className="text-xs text-muted-foreground mt-[-5px]">
             累计积分 {ranking?.current_user_points ?? 0}
-            {ranking?.current_user_points ? `, 当前第 ${ranking?.current_user_rank ?? 0} 名` : ''}
+            {ranking?.current_user_points
+              ? `, 当前第 ${ranking?.current_user_rank ?? 0} 名`
+              : ''}
           </p>
         </div>
       </div>

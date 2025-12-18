@@ -456,7 +456,7 @@ const HistoryPage: React.FC = () => {
       </div>
 
       <AlertDialog open={showRetentionDialog} onOpenChange={setShowRetentionDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[400px]!">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {getRetentionTitleMessage(pendingRetention)}
@@ -475,7 +475,7 @@ const HistoryPage: React.FC = () => {
       </AlertDialog>
 
       <AlertDialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[400px]!">
           <AlertDialogHeader>
             <AlertDialogTitle>删除所有历史记录？</AlertDialogTitle>
             <AlertDialogDescription>

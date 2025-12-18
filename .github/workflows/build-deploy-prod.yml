@@ -51,7 +51,7 @@ jobs:
       - name: Build
         run: |
           cd packages/d-flow-center && rm -rf release
-          npm i && ls -ll && pnpm build
+          npm i && pnpm build
 
       # Upload Artifact
       - name: Upload artifact to OSS

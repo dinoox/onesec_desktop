@@ -94,6 +94,8 @@ const IPC_DELETE_AUDIO_CHANNEL = 'delete_audio_channel'
 const IPC_READ_AUDIO_FILE_CHANNEL = 'read_audio_file_channel'
 const IPC_UPDATE_AUDIO_CHANNEL = 'update_audio_channel'
 const IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL = 'delete_audios_by_retention_channel'
+// System
+const IPC_GET_SYSTEM_INFO_CHANNEL = 'get_system_info_channel'
 
 export {
   DEFAULT_IPC_CHANNEL,
@@ -115,4 +117,5 @@ export {
   IPC_READ_AUDIO_FILE_CHANNEL,
   IPC_UPDATE_AUDIO_CHANNEL,
   IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
+  IPC_GET_SYSTEM_INFO_CHANNEL,
 }

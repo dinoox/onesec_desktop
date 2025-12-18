@@ -41,6 +41,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+
   --color-ripple-green: var(--ripple-green-brand);
   --color-ripple-green-text: var(--ripple-green-text);
   --color-ripple-yellow: var(--ripple-yellow-brand);
@@ -49,6 +50,7 @@
   --color-ripple-brand: var(--ripple-brand);
   --color-ripple-brand-text: var(--ripple-brand-text);
   --color-setting: var(--setting);
+  --color-selection: var(--selection);
 }
 
 :root {
@@ -86,7 +88,6 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  --setting: oklch(0.98 0 0);
   --ripple-green-brand: #2EDDA8;
   --ripple-yellow-brand: #ffcc00;
   --ripple-brand: #2EDDA8;
@@ -96,6 +97,9 @@
   --ripple-error-text: oklch(0.578 0.203 24.8);
 
   --ripple-brand-text: oklch(0.703 0.143 167.842);
+
+  --selection: oklch(0.703 0.143 167.842 / 0.3);
+  --setting: oklch(0.98 0 0);
 }
 
 .dark {
@@ -132,7 +136,6 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  --setting: oklch(0.244 0 89.876 / 0.6);
   --ripple-green-brand: #2EDDA8;
   --ripple-yellow-brand: #ffcc00;
   --ripple-brand: #ffcc00;
@@ -141,6 +144,9 @@
   --ripple-yellow-text: oklch(0.832 0.165 86.343);
   --ripple-error-text: oklch(0.578 0.203 24.8);
   --ripple-brand-text: oklch(0.832 0.165 86.343);
+
+  --selection: oklch(0.832 0.165 86.343 / 0.3);
+  --setting: oklch(0.244 0 89.876 / 0.6);
 }
 
 @layer base {
@@ -154,6 +160,10 @@
   }
   button, [role="button"] {
     cursor: pointer
+  }
+  ::selection {
+    background-color: var(--selection);
+    color: var(--foreground);
   }
 }
 
