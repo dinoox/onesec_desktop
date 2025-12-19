@@ -6,6 +6,7 @@ import { HotkeyMode } from '../../main/types/message.ts'
 interface UserConfigStore {
   shortcutKeys: string[]
   shortcutCommandKeys: string[]
+  shortcutFreeKeys: string[]
   showComparison: boolean
   hideStatusPanel: boolean
   historyRetention: string
@@ -16,12 +17,14 @@ interface UserConfigStore {
     setHistoryRetention: (historyRetention: string) => Promise<void>
     setShortcutKeys: (keys: string[]) => void
     setShortcutCommandKeys: (keys: string[]) => void
+    setShortcutFreeKeys: (keys: string[]) => void
   }
 }
 
 const useUserConfigStore = create<UserConfigStore>((set, get) => ({
   shortcutKeys: [],
   shortcutCommandKeys: [],
+  shortcutFreeKeys: [],
   showComparison: true,
   hideStatusPanel: false,
   historyRetention: 'forever',
@@ -35,9 +38,13 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
       const commandConfig = config.hotkey_configs?.find(
         (item: any) => item.mode === 'command',
       )
+      const freeConfig = config.hotkey_configs?.find(
+        (item: any) => item.mode === 'free',
+      )
       set({
         shortcutKeys: normalConfig?.hotkey_combination || ['Fn'],
         shortcutCommandKeys: commandConfig?.hotkey_combination || ['Fn', 'LCmd'],
+        shortcutFreeKeys: freeConfig?.hotkey_combination || ['Fn', 'Space'],
         showComparison: settings?.show_comparison ?? true,
         hideStatusPanel: settings?.hide_status_panel ?? false,
         historyRetention: settings?.history_retention ?? 'forever',
@@ -75,6 +82,7 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
     },
     setShortcutKeys: (keys: string[]) => set({ shortcutKeys: keys }),
     setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys }),
+    setShortcutFreeKeys: (keys: string[]) => set({ shortcutFreeKeys: keys }),
   },
 }))
 

@@ -44,7 +44,7 @@ export interface ServerResultOptions {
 }
 //
 
-export type HotkeyMode = 'normal' | 'command'
+export type HotkeyMode = 'normal' | 'command' | 'free'
 
 export interface HotkeyConfig {
   mode: HotkeyMode

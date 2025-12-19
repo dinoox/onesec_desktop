@@ -5,9 +5,11 @@ import windowManager, { WINDOW_CONTENT_ID } from '../main/services/window-manage
 import processManager from '../main/process-manager.ts'
 import menuService from '../main/services/menu-service.ts'
 import userConfigManager from '../main/services/user-config-manager.ts'
-import { startPeriodicUpdateCheck } from './updater.ts'
+import { checkForUpdates, startPeriodicUpdateCheck } from './updater.ts'
+import { throttle } from '../main/utils/throttle.ts'
 
 import { version } from '../package.json'
+import { log } from 'electron-log'
 
 // Disable HTTPS Cert Verification（only dev）
 app.commandLine.appendSwitch('--ignore-certificate-errors')
@@ -79,6 +81,10 @@ app.on('window-all-closed', () => {
 app.on('before-quit', async (_) => {
   await processManager.destroy()
   app.quit()
+})
+
+app.on('browser-window-focus', () => {
+  throttle(checkForUpdates, 5 * 60 * 1000)
 })
 
 app.on('activate', () => {

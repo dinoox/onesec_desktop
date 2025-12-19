@@ -155,6 +155,9 @@
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
   }
+  *:focus-visible {
+    outline: none;
+  }
   body {
     @apply bg-background text-foreground h-svh w-full;
   }
