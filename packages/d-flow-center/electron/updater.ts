@@ -21,7 +21,7 @@ log.transports.file.format = (message) => {
 
 autoUpdater.logger = log
 let updateCheckTimer: NodeJS.Timeout | null = null
-const CHECK_INTERVAL = 24 * 60 * 60 * 1000 // 1 day
+const CHECK_INTERVAL = 30 * 60 * 1000 // 30 min
 
 // if (!app.isPackaged) {
 //   autoUpdater.forceDevUpdateConfig = true
@@ -74,4 +74,4 @@ const startPeriodicUpdateCheck = async () => {
 }
 
 export default autoUpdater
-export { startPeriodicUpdateCheck }
+export { startPeriodicUpdateCheck, checkForUpdates }

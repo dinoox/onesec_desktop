@@ -1,8 +1,6 @@
 import { app } from 'electron'
 import os from 'node:os'
 import { execSync } from 'node:child_process'
-import log from 'electron-log'
-import request from '../src/lib/request'
 
 export type SystemInfo = {
   appVersion: string
@@ -22,7 +20,7 @@ function getMacOsVersion(): string {
   }
 }
 
-function getMacModel(): string | null {
+function getDeviceModel(): string | null {
   if (process.platform !== 'darwin') return null
   try {
     const output = execSync('sysctl -n hw.model', {
@@ -38,6 +36,6 @@ export const getSystemInfo = async () => {
   return {
     appVersion: app.getVersion(),
     osVersion: getMacOsVersion(),
-    deviceModel: getMacModel(),
+    deviceModel: getDeviceModel(),
   }
 }

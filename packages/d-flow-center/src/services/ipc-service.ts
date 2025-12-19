@@ -101,7 +101,6 @@ class IPCService {
 
   // Audios
   async getAudios(): Promise<Audios[]> {
-    await updateDeviceInfo(await this.getSystemInfo())
     return await window.ipcRenderer.invoke(IPC_GET_AUDIOS_CHANNEL)
   }
 

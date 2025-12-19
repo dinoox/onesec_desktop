@@ -1,5 +1,6 @@
 import { app, Menu, MenuItemConstructorOptions, shell } from 'electron'
 import windowManager from './window-manager'
+import { checkForUpdates } from '../../electron/updater'
 
 class MenuService {
   constructor() {}
@@ -18,6 +19,11 @@ class MenuService {
             label: '关于秒言',
             click: app.showAboutPanel,
           },
+          {
+            label: '检查更新',
+            click: checkForUpdates,
+          },
+          { type: 'separator' },
           {
             label: '退出秒言',
             accelerator: 'Command+Q',
@@ -61,21 +67,21 @@ class MenuService {
           },
         ],
       },
-      {
-        label: '开发',
-        submenu: [
-          {
-            label: '切换开发者工具',
-            accelerator: process.platform === 'darwin' ? 'Command+I' : 'Alt+Ctrl+I',
-            click: () => windowManager.getContentWindow()?.webContents.toggleDevTools(),
-          },
-          {
-            label: '重新加载',
-            accelerator: process.platform === 'darwin' ? 'Command+R' : 'Ctrl+R',
-            click: () => windowManager.getContentWindow()?.webContents.reload(),
-          },
-        ],
-      },
+      // {
+      //   label: '开发',
+      //   submenu: [
+      //     {
+      //       label: '切换开发者工具',
+      //       accelerator: process.platform === 'darwin' ? 'Command+I' : 'Alt+Ctrl+I',
+      //       click: () => windowManager.getContentWindow()?.webContents.toggleDevTools(),
+      //     },
+      //     {
+      //       label: '重新加载',
+      //       accelerator: process.platform === 'darwin' ? 'Command+R' : 'Ctrl+R',
+      //       click: () => windowManager.getContentWindow()?.webContents.reload(),
+      //     },
+      //   ],
+      // },
       {
         label: '帮助',
         submenu: [
