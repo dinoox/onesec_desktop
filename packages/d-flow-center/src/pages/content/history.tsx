@@ -54,12 +54,15 @@ const HistoryPage: React.FC = () => {
   const [showRetentionDialog, setShowRetentionDialog] = useState(false)
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false)
   const [pendingRetention, setPendingRetention] = useState<string>('')
+  const [currentGroupLabel, setCurrentGroupLabel] = useState<string>('')
   const historyRetention = useUserConfigStore((state) => state.historyRetention)
   const { setHistoryRetention } = useUserConfigActions()
   const holdIPCMessage = useStatusStore((state) => state.holdIPCMessage)
   const reconvertingId = useStatusStore((state) => state.reconvertingId)
   const { setReconvertingId } = useStatusStore((state) => state.actions)
   const prevMessageIdRef = useRef<string | null>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const groupRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
   const loadAudios = async () => {
     try {
@@ -241,6 +244,47 @@ const HistoryPage: React.FC = () => {
     return groups
   }, [records])
 
+  // 初始化第一个分组的标题
+  useEffect(() => {
+    if (groupedRecords.length > 0 && !currentGroupLabel) {
+      setCurrentGroupLabel(groupedRecords[0].label)
+    }
+  }, [groupedRecords, currentGroupLabel])
+
+  // 使用滚动事件监听当前分组
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current
+    if (!scrollContainer || groupedRecords.length === 0) return
+
+    const handleScroll = () => {
+      const containerTop = scrollContainer.getBoundingClientRect().top
+
+      // 找到当前应该显示的分组（最后一个 top <= containerTop 的分组）
+      let currentGroup = groupedRecords[0]
+
+      for (const group of groupedRecords) {
+        const el = groupRefs.current.get(group.key)
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          // 如果分组顶部还在容器顶部之上或刚好在顶部，这就是当前分组
+          if (rect.top <= containerTop - 14) {
+            currentGroup = group
+          } else {
+            break
+          }
+        }
+      }
+
+      setCurrentGroupLabel(currentGroup.label)
+    }
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true })
+    // 初始化时也执行一次
+    handleScroll()
+
+    return () => scrollContainer.removeEventListener('scroll', handleScroll)
+  }, [groupedRecords])
+
   return (
     <div className="max-w-2xl h-full flex flex-col">
       <div className="flex-shrink-0 space-y-3 pb-3">
@@ -294,164 +338,184 @@ const HistoryPage: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-h-0 mt-6 relative overflow-y-auto">
-        <div
-          className={`flex justify-center py-12 transition-opacity duration-300 ${
-            isLoading ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-0'
-          }`}
-        >
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
+      <div className="flex-1 min-h-0 mt-6 relative flex flex-col">
+        {/* 固定的分组标题 */}
+        {groupedRecords.length > 0 && !isLoading && (
+          <div className="flex-shrink-0 text-xs text-muted-foreground pb-2 bg-background">
+            {currentGroupLabel}
+          </div>
+        )}
 
-        <div
-          className={`space-y-6 transition-opacity duration-300 ${
-            isLoading ? 'opacity-0' : 'opacity-100'
-          }`}
-        >
-          {groupedRecords.length > 0 ? (
-            groupedRecords.map((group) => (
-              <motion.div
-                key={group.key}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="text-xs text-muted-foreground mb-2">{group.label}</div>
-                <div className="border rounded-lg">
-                  <AnimatePresence mode="popLayout">
-                    {group.records.map((record, index) => (
-                      <motion.div
-                        key={record.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{
-                          duration: 0.3,
-                          delay: index * 0.05,
-                        }}
-                        className="group flex items-center gap-3 border-b pl-4 pr-5 py-3 hover:bg-muted/50 transition-colors last:border-b-0"
-                      >
-                        <span className="text-xs text-muted-foreground w-[70px] flex-shrink-0 pt-0.5 tabular-nums">
-                          {formatTime(record.created_at)}
-                        </span>
-                        <div className="flex-1 min-w-0 text-sm flex items-center gap-2">
-                          {reconvertingId === record.id ? (
-                            <span className="flex items-center gap-2 text-muted-foreground">
-                              <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
-                              转录中...
-                            </span>
-                          ) : record.error ? (
-                            <span
-                              className="flex items-center gap-2"
-                              style={{ color: 'var(--ripple-error-text)' }}
-                            >
-                              <BadgeAlert className="h-4 w-4 flex-shrink-0" />
-                              {record.error}
-                            </span>
-                          ) : record.content ? (
-                            record.content
-                          ) : (
-                            <span className="text-muted-foreground">未识别到内容</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-4.5 text-muted-foreground opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-3 w-3 relative text-muted-foreground/80"
-                                disabled={copiedId === record.id}
-                                onClick={() => handleCopy(record.id, record.content)}
-                              >
-                                <Check
-                                  className={`h-2 w-2 absolute transition-all duration-200 ${
-                                    copiedId === record.id
-                                      ? 'opacity-100 scale-100'
-                                      : 'opacity-0 scale-50'
-                                  }`}
-                                />
-                                <Copy
-                                  className={`h-2 w-2 absolute transition-all duration-200 ${
-                                    copiedId === record.id
-                                      ? 'opacity-0 scale-50'
-                                      : 'opacity-100 scale-100'
-                                  }`}
-                                />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {copiedId === record.id ? '已复制' : '复制'}
-                            </TooltipContent>
-                          </Tooltip>
+        <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto">
+          <div
+            className={`flex justify-center py-12 transition-opacity duration-300 ${
+              isLoading ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-0'
+            }`}
+          >
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
 
-                          <DropdownMenu
-                            modal={false}
-                            open={openMenuId === record.id}
-                            onOpenChange={(open) =>
-                              setOpenMenuId(open ? record.id : null)
-                            }
-                          >
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-3 w-3 text-muted-foreground/80"
+          <div
+            className={`space-y-6 transition-opacity duration-300 ${
+              isLoading ? 'opacity-0' : 'opacity-100'
+            }`}
+          >
+            {groupedRecords.length > 0 ? (
+              groupedRecords.map((group, groupIndex) => (
+                <motion.div
+
+                  key={group.key}
+                  ref={(el) => {
+                    if (el) groupRefs.current.set(group.key, el)
+                    else groupRefs.current.delete(group.key)
+                  }}
+                  data-group-key={group.key}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  {/* 第一个分组不显示标题（已在顶部固定显示），其他分组显示标题 */}
+                  {groupIndex > 0 && (
+                    <div className="text-xs text-muted-foreground mb-2">
+                      {group.label}
+                    </div>
+                  )}
+                  <div className="border rounded-lg overflow-hidden">
+                    <AnimatePresence initial={false}>
+                      {group.records.map((record) => (
+                        <motion.div
+                          key={record.id}
+                          layout
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{
+                            opacity: { duration: 0.12 },
+                            layout: { type: 'spring', stiffness: 500, damping: 35 },
+                          }}
+                          className="group flex items-center gap-3 border-b pl-4 pr-5 py-3 hover:bg-muted/50 transition-colors last:border-b-0"
+                        >
+                          <span className="text-xs text-muted-foreground w-[70px] flex-shrink-0 pt-0.5 tabular-nums">
+                            {formatTime(record.created_at)}
+                          </span>
+                          <div className="flex-1 min-w-0 text-sm flex items-center gap-2">
+                            {reconvertingId === record.id ? (
+                              <span className="flex items-center gap-2 text-muted-foreground">
+                                <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
+                                转录中...
+                              </span>
+                            ) : record.error ? (
+                              <span
+                                className="flex items-center gap-2"
+                                style={{ color: 'var(--ripple-error-text)' }}
                               >
-                                <Menu className="h-2 w-2" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              onPointerDownOutside={(e) => {
-                                const target = e.target as HTMLElement
-                                if (target.closest('.group')) {
-                                  e.preventDefault()
-                                }
-                              }}
+                                <BadgeAlert className="h-4 w-4 flex-shrink-0" />
+                                {record.error}
+                              </span>
+                            ) : record.content ? (
+                              record.content
+                            ) : (
+                              <span className="text-muted-foreground">未识别到内容</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4.5 text-muted-foreground opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-3 w-3 relative text-muted-foreground/80"
+                                  disabled={copiedId === record.id}
+                                  onClick={() => handleCopy(record.id, record.content)}
+                                >
+                                  <Check
+                                    className={`h-2 w-2 absolute transition-all duration-200 ${
+                                      copiedId === record.id
+                                        ? 'opacity-100 scale-100'
+                                        : 'opacity-0 scale-50'
+                                    }`}
+                                  />
+                                  <Copy
+                                    className={`h-2 w-2 absolute transition-all duration-200 ${
+                                      copiedId === record.id
+                                        ? 'opacity-0 scale-50'
+                                        : 'opacity-100 scale-100'
+                                    }`}
+                                  />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {copiedId === record.id ? '已复制' : '复制'}
+                              </TooltipContent>
+                            </Tooltip>
+
+                            <DropdownMenu
+                              modal={false}
+                              open={openMenuId === record.id}
+                              onOpenChange={(open) =>
+                                setOpenMenuId(open ? record.id : null)
+                              }
                             >
-                              <DropdownMenuItem
-                                onSelect={(e) => {
-                                  e.preventDefault()
-                                  handleDownload(record.filename)
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-3 w-3 text-muted-foreground/80"
+                                >
+                                  <Menu className="h-2 w-2" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                onPointerDownOutside={(e) => {
+                                  const target = e.target as HTMLElement
+                                  if (target.closest('.group')) {
+                                    e.preventDefault()
+                                  }
                                 }}
                               >
-                                <Download className="mr-2 h-4 w-4" />
-                                音频另存
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                disabled={reconvertingId !== null}
-                                onSelect={(e) => {
-                                  e.preventDefault()
-                                  handleReconvert(record.id, record.filename)
-                                }}
-                              >
-                                <RefreshCw className="mr-2 h-4 w-4" />
-                                重新转录
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                disabled={reconvertingId === record.id}
-                                onSelect={(e) => {
-                                  e.preventDefault()
-                                  handleDelete(record.id, record.filename)
-                                }}
-                                className="text-destructive focus:text-destructive"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                删除音频
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-              </motion.div>
-            ))
-          ) : (
-            <div className="text-center py-12 text-muted-foreground">暂无历史记录</div>
-          )}
+                                <DropdownMenuItem
+                                  onSelect={(e) => {
+                                    e.preventDefault()
+                                    handleDownload(record.filename)
+                                  }}
+                                >
+                                  <Download className="mr-2 h-4 w-4" />
+                                  音频另存
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  disabled={reconvertingId !== null}
+                                  onSelect={(e) => {
+                                    e.preventDefault()
+                                    handleReconvert(record.id, record.filename)
+                                  }}
+                                >
+                                  <RefreshCw className="mr-2 h-4 w-4" />
+                                  重新转录
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  disabled={reconvertingId === record.id}
+                                  onSelect={(e) => {
+                                    e.preventDefault()
+                                    handleDelete(record.id, record.filename)
+                                  }}
+                                  className="text-destructive focus:text-destructive"
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  删除音频
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">暂无历史记录</div>
+            )}
+          </div>
         </div>
       </div>
 

@@ -130,6 +130,25 @@ class Request {
   patch<T>(url: string, params?: Params): Promise<DataResponse<T>> {
     return this.request('PATCH', url, params)
   }
+
+  async upload<T>(url: string, formData: FormData): Promise<DataResponse<T>> {
+    const signature = await generateSignature({})
+    formData.append('time', signature.time)
+    formData.append('sign', signature.sign)
+
+    const res = await fetch(
+      url.startsWith('http') ? url : import.meta.env.VITE_API_BASEURL + url,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authStore.getState().accessToken}`,
+        },
+        body: formData,
+      },
+    )
+
+    return this.interceptorsResponse<DataResponse<T>>(res)
+  }
 }
 
 const request = new Request()

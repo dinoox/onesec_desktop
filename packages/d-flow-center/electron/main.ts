@@ -57,7 +57,8 @@ function createWindow(onWebLoaded: Function = () => {}) {
 
   win.webContents.once('did-finish-load', async () => {
     windowManager.register(win!, WINDOW_CONTENT_ID)
-    if (app.isPackaged) menuService.initialize()
+    // if (app.isPackaged) menuService.initialize()
+    menuService.initialize()
     await onWebLoaded()
   })
 

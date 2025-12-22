@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
-import { Kbd, KbdGroup } from '@/components/ui/kbd.tsx'
+import { KbdGroup } from '@/components/ui/kbd.tsx'
 import { Languages, Globe, Terminal, MonitorCog, LucideLogOut } from 'lucide-react'
+import { KeyDisplay } from '@/components/ui/key-display.tsx'
 import { toast } from 'sonner'
 import useUserConfigStore from '@/store/user-config-store.ts'
 import { getKeyDisplayText } from '@/lib/utils.ts'
@@ -17,7 +18,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
-import { KeyMapper } from '@/utils/key'
+import { KeyMapper } from '@/utils/key.ts'
 
 const exampleList = [
   {
@@ -47,6 +48,7 @@ const exampleList = [
 const ContentPage: React.FC = () => {
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
   const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
+  const shortcutFreeKeys = useUserConfigStore((state) => state.shortcutFreeKeys)
   const { loadUserConfig } = useUserConfigStore((state) => state.actions)
 
   useEffect(() => {
@@ -61,7 +63,10 @@ const ContentPage: React.FC = () => {
     () => KeyMapper.formatKeys(shortcutCommandKeys),
     [shortcutCommandKeys],
   )
-
+  const formattedFreeKeys = useMemo(
+    () => KeyMapper.formatKeys(shortcutFreeKeys),
+    [shortcutFreeKeys],
+  )
   return (
     <div className="max-w-9/12 flex flex-col justify-between gap-5">
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
@@ -84,11 +89,7 @@ const ContentPage: React.FC = () => {
               </Label>
               <div className="text-sm text-muted-foreground flex flex-row gap-1">
                 <span>长按</span>
-                <KbdGroup className="mx-1">
-                  {formattedNormalKeys.map((key) => (
-                    <Kbd key={key}>{key}</Kbd>
-                  ))}
-                </KbdGroup>
+                <KeyDisplay keys={formattedNormalKeys} className="mx-1" />
                 <span>语音识别：自动识别使用场景，让识别更准确，输出更清晰</span>
               </div>
             </div>
@@ -105,11 +106,24 @@ const ContentPage: React.FC = () => {
               </Label>
               <div className="text-sm text-muted-foreground flex flex-row gap-1">
                 <span>长按</span>
-                <KbdGroup className="mx-1">
-                  {formattedCommandKeys.map((key) => (
-                    <Kbd key={key}>{key}</Kbd>
-                  ))}
-                </KbdGroup>
+                <KeyDisplay keys={formattedCommandKeys} className="mx-1" />
+                语音命令：支持命令识别和智能交互
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center px-2">
+            <div className="flex flex-col space-y-2">
+              <Label>
+                <div className="text-sm font-medium">
+                  <div className="flex flex-col gap-4">
+                    <p>免提模式</p>
+                  </div>
+                </div>
+              </Label>
+              <div className="text-sm text-muted-foreground flex flex-row gap-1">
+                <span>长按</span>
+                <KeyDisplay keys={formattedFreeKeys} className="mx-1" />
                 语音命令：支持命令识别和智能交互
               </div>
             </div>
@@ -122,11 +136,7 @@ const ContentPage: React.FC = () => {
           <span className="text-[15px] font-medium">试试下面的[命令模式]例子</span>
           <span className="text-sm text-muted-foreground">
             按住快捷键
-            <KbdGroup className="mx-1">
-              {formattedCommandKeys.map((key) => (
-                <Kbd key={key}>{key}</Kbd>
-              ))}
-            </KbdGroup>
+            <KeyDisplay keys={formattedCommandKeys} className="mx-1" />
             说话，松开后内容自动输入到当前光标位置
           </span>
         </div>
@@ -136,7 +146,7 @@ const ContentPage: React.FC = () => {
             return (
               <div
                 key={example.id}
-                className="flex flex-row gap-5 items-center px-5 py-4"
+                className="flex flex-row gap-5 items-center px-5 py-3.5"
               >
                 <div className="flex-shrink-0">
                   <IconComponent className={`w-6 h-6 ${example.iconColor}`} />

@@ -7,7 +7,6 @@ import {
   IPC_QUIT_AND_INSTALL_CHANNEL,
   IPC_AUTH_TOKEN_FAILED_CHANNEL,
   IPC_HOT_KEY_SETTING_START_CHANNEL,
-  IPC_HOT_KEY_SETTING_RESULT_CHANNEL,
   IPC_HOT_KEY_SETTING_END_CHANNEL,
   IPC_IS_FIRST_LAUNCH_CHANNEL,
   IPC_MARK_AS_LAUNCHED_CHANNEL,
@@ -18,8 +17,10 @@ import {
   IPC_UPDATE_AUDIO_CHANNEL,
   IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
   IPC_GET_SYSTEM_INFO_CHANNEL,
+  IPC_READ_ERROR_LOG_CHANNEL,
   MessageTypes,
 } from '../types/message'
+import os from 'os'
 import userConfigManager from './user-config-manager'
 import nativeProcessManager from './native-process-manager'
 import { ipcMain, shell, dialog } from 'electron'
@@ -31,6 +32,7 @@ import path from 'path'
 import fs from 'fs'
 import windowManager from './window-manager'
 import { getSystemInfo } from '../../electron/system'
+import { name } from '../../package.json'
 
 class IPCService {
   constructor() {}
@@ -57,6 +59,7 @@ class IPCService {
       this.handleDeleteAudiosByRetention,
     )
     ipcMain.handle(IPC_GET_SYSTEM_INFO_CHANNEL, this.handleGetSystemInfo)
+    ipcMain.handle(IPC_READ_ERROR_LOG_CHANNEL, this.handleReadErrorLog)
   }
 
   // User Config
@@ -201,6 +204,15 @@ class IPCService {
   // System
   private handleGetSystemInfo = async () => {
     return await getSystemInfo()
+  }
+
+  // Error Log
+  private handleReadErrorLog = async () => {
+    const logPath = path.join(os.homedir(), `Library/Logs/${name}/main.log`)
+    if (!fs.existsSync(logPath)) {
+      throw 'not exists'
+    }
+    return fs.readFileSync(logPath)
   }
 }
 

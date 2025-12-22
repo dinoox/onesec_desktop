@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Label } from '@radix-ui/react-label'
 import { Input } from '@/components/ui/input.tsx'
 import useAuthStore from '@/store/auth-store.ts'
@@ -19,6 +19,9 @@ import { useGetUserInfo, useUpdateUserInfo } from '@/services/queries/user-query
 import { IconGitBranch } from '@tabler/icons-react'
 import { AdvancedSettingsDialog } from '@/components/advanced-settings-dialog.tsx'
 import { SystemFamily } from '@/types/terminal.ts'
+import ipcService from '@/services/ipc-service.ts'
+import { uploadErrorLog } from '@/services/api/error-log-api.ts'
+import {toast} from "sonner";
 
 const ContentPage: React.FC = () => {
   const user = useAuthStore((state) => state.user)
@@ -30,9 +33,26 @@ const ContentPage: React.FC = () => {
   const hideStatusPanel = useUserConfigStore((state) => state.hideStatusPanel)
   const { setShowComparison, setHideStatusPanel } = useUserConfigActions()
   const { setAdvancedSettingsOpen } = useUIActions()
+  const [uploadingLog, setUploadingLog] = useState(false)
 
   async function logout() {
     await mutation.mutateAsync()
+  }
+
+  async function handleUploadLog() {
+    setUploadingLog(true)
+    try {
+      const res = await uploadErrorLog(await ipcService.readErrorLog())
+      if (res.success) {
+        toast.success('日志上传成功')
+      } else {
+        toast.error(res.message || '上传失败')
+      }
+    } catch (e) {
+      toast.error('上传失败')
+    } finally {
+      setUploadingLog(false)
+    }
   }
 
   const handleSystemFamilyChange = async (value: string) => {
@@ -159,15 +179,26 @@ const ContentPage: React.FC = () => {
         )}
       </div>
 
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={logout}
-        disabled={mutation.isPending}
-      >
-        {mutation.isPending ? <Spinner /> : null}
-        退出登录
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={logout}
+          disabled={mutation.isPending}
+        >
+          {mutation.isPending ? <Spinner /> : null}
+          退出登录
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleUploadLog}
+          disabled={uploadingLog}
+        >
+          {uploadingLog ? <Spinner /> : null}
+          上传日志
+        </Button>
+      </div>
 
       <AdvancedSettingsDialog />
     </div>

@@ -13,9 +13,11 @@ import {
   IPC_UPDATE_AUDIO_CHANNEL,
   IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
   IPC_GET_SYSTEM_INFO_CHANNEL,
+  IPC_READ_ERROR_LOG_CHANNEL,
   IPCMessage,
   MessageType,
 } from '../../main/types/message.ts'
+import { toast } from 'sonner'
 import useStatusStore from '@/store/status-store.ts'
 import useUserConfigStore from '@/store/user-config-store.ts'
 import useAuthStore from '@/store/auth-store.ts'
@@ -42,8 +44,14 @@ class IPCService {
   async handleIPCMessage(message: IPCMessage) {
     console.log(`[IPCService] ${JSON.stringify(message)}`)
 
-    const { setAuthTokenInvalid, setUpdateInfo, setHotkeySettingStatus, setIPCMessage } =
-      useStatusStore.getState().actions
+    const {
+      setAuthTokenInvalid,
+      setUpdateChecking,
+      setUpdateProgress,
+      setUpdateInfo,
+      setHotkeySettingStatus,
+      setIPCMessage,
+    } = useStatusStore.getState().actions
     const { loadUserConfig } = useUserConfigStore.getState().actions
     const action = message.action as MessageType
 
@@ -63,7 +71,33 @@ class IPCService {
       return
     }
 
+    if (action === 'app_update_checking') {
+      setUpdateChecking(true)
+      return
+    }
+
+    if (action === 'app_update_not_available') {
+      if (useStatusStore.getState().updateChecking) {
+        toast.success('当前已是最新版本')
+      }
+
+      setUpdateChecking(false)
+      return
+    }
+
+    if (action === 'app_update_error') {
+      setUpdateChecking(false)
+      return
+    }
+
+    if (action === 'app_update_progress') {
+      setUpdateProgress(message.data?.data?.data ?? 0)
+      return
+    }
+
     if (action === 'app_update_downloaded') {
+      setUpdateChecking(false)
+      setUpdateProgress(null)
       const { version, releaseDate } = message.data?.data || {}
       setUpdateInfo(true, { version, releaseDate })
       await updateDeviceInfo(await this.getSystemInfo())
@@ -71,7 +105,7 @@ class IPCService {
     }
 
     if (action === 'recording_interrupted') {
-      router.navigate('/content/history')
+      await router.navigate('/content/history')
       return
     }
   }
@@ -134,6 +168,11 @@ class IPCService {
   // System
   async getSystemInfo(): Promise<SystemInfo> {
     return await window.ipcRenderer.invoke(IPC_GET_SYSTEM_INFO_CHANNEL)
+  }
+
+  // Error Log
+  async readErrorLog(): Promise<Uint8Array> {
+    return await window.ipcRenderer.invoke(IPC_READ_ERROR_LOG_CHANNEL)
   }
 }
 

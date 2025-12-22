@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { Kbd, KbdGroup } from '@/components/ui/kbd.tsx'
+import { KbdGroup } from '@/components/ui/kbd.tsx'
 import ipcService from '@/services/ipc-service.ts'
 import useStatusStore from '@/store/status-store.ts'
 import useUserConfigStore from '@/store/user-config-store.ts'
@@ -8,16 +8,19 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { HotkeyMode, MessageTypes } from '../../../main/types/message.ts'
 import { KeyMapper } from '@/utils/key.ts'
+import { KeyDisplay } from '@/components/ui/key-display.tsx'
+import {PopcornIcon} from "lucide-react";
 
 const ContentPage: React.FC = () => {
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
   const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
   const shortcutFreeKeys = useUserConfigStore((state) => state.shortcutFreeKeys)
-  const { setShortcutKeys, setShortcutCommandKeys, setShortcutFreeKeys, loadUserConfig } = useUserConfigStore(
-    (state) => state.actions,
-  )
+  const { setShortcutKeys, setShortcutCommandKeys, setShortcutFreeKeys, loadUserConfig } =
+    useUserConfigStore((state) => state.actions)
 
-  const [editingMode, setEditingMode] = useState<'normal' | 'command' | 'free' | null>(null)
+  const [editingMode, setEditingMode] = useState<'normal' | 'command' | 'free' | null>(
+    null,
+  )
 
   const normalInputRef = useRef<HTMLDivElement>(null)
   const commandInputRef = useRef<HTMLDivElement>(null)
@@ -99,10 +102,13 @@ const ContentPage: React.FC = () => {
     editingMode === 'normal' && hotkeySettingStatus === 'hotkey_setting'
   const isWaitingCommand =
     editingMode === 'command' && hotkeySettingStatus === 'hotkey_setting'
-  const isWaitingFree =
-    editingMode === 'free' && hotkeySettingStatus === 'hotkey_setting'
+  const isWaitingFree = editingMode === 'free' && hotkeySettingStatus === 'hotkey_setting'
 
-  useClickOutside([normalInputRef, commandInputRef, freeInputRef], endHotKeySetting, !!editingMode)
+  useClickOutside(
+    [normalInputRef, commandInputRef, freeInputRef],
+    endHotKeySetting,
+    !!editingMode,
+  )
 
   const formattedNormalKeys = useMemo(
     () => KeyMapper.formatKeys(shortcutKeys),
@@ -123,7 +129,7 @@ const ContentPage: React.FC = () => {
         <div className="flex flex-col justify-center space-y-1">
           <span className="text-[15px] font-medium">普通模式</span>
           <span className="text-sm text-muted-foreground">
-            按住该快捷键会进入普通识别模式
+            按住该快捷键会进入普通识别模式，双击进入免提模式
           </span>
         </div>
         <div
@@ -157,11 +163,7 @@ const ContentPage: React.FC = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <KbdGroup>
-                    {formattedNormalKeys.map((key, index) => (
-                      <Kbd key={`${key}-${index}`}>{key}</Kbd>
-                    ))}
-                  </KbdGroup>
+                  <KeyDisplay keys={formattedNormalKeys} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -175,7 +177,7 @@ const ContentPage: React.FC = () => {
                 transition={{ duration: 0.15 }}
                 className="text-muted-foreground text-sm ml-auto"
               >
-                点击修改
+                修改
               </motion.span>
             )}
           </AnimatePresence>
@@ -222,11 +224,7 @@ const ContentPage: React.FC = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <KbdGroup>
-                    {formattedCommandKeys.map((key, index) => (
-                      <Kbd key={`${key}-${index}`}>{key}</Kbd>
-                    ))}
-                  </KbdGroup>
+                  <KeyDisplay keys={formattedCommandKeys} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -240,7 +238,7 @@ const ContentPage: React.FC = () => {
                 transition={{ duration: 0.15 }}
                 className="text-muted-foreground text-sm ml-auto"
               >
-                点击修改
+                修改
               </motion.span>
             )}
           </AnimatePresence>
@@ -285,11 +283,7 @@ const ContentPage: React.FC = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <KbdGroup>
-                    {formattedFreeKeys.map((key, index) => (
-                      <Kbd key={`${key}-${index}`}>{key}</Kbd>
-                    ))}
-                  </KbdGroup>
+                  <KeyDisplay keys={formattedFreeKeys} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -303,11 +297,17 @@ const ContentPage: React.FC = () => {
                 transition={{ duration: 0.15 }}
                 className="text-muted-foreground text-sm ml-auto"
               >
-                点击修改
+                修改
               </motion.span>
             )}
           </AnimatePresence>
         </div>
+      </div>
+
+
+      <div className="border-none text-ripple-brand-text  flex h-9 w-full justify-center items-center gap-2 rounded-md border bg-ripple-brand-text/10 px-3 shadow-none transition-colors duration-300">
+        <PopcornIcon size="16" />
+        <span className="">单次录音限时 3 分钟，超时自动结束并上传</span>
       </div>
     </div>
   )

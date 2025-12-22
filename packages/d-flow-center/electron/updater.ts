@@ -8,6 +8,7 @@ import {
 } from '../main/types/message.ts'
 import windowManager from '../main/services/window-manager.ts'
 import { app } from 'electron'
+import { da } from 'zod/v4/locales'
 
 log.transports.file.format = (message) => {
   return message.data.map((item) => {
@@ -33,18 +34,36 @@ autoUpdater.on('checking-for-update', () => {
 
 autoUpdater.on('update-available', (info) => {
   log.info('发现新版本')
+  windowManager.broadcast(
+    DEFAULT_IPC_CHANNEL,
+    buildIPCMessage(MessageTypes.APP_UPDATE_AVAILABLE),
+  )
 })
 
 autoUpdater.on('update-not-available', (info) => {
-  log.info('当前已是最新版本')
+  windowManager.broadcast(
+    DEFAULT_IPC_CHANNEL,
+    buildIPCMessage(MessageTypes.APP_UPDATE_NOT_AVAILABLE),
+  )
 })
 
 autoUpdater.on('error', (err) => {
   log.info('更新错误:', err)
+  windowManager.broadcast(
+    DEFAULT_IPC_CHANNEL,
+    buildIPCMessage(MessageTypes.APP_UPDATE_ERROR),
+  )
 })
 
 autoUpdater.on('download-progress', (progressObj) => {
   log.info(`下载进度: ${progressObj.percent}%`)
+  windowManager.broadcast(
+    DEFAULT_IPC_CHANNEL,
+    buildIPCMessage(MessageTypes.APP_UPDATE_PROGRESS, {
+      type: MessageTypes.APP_UPDATE_PROGRESS,
+      data: { data: progressObj.percent },
+    }),
+  )
 })
 
 autoUpdater.on('update-downloaded', (info) => {
