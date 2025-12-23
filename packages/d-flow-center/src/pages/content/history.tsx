@@ -112,8 +112,8 @@ const HistoryPage: React.FC = () => {
       }
 
       await loadAudios()
-    } catch (error) {
-      console.error('重新转录失败:', error)
+    } catch (error: any) {
+      toast.error(`获取音频文件错误, 文件可能损坏`)
     } finally {
       setReconvertingId(null)
     }
@@ -311,10 +311,10 @@ const HistoryPage: React.FC = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-
+        {/* 提示 */}
         <div className="flex items-center justify-between bg-setting rounded-xl px-4 py-3">
           <div className="flex items-center">
-            <LockIcon className="w-4 h-4 mr-3" />
+            <LockIcon className="w-4 h-4 mr-[0.7rem]" />
             <div className="flex flex-col gap-1">
               <span>历史记录保存</span>
               <p className="text-sm text-muted-foreground">
@@ -338,13 +338,11 @@ const HistoryPage: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-h-0 mt-6 relative flex flex-col">
+      <div className="flex-1 min-h-0 mt-4 relative flex flex-col">
         {/* 固定的分组标题 */}
-        {groupedRecords.length > 0 && !isLoading && (
-          <div className="flex-shrink-0 text-xs text-muted-foreground pb-2 bg-background">
-            {currentGroupLabel}
-          </div>
-        )}
+        <div className="flex-shrink-0 text-xs text-muted-foreground pb-2 bg-background min-h-[24px]">
+          {groupedRecords.length > 0 && !isLoading && currentGroupLabel}
+        </div>
 
         <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto">
           <div
@@ -381,15 +379,20 @@ const HistoryPage: React.FC = () => {
                     </div>
                   )}
                   <div className="border rounded-lg overflow-hidden">
-                    <AnimatePresence initial={false}>
-                      {group.records.map((record) => (
+                    <AnimatePresence>
+                      {group.records.map((record, recordIndex) => (
                         <motion.div
                           key={record.id}
                           layout
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
+                          initial={{ opacity: 0, scale: 0.96 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 1 }}
                           transition={{
-                            opacity: { duration: 0.12 },
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 24,
+                            mass: 0.8,
+                            delay: groupIndex * 0.04 + recordIndex * 0.025,
                             layout: { type: 'spring', stiffness: 500, damping: 35 },
                           }}
                           className="group flex items-center gap-3 border-b pl-4 pr-5 py-3 hover:bg-muted/50 transition-colors last:border-b-0"
@@ -412,7 +415,9 @@ const HistoryPage: React.FC = () => {
                                 {record.error}
                               </span>
                             ) : record.content ? (
-                              record.content
+                              <span className="line-clamp-4">
+                                {record.content}
+                                </span>
                             ) : (
                               <span className="text-muted-foreground">未识别到内容</span>
                             )}

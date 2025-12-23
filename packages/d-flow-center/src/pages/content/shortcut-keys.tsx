@@ -305,7 +305,7 @@ const ContentPage: React.FC = () => {
       </div>
 
 
-      <div className="border-none text-ripple-brand-text  flex h-9 w-full justify-center items-center gap-2 rounded-md border bg-ripple-brand-text/10 px-3 shadow-none transition-colors duration-300">
+      <div className="border-none text-ripple-brand-text flex h-9 w-full justify-center items-center gap-2 rounded-md border bg-ripple-brand-text/10 px-3 shadow-none transition-colors duration-300">
         <PopcornIcon size="16" />
         <span className="">单次录音限时 3 分钟，超时自动结束并上传</span>
       </div>

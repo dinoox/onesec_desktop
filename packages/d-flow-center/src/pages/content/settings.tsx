@@ -66,7 +66,20 @@ const ContentPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-1/2 space-y-3">
+    <div className="max-w-1/2 space-y-3 ">
+
+      <div className="absolute right-4 top-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleUploadLog}
+          disabled={uploadingLog}
+        >
+          {uploadingLog ? <Spinner /> : null}
+          上传日志
+        </Button>
+      </div>
+
       <div className=" flex flex-col justify-between self-start space-y-2 gap-x-4">
         <div className="text-[15px]">基础设置</div>
         <div className="flex items-center justify-between w-full bg-setting rounded-xl px-3 py-3">
@@ -188,15 +201,6 @@ const ContentPage: React.FC = () => {
         >
           {mutation.isPending ? <Spinner /> : null}
           退出登录
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleUploadLog}
-          disabled={uploadingLog}
-        >
-          {uploadingLog ? <Spinner /> : null}
-          上传日志
         </Button>
       </div>
 

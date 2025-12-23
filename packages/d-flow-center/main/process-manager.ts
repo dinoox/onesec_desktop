@@ -1,7 +1,6 @@
 import log from 'electron-log'
 import windowManager, { WINDOW_CONTENT_ID } from './services/window-manager.ts'
 import udsService from './services/uds-service.ts'
-import databaseService from './services/database-service.ts'
 import nativeProcessManager from './services/native-process-manager.ts'
 import {
   buildIPCMessage,
@@ -46,8 +45,11 @@ class ProcessManager {
 
   ensureContentWindowAndShow(message: IPCMessage) {
     if (!windowManager.getContentWindow()) {
-      createWindow(() => {
-        windowManager.broadcast(DEFAULT_IPC_CHANNEL, message)
+      createWindow(async () => {
+        for (let i = 0; i < 3; i++) {
+          windowManager.broadcast(DEFAULT_IPC_CHANNEL, message)
+          await new Promise(resolve => setTimeout(resolve, 333))
+        }
       })
     }
     windowManager.getWindow(WINDOW_CONTENT_ID)?.show()

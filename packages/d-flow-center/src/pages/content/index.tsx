@@ -122,9 +122,9 @@ const ContentPage: React.FC = () => {
                 </div>
               </Label>
               <div className="text-sm text-muted-foreground flex flex-row gap-1">
-                <span>长按</span>
+
                 <KeyDisplay keys={formattedFreeKeys} className="mx-1" />
-                语音命令：支持命令识别和智能交互
+                开启免提语音识别：无需长按，解放双手，再按一次结束并输出结果
               </div>
             </div>
           </div>

@@ -54,54 +54,23 @@ const ContentPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5 max-w-3xl">
-      {/* 积分区域 */}
-      <div className="space-y-1 border p-4 rounded-xl">
-        <div className="flex items-center gap-2 text-[15px] font-medium">
-          <Gift className="w-5 h-5 text-ripple-brand-text" />
-          <span>我的积分</span>
+    <div className="max-w-2xl h-full flex flex-col">
+      <div className="flex-shrink-0 space-y-3 pb-3">
+        <div className="flex items-center justify-between min-h-[32px]">
+          <span className="text-[15px] font-medium">邀请奖励</span>
         </div>
-        <div className="flex items-center justify-between rounded-xl py-4">
-          {userLoading ? (
-            <Skeleton className="h-[36px] w-20 animate-in fade-in duration-300" />
-          ) : (
-            <span className="text-3xl font-medium animate-in fade-in duration-300">
-              {user?.points ?? 0}
-            </span>
-          )}
-          <Button
-            size="sm"
-            onClick={handleExchange}
-            disabled={
-              exchangeMutation.isPending || userLoading || !user || user.points < 100
-            }
-            variant="outline"
-          >
-            {exchangeMutation.isPending && <Spinner />}
-            <IconAward />
-            <span>兑换会员</span>
-          </Button>
-        </div>
-        <p className="text-xs text-muted-foreground">100 积分可兑换 1 个月 Pro 会员</p>
-      </div>
-
-      {/* 分享邀请 */}
-      <div className="space-y-2 border p-4 rounded-xl">
-        <div className="flex items-center gap-2 text-[15px] font-medium">
-          <IconShare className="w-5 h-5 text-ripple-brand-text" />
-          <span>{isNewUserPromo ? '新人专享' : '邀请好友'}</span>
-        </div>
-        <div className="flex items-center justify-between py-1">
-          <div className="space-y-1">
-            <p className="text-sm">
-              {isNewUserPromo ? '限时: 邀请好友注册,解锁 23 天会员!' : '我的邀请码：'}
-              {!isNewUserPromo && (
-                <span className="font-mono font-medium">{user?.share_code ?? '-'}</span>
-              )}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {isNewUserPromo ? '任务自注册日起 30 天有效' : '邀请好友注册可获得积分奖励'}
-            </p>
+        {/* 新人专享/邀请好友 提示 */}
+        <div className="flex items-center justify-between bg-ripple-brand-text/12 rounded-xl px-4 py-3 ">
+          <div className="flex items-center ">
+            <IconShare className="w-4 h-4 mr-[0.7rem]" />
+            <div className="flex flex-col gap-1">
+              <span>{isNewUserPromo ? '新人专享' : '邀请好友'}</span>
+              <p className="text-sm text-muted-foreground">
+                {isNewUserPromo
+                  ? '限时: 邀请好友注册,解锁 23 天会员! 任务自注册日起 30 天有效'
+                  : `我的邀请码：${user?.share_code ?? '-'}，邀请好友注册可获得积分奖励`}
+              </p>
+            </div>
           </div>
           <Button size="sm" variant="outline" onClick={handleCopyShareLink}>
             <Copy className="w-4 h-4" />
@@ -110,119 +79,151 @@ const ContentPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* 交易记录 */}
-        <div className="space-y-2 border p-4 rounded-xl">
+      <div className="flex-1 min-h-0 overflow-y-auto mt-4 space-y-5">
+        {/* 积分区域 */}
+        <div className="border p-4 rounded-xl">
           <div className="flex items-center gap-2 text-[15px] font-medium">
-            <IconHistory className="w-5 h-5 text-ripple-brand-text" />
-            积分记录
+            <Gift className="w-5 h-5 text-ripple-brand-text" />
+            <span>我的积分</span>
           </div>
-          <div className="max-h-[185px] overflow-y-auto">
-            {txLoading ? (
-              <div className="space-y-2 animate-in fade-in duration-300">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-[46px] w-full rounded-xl" />
-                ))}
-              </div>
-            ) : transactions?.transactions.length ? (
-              <Table className="animate-in fade-in duration-300">
-                <TableBody>
-                  {transactions.transactions.map((tx) => (
-                    <TableRow key={tx.id}>
-                      <TableCell className="w-8">
-                        {tx.points > 0 ? (
-                          <ArrowUpRight className="w-4 h-4 text-ripple-brand-text" />
-                        ) : (
-                          <ArrowDownRight className="w-4 h-4 text-ripple-brand-text" />
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <p className="">{tx.reason}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(tx.created_at)}
-                        </p>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="secondary">
-                          {tx.points > 0 ? '+' : ''}
-                          {tx.points}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+          <div className="flex items-center justify-between rounded-xl py-4">
+            {userLoading ? (
+              <Skeleton className="h-[36px] w-20 animate-in fade-in duration-300" />
             ) : (
-              <div className="flex items-center justify-center h-full min-h-[100px]">
-                <p className="text-sm text-muted-foreground">暂无记录</p>
-              </div>
+              <span className="text-3xl font-medium animate-in fade-in duration-300">
+                {user?.points ?? 0}
+              </span>
             )}
+            <Button
+              size="sm"
+              onClick={handleExchange}
+              disabled={
+                exchangeMutation.isPending || userLoading || !user || user.points < 100
+              }
+              variant="outline"
+            >
+              {exchangeMutation.isPending && <Spinner />}
+              <IconAward />
+              <span>兑换会员</span>
+            </Button>
           </div>
+          <p className="text-xs text-muted-foreground">100 积分可兑换 1 个月 Pro 会员</p>
         </div>
 
-        {/* 排行榜 */}
-        <div className="space-y-4 border p-4 rounded-xl">
-          <div className="flex items-center justify-between">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* 交易记录 */}
+          <div className="space-y-2 border p-4 rounded-xl">
             <div className="flex items-center gap-2 text-[15px] font-medium">
-              <IconTrophy className="w-5 h-5 text-ripple-brand-text" />
-              <span>积分排行榜</span>
+              <IconHistory className="w-5 h-5 text-ripple-brand-text" />
+              积分记录
             </div>
-            {/* {ranking?.current_user_rank && (
+            <div className="max-h-[185px] overflow-y-auto">
+              {txLoading ? (
+                <div className="space-y-2 animate-in fade-in duration-300">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-[46px] w-full rounded-xl" />
+                  ))}
+                </div>
+              ) : transactions?.transactions.length ? (
+                <Table className="animate-in fade-in duration-300">
+                  <TableBody>
+                    {transactions.transactions.map((tx) => (
+                      <TableRow key={tx.id}>
+                        <TableCell className="w-8">
+                          {tx.points > 0 ? (
+                            <ArrowUpRight className="w-4 h-4 text-ripple-brand-text" />
+                          ) : (
+                            <ArrowDownRight className="w-4 h-4 text-ripple-brand-text" />
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <p className="">{tx.reason}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(tx.created_at)}
+                          </p>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge variant="secondary">
+                            {tx.points > 0 ? '+' : ''}
+                            {tx.points}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="flex items-center justify-center h-full min-h-[100px]">
+                  <p className="text-sm text-muted-foreground">暂无记录</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 排行榜 */}
+          <div className="space-y-4 border p-4 rounded-xl flex flex-col">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[15px] font-medium">
+                <IconTrophy className="w-5 h-5 text-ripple-brand-text" />
+                <span>积分排行榜</span>
+              </div>
+              {/* {ranking?.current_user_rank && (
               <span className="text-xs text-muted-foreground">
                 当前第 {ranking.current_user_rank} 名
               </span>
             )} */}
-          </div>
-          <div className="max-h-[185px] overflow-y-auto">
-            {rankLoading ? (
-              <div className="space-y-2 animate-in fade-in duration-300">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-[29px] w-full rounded-xl" />
-                ))}
-              </div>
-            ) : ranking?.ranking.length ? (
-              <Table className="animate-in fade-in duration-300">
-                <TableBody>
-                  {ranking.ranking.map((item) => (
-                    <TableRow key={item.rank}>
-                      <TableCell className="w-10 pl-0">
-                        <span
-                          className={` flex items-center justify-center  ${
-                            item.rank === 1
-                              ? ''
-                              : item.rank === 2
-                                ? ''
-                                : item.rank === 3
-                                  ? ''
-                                  : ''
-                          }`}
-                        >
-                          {item.rank}
-                        </span>
-                      </TableCell>
-                      <TableCell className=" truncate max-w-[100px]">
-                        {item.phone}
-                      </TableCell>
-                      <TableCell className="text-right text-ripple-brand-text">
-                        {item.points}
-                      </TableCell>
-                    </TableRow>
+            </div>
+            <div className="max-h-[160px] overflow-y-auto flex-1">
+              {rankLoading ? (
+                <div className="space-y-2 animate-in fade-in duration-300">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-[29px] w-full rounded-xl" />
                   ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="flex items-center justify-center h-full min-h-[100px] animate-in fade-in duration-300">
-                <p className="text-sm text-muted-foreground">暂无排行</p>
-              </div>
-            )}
-          </div>
+                </div>
+              ) : ranking?.ranking.length ? (
+                <Table className="animate-in fade-in duration-300">
+                  <TableBody>
+                    {ranking.ranking.map((item) => (
+                      <TableRow key={item.rank}>
+                        <TableCell className="w-10 pl-0">
+                          <span
+                            className={` flex items-center justify-center  ${
+                              item.rank === 1
+                                ? ''
+                                : item.rank === 2
+                                  ? ''
+                                  : item.rank === 3
+                                    ? ''
+                                    : ''
+                            }`}
+                          >
+                            {item.rank}
+                          </span>
+                        </TableCell>
+                        <TableCell className=" truncate max-w-[100px]">
+                          {item.phone}
+                        </TableCell>
+                        <TableCell className="text-right text-ripple-brand-text">
+                          {item.points}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="flex items-center justify-center h-full min-h-[100px] animate-in fade-in duration-300">
+                  <p className="text-sm text-muted-foreground">暂无排行</p>
+                </div>
+              )}
+            </div>
 
-          <p className="text-xs text-muted-foreground mt-[-5px]">
-            累计积分 {ranking?.current_user_points ?? 0}
-            {ranking?.current_user_points
-              ? `, 当前第 ${ranking?.current_user_rank ?? 0} 名`
-              : ''}
-          </p>
+            <div className="text-xs text-muted-foreground  mt-auto">
+              累计积分 {ranking?.current_user_points ?? 0}
+              {ranking?.current_user_points
+                ? `, 当前第 ${ranking?.current_user_rank ?? 0} 名`
+                : ''}
+            </div>
+          </div>
         </div>
       </div>
     </div>

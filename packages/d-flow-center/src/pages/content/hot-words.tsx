@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import React, { useMemo, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -15,23 +14,26 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { TruncatedText } from '@/components/ui/truncated-text'
-import { Loader2, PopcornIcon, Search, Plus, AlertCircle } from 'lucide-react'
+import {
+  Loader2,
+  PopcornIcon,
+  Search,
+  Plus,
+  AlertCircle,
+  Menu,
+  Edit,
+  Trash2,
+} from 'lucide-react'
 import {
   useCreateHotWordQuery,
   useDeleteHotWordQuery,
   useHotWordListQuery,
   useUpdateHotWordQuery,
 } from '@/services/queries/hotword-query'
-import { IconAdjustmentsHorizontal, IconEdit, IconTrash } from '@tabler/icons-react'
 import { HotWord } from '@/services/api/hotword-api'
 import { Empty, EmptyDescription } from '@/components/ui/empty'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -43,7 +45,7 @@ const ContentPage: React.FC = () => {
   const [newHotWord, setNewHotWord] = useState('')
   const [editingHotWord, setEditingHotWord] = useState<HotWord | null>(null)
   const [editValue, setEditValue] = useState('')
-  const [showAlert, setShowAlert] = useState(true)
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null)
 
   // 获取热词列表
   const { data: hotWords = [], isLoading, isError, error } = useHotWordListQuery()
@@ -85,216 +87,247 @@ const ContentPage: React.FC = () => {
 
   // 删除热词
   const handleDelete = async (id: number) => {
+    setOpenMenuId(null)
     await deleteHotWordMutation.mutateAsync(id)
   }
 
   // 打开编辑对话框
   const openEditDialog = (hotWord: HotWord) => {
+    setOpenMenuId(null)
     setEditingHotWord(hotWord)
     setEditValue(hotWord.hotword)
     setEditOpen(true)
   }
 
   return (
-    <>
-      <div className="flex w-full flex-col gap-6">
-        <div className="flex items-center justify-between gap-4 w-full">
-          <InputGroup className="max-w-md">
-            <InputGroupInput
-              placeholder="搜索常用词..."
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
-            <InputGroupAddon>
-              <Search />
-            </InputGroupAddon>
-            <InputGroupAddon align="inline-end">
-              <AnimatePresence>
-                {filteredHotWords.length !== hotWords.length && (
-                  <motion.span
-                    key={filteredHotWords.length}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {filteredHotWords.length} 个结果
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </InputGroupAddon>
-          </InputGroup>
+    <div className="max-w-2xl h-full flex flex-col">
+      <div className="flex-shrink-0 space-y-3 pb-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[15px] font-medium">常用词</span>
 
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button variant="secondary">
-                <Plus />
-                添加常用词
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>添加新常用词</DialogTitle>
-                <DialogDescription>在这里添加您的常用词内容</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4">
-                <InputGroup>
-                  <InputGroupInput
-                    placeholder="请输入常用词..."
-                    value={newHotWord}
-                    onChange={(e) => setNewHotWord(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleCreate().then()
-                      }
-                    }}
-                  />
-                </InputGroup>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setOpen(false)}>
-                  取消
+          {/* 搜索框 */}
+          <div className="flex items-center gap-2">
+            <div className="flex-shrink-0 ">
+              <InputGroup className="max-w-md h-[32px] w-[212px]">
+                <InputGroupInput
+                  placeholder="搜索常用词..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
+                <InputGroupAddon>
+                  <Search />
+                </InputGroupAddon>
+                <InputGroupAddon align="inline-end">
+                  <AnimatePresence>
+                    {filteredHotWords.length !== hotWords.length && (
+                      <motion.span
+                        key={filteredHotWords.length}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                        className='text-xs font-normal'
+                      >
+                        {filteredHotWords.length} 个结果
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button variant="secondary" size="sm" className="px-2!">
+                  <Plus className="h-4 w-4" />
                 </Button>
-                <Button
-                  onClick={handleCreate}
-                  disabled={createHotWordMutation.isPending || !newHotWord.trim()}
-                >
-                  {createHotWordMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      创建中...
-                    </>
-                  ) : (
-                    '确定'
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>添加新常用词</DialogTitle>
+                  <DialogDescription>在这里添加您的常用词内容</DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4">
+                  <InputGroup>
+                    <InputGroupInput
+                      placeholder="请输入常用词..."
+                      value={newHotWord}
+                      onChange={(e) => setNewHotWord(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleCreate().then()
+                        }
+                      }}
+                    />
+                  </InputGroup>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setOpen(false)}>
+                    取消
+                  </Button>
+                  <Button
+                    onClick={handleCreate}
+                    disabled={createHotWordMutation.isPending || !newHotWord.trim()}
+                  >
+                    {createHotWordMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        创建中...
+                      </>
+                    ) : (
+                      '确定'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+        {/* 提示 */}
+        <div className="flex items-center bg-setting rounded-xl px-4 py-3">
+          <PopcornIcon className="w-4 h-4 mr-[0.7rem]" />
+          <div className="flex flex-col gap-1">
+            <span>让秒言更懂你</span>
+            <p className="text-sm text-muted-foreground">
+              添加常用的人名、地名或术语，系统会优先识别，避免识别错误或遗漏
+            </p>
+          </div>
         </div>
       </div>
 
-      {showAlert && (
-        <Alert className="max-w-md mt-4">
-          <PopcornIcon />
-          <AlertTitle>让秒言更懂你</AlertTitle>
-          <AlertDescription>
-            添加常用的人名、地名或术语，系统会优先识别，避免识别错误或遗漏
-          </AlertDescription>
-        </Alert>
-      )}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="mt-4">
+          <div className="flex-shrink-0 text-xs text-muted-foreground pb-2 bg-background min-h-[24px]">
+            {(filteredHotWords.length > 0 && !isLoading) ? '常用词' : '搜索词'}
+          </div>
 
-      <div className="flex w-full max-w-md flex-col gap-6 my-4">
-        <AnimatePresence mode="wait">
-          {isError ? (
-            <motion.div
-              key="error"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Alert variant="destructive">
-                <AlertCircle />
-                <AlertTitle>连接失败</AlertTitle>
-                <AlertDescription>
-                  无法连接到服务器，请检查网络连接或稍后重试
-                </AlertDescription>
-              </Alert>
-            </motion.div>
-          ) : isLoading ? (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-2"
-            >
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-[44px] w-full rounded-xl" />
-              ))}
-            </motion.div>
-          ) : filteredHotWords.length === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Empty>
-                <EmptyDescription>
-                  {searchValue ? '未找到匹配的常用词' : '还没有添加常用词'}
-                </EmptyDescription>
-              </Empty>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="list"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="border rounded-md"
-            >
-              <Table>
-                <TableBody>
-                  <AnimatePresence>
-                    {filteredHotWords.map((item) => (
-                      <motion.tr
-                        key={item.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="border-b transition-colors hover:bg-muted/50"
-                      >
-                        <TableCell className="pl-5 font-medium max-w-xs">
-                          <TruncatedText text={item.hotword} />
-                        </TableCell>
-                        <TableCell className="text-right w-12">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="rounded-full"
-                              >
-                                <IconAdjustmentsHorizontal />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="" align="end">
-                              <DropdownMenuLabel>提示词操作</DropdownMenuLabel>
-                              <DropdownMenuGroup>
-                                <DropdownMenuItem onClick={() => openEditDialog(item)}>
-                                  编辑
-                                  <DropdownMenuShortcut>
-                                    <IconEdit />
-                                  </DropdownMenuShortcut>
-                                </DropdownMenuItem>
-                              </DropdownMenuGroup>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => handleDelete(item.id)}
-                                disabled={deleteHotWordMutation.isPending}
-                              >
-                                删除
-                                <DropdownMenuShortcut>
-                                  <IconTrash />
-                                </DropdownMenuShortcut>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </motion.tr>
-                    ))}
-                  </AnimatePresence>
-                </TableBody>
-              </Table>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          <AnimatePresence mode="wait">
+            {isError ? (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Alert variant="destructive">
+                  <AlertCircle />
+                  <AlertTitle>连接失败</AlertTitle>
+                  <AlertDescription>
+                    无法连接到服务器，请检查网络连接或稍后重试
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
+            ) : isLoading ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-2"
+              >
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[44px] w-full rounded-xl" />
+                ))}
+              </motion.div>
+            ) : filteredHotWords.length === 0 ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Empty>
+                  <EmptyDescription>
+                    {searchValue ? '未找到匹配的常用词' : '还没有添加常用词'}
+                  </EmptyDescription>
+                </Empty>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="list"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="border rounded-lg overflow-hidden"
+              >
+                <AnimatePresence>
+                  {filteredHotWords.map((item, index) => (
+                    <motion.div
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 1 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 24,
+                        mass: 0.8,
+                        delay: index * 0.025,
+                        layout: { type: 'spring', stiffness: 500, damping: 35 },
+                      }}
+                      className="group flex items-center gap-3 border-b pl-4 pr-5 py-3 hover:bg-muted/50 transition-colors last:border-b-0"
+                    >
+                      <div className="flex-1 min-w-0 text-sm">
+                        <span className="line-clamp-2">{item.hotword}</span>
+                      </div>
+                      <div className="flex items-center gap-4.5 text-muted-foreground opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
+                        <DropdownMenu
+                          modal={false}
+                          open={openMenuId === item.id}
+                          onOpenChange={(open) => setOpenMenuId(open ? item.id : null)}
+                        >
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-3 w-3 text-muted-foreground/80"
+                            >
+                              <Menu className="h-2 w-2" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            onPointerDownOutside={(e) => {
+                              const target = e.target as HTMLElement
+                              if (target.closest('.group')) {
+                                e.preventDefault()
+                              }
+                            }}
+                          >
+                            <DropdownMenuItem
+                              onSelect={(e) => {
+                                e.preventDefault()
+                                openEditDialog(item)
+                              }}
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              编辑
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={(e) => {
+                                e.preventDefault()
+                                handleDelete(item.id)
+                              }}
+                              disabled={deleteHotWordMutation.isPending}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              删除
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* 编辑对话框 */}
@@ -338,7 +371,7 @@ const ContentPage: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   )
 }
 
