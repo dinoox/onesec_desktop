@@ -223,7 +223,7 @@ const ContentPage: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.1 }}
                 className="space-y-2"
               >
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -236,7 +236,7 @@ const ContentPage: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.1 }}
               >
                 <Empty>
                   <EmptyDescription>

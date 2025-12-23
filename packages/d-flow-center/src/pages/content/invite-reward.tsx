@@ -60,12 +60,12 @@ const ContentPage: React.FC = () => {
           <span className="text-[15px] font-medium">邀请奖励</span>
         </div>
         {/* 新人专享/邀请好友 提示 */}
-        <div className="flex items-center justify-between bg-ripple-brand-text/12 rounded-xl px-4 py-3 ">
+        <div className="flex items-center justify-between bg-ripple-brand-text/10 text-ripple-brand-text rounded-xl px-4 py-3 ">
           <div className="flex items-center ">
             <IconShare className="w-4 h-4 mr-[0.7rem]" />
             <div className="flex flex-col gap-1">
               <span>{isNewUserPromo ? '新人专享' : '邀请好友'}</span>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-ripple-brand-text">
                 {isNewUserPromo
                   ? '限时: 邀请好友注册,解锁 23 天会员! 任务自注册日起 30 天有效'
                   : `我的邀请码：${user?.share_code ?? '-'}，邀请好友注册可获得积分奖励`}
@@ -79,7 +79,7 @@ const ContentPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto mt-4 space-y-5">
+      <div className="flex-1 min-h-0 overflow-y-auto mt-2 space-y-5">
         {/* 积分区域 */}
         <div className="border p-4 rounded-xl">
           <div className="flex items-center gap-2 text-[15px] font-medium">
@@ -112,12 +112,12 @@ const ContentPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* 交易记录 */}
-          <div className="space-y-2 border p-4 rounded-xl">
+          <div className="space-y-2 border p-4 rounded-xl flex flex-col">
             <div className="flex items-center gap-2 text-[15px] font-medium">
               <IconHistory className="w-5 h-5 text-ripple-brand-text" />
               积分记录
             </div>
-            <div className="max-h-[185px] overflow-y-auto">
+            <div className="max-h-[185px] overflow-y-auto flex-1">
               {txLoading ? (
                 <div className="space-y-2 animate-in fade-in duration-300">
                   {Array.from({ length: 4 }).map((_, i) => (
