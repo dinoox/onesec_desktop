@@ -88,7 +88,7 @@ class IPCService {
   }
 
   // Quit and Install
-  private handleQuitAndInstall = () => {
+  private handleQuitAndInstall = async (_: any, version: string) => {
     autoUpdater.quitAndInstall()
   }
 

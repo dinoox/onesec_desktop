@@ -113,7 +113,7 @@ const HistoryPage: React.FC = () => {
 
       await loadAudios()
     } catch (error: any) {
-      toast.error(`获取音频文件错误, 文件可能损坏`)
+      toast.error(`转录失败, 请稍后再试刚好那边有日志。啊？`)
     } finally {
       setReconvertingId(null)
     }
@@ -222,6 +222,17 @@ const HistoryPage: React.FC = () => {
   }, [holdIPCMessage])
 
   const groupedRecords = useMemo(() => {
+    if (historyRetention === 'never') {
+      if (records.length > 0) {
+        return [{
+          key: 'last-error-record',
+          label: '最近一次转录失败记录',
+          records: [records[0]],
+        }]
+      }
+      return []
+    }
+
     const groups: { key: string; label: string; records: Audios[] }[] = []
     const groupMap = new Map<string, Audios[]>()
 
@@ -242,7 +253,7 @@ const HistoryPage: React.FC = () => {
     })
 
     return groups
-  }, [records])
+  }, [records, historyRetention])
 
   // 初始化第一个分组的标题
   useEffect(() => {
@@ -426,7 +437,7 @@ const HistoryPage: React.FC = () => {
                                   variant="ghost"
                                   size="icon"
                                   className="h-3 w-3 relative text-muted-foreground/80"
-                                  disabled={copiedId === record.id}
+                                  disabled={copiedId === record.id  || !!(record.error) }
                                   onClick={() => handleCopy(record.id, record.content)}
                                 >
                                   <Check
