@@ -5,7 +5,7 @@ import { StoreSchema, USER_DEFAULT_CONFIG } from '../types/config.ts'
 
 class UserConfigManager {
   private store: Store<StoreSchema>
-  private launchMarkerPath: string
+  private readonly launchMarkerPath: string
 
   constructor() {
     this.store = new Store<StoreSchema>({

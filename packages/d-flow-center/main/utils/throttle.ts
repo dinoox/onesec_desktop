@@ -5,7 +5,7 @@
  */
 export function throttle<T extends (...args: unknown[]) => unknown>(
   fn: T,
-  interval: number
+  interval: number,
 ): (...args: Parameters<T>) => ReturnType<T> | undefined {
   let lastCallTime = 0
 

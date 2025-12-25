@@ -122,7 +122,6 @@ const ContentPage: React.FC = () => {
                 </div>
               </Label>
               <div className="text-sm text-muted-foreground flex flex-row gap-1">
-
                 <KeyDisplay keys={formattedFreeKeys} className="mx-1" />
                 开启免提语音识别：无需长按，解放双手，再按一次结束并输出结果
               </div>

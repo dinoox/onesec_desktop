@@ -38,9 +38,7 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
       const commandConfig = config.hotkey_configs?.find(
         (item: any) => item.mode === 'command',
       )
-      const freeConfig = config.hotkey_configs?.find(
-        (item: any) => item.mode === 'free',
-      )
+      const freeConfig = config.hotkey_configs?.find((item: any) => item.mode === 'free')
       set({
         shortcutKeys: normalConfig?.hotkey_combination || ['Fn'],
         shortcutCommandKeys: commandConfig?.hotkey_combination || ['Fn', 'LCmd'],

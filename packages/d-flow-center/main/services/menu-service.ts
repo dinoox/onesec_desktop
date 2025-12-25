@@ -1,8 +1,8 @@
 import { app, Menu, MenuItemConstructorOptions, shell } from 'electron'
 import windowManager from './window-manager'
 import { checkForUpdates } from '../../electron/updater'
-import log from "electron-log";
-import {buildIPCMessage, DEFAULT_IPC_CHANNEL, MessageTypes} from "../types/message.ts";
+import log from 'electron-log'
+import { buildIPCMessage, DEFAULT_IPC_CHANNEL, MessageTypes } from '../types/message.ts'
 
 class MenuService {
   constructor() {}
@@ -76,21 +76,26 @@ class MenuService {
           },
         ],
       },
-      ...(!app.isPackaged ? [{
-        label: '开发',
-        submenu: [
-          {
-            label: '切换开发者工具',
-            accelerator: process.platform === 'darwin' ? 'Command+I' : 'Alt+Ctrl+I',
-            click: () => windowManager.getContentWindow()?.webContents.toggleDevTools(),
-          },
-          {
-            label: '重新加载',
-            accelerator: process.platform === 'darwin' ? 'Command+R' : 'Ctrl+R',
-            click: () => windowManager.getContentWindow()?.webContents.reload(),
-          },
-        ],
-      }] : []),
+      ...(!app.isPackaged
+        ? [
+            {
+              label: '开发',
+              submenu: [
+                {
+                  label: '切换开发者工具',
+                  accelerator: process.platform === 'darwin' ? 'Command+I' : 'Alt+Ctrl+I',
+                  click: () =>
+                    windowManager.getContentWindow()?.webContents.toggleDevTools(),
+                },
+                {
+                  label: '重新加载',
+                  accelerator: process.platform === 'darwin' ? 'Command+R' : 'Ctrl+R',
+                  click: () => windowManager.getContentWindow()?.webContents.reload(),
+                },
+              ],
+            },
+          ]
+        : []),
       {
         label: '帮助',
         submenu: [

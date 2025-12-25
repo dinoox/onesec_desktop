@@ -21,7 +21,7 @@ import { AdvancedSettingsDialog } from '@/components/advanced-settings-dialog.ts
 import { SystemFamily } from '@/types/terminal.ts'
 import ipcService from '@/services/ipc-service.ts'
 import { uploadErrorLog } from '@/services/api/error-log-api.ts'
-import {toast} from "sonner";
+import { toast } from 'sonner'
 
 const ContentPage: React.FC = () => {
   const user = useAuthStore((state) => state.user)
@@ -67,7 +67,6 @@ const ContentPage: React.FC = () => {
 
   return (
     <div className="max-w-1/2 space-y-3 ">
-
       <div className="absolute right-4 top-4">
         <Button
           type="button"

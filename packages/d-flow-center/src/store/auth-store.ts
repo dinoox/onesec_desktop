@@ -51,7 +51,7 @@ const useAuthStore = create<AuthStore>((set) => ({
     },
 
     logout: async () => {
-      await logout()
+      logout().then()
 
       await UserService.setPartialConfig({
         auth_token: '',

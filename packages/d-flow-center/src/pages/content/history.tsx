@@ -361,7 +361,6 @@ const HistoryPage: React.FC = () => {
             {groupedRecords.length > 0 ? (
               groupedRecords.map((group, groupIndex) => (
                 <motion.div
-
                   key={group.key}
                   ref={(el) => {
                     if (el) groupRefs.current.set(group.key, el)
@@ -415,9 +414,7 @@ const HistoryPage: React.FC = () => {
                                 {record.error}
                               </span>
                             ) : record.content ? (
-                              <span className="line-clamp-4">
-                                {record.content}
-                                </span>
+                              <span className="line-clamp-4">{record.content}</span>
                             ) : (
                               <span className="text-muted-foreground">未识别到内容</span>
                             )}

@@ -60,7 +60,7 @@ export const useLogoutQuery = () =>
   useMutation({
     mutationFn: logout,
     onSuccess: async (resp) => {
-      await authStore.getState().actions.logout()
+      authStore.getState().actions.logout().then()
       useStatusStore.getState().actions.setAuthTokenInvalid(true)
       if (resp.success) {
         toast.success('退出成功')

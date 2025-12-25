@@ -48,7 +48,7 @@ class ProcessManager {
       createWindow(async () => {
         for (let i = 0; i < 3; i++) {
           windowManager.broadcast(DEFAULT_IPC_CHANNEL, message)
-          await new Promise(resolve => setTimeout(resolve, 333))
+          await new Promise((resolve) => setTimeout(resolve, 333))
         }
       })
     }

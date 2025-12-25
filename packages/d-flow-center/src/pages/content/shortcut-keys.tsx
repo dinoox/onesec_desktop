@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { HotkeyMode, MessageTypes } from '../../../main/types/message.ts'
 import { KeyMapper } from '@/utils/key.ts'
 import { KeyDisplay } from '@/components/ui/key-display.tsx'
-import {PopcornIcon} from "lucide-react";
+import { PopcornIcon } from 'lucide-react'
 
 const ContentPage: React.FC = () => {
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
@@ -304,10 +304,9 @@ const ContentPage: React.FC = () => {
         </div>
       </div>
 
-
       <div className="border-none text-ripple-brand-text flex h-9 w-full justify-center items-center gap-2 rounded-md border bg-ripple-brand-text/10 px-3 shadow-none transition-colors duration-300">
         <PopcornIcon size="16" />
-        <span className="">单次录音限时 3 分钟，超时自动结束并上传</span>
+        <span className="">单次录音限时 5 分钟，超时自动结束并上传</span>
       </div>
     </div>
   )

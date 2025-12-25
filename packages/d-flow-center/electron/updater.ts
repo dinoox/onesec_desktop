@@ -77,7 +77,7 @@ autoUpdater.on('update-downloaded', (info) => {
 
 const checkForUpdates = async () => {
   await new Promise((resolve) => setTimeout(resolve, 3000))
-  await autoUpdater.checkForUpdatesAndNotify()
+  await autoUpdater.checkForUpdates()
 }
 
 const startPeriodicUpdateCheck = async () => {

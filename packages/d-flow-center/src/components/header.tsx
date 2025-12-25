@@ -58,7 +58,6 @@ const Header: React.FC = () => {
           <div className="relative w-5 h-5">
             {/* 检查更新状态 - 旋转加载 */}
             <div
-
               className={`absolute inset-0 transition-all duration-300 ${
                 updateChecking && updateProgress === null
                   ? 'opacity-100 scale-100'

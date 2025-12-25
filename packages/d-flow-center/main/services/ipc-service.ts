@@ -89,7 +89,6 @@ class IPCService {
 
   // Quit and Install
   private handleQuitAndInstall = () => {
-    log.info('Quit and Install')
     autoUpdater.quitAndInstall()
   }
 

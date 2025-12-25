@@ -126,7 +126,7 @@ const ContentPage: React.FC = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
                         transition={{ duration: 0.2 }}
-                        className='text-xs font-normal'
+                        className="text-xs font-normal"
                       >
                         {filteredHotWords.length} 个结果
                       </motion.span>
@@ -197,7 +197,7 @@ const ContentPage: React.FC = () => {
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="mt-4">
           <div className="flex-shrink-0 text-xs text-muted-foreground pb-2 bg-background min-h-[24px]">
-            {(filteredHotWords.length > 0 && !isLoading) ? '常用词' : '搜索词'}
+            {filteredHotWords.length > 0 && !isLoading ? '常用词' : '搜索词'}
           </div>
 
           <AnimatePresence mode="wait">
