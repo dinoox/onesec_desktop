@@ -16,6 +16,7 @@ import {
 import useStatusStore, { useStatusActions } from '@/store/status-store'
 import { IPC_QUIT_AND_INSTALL_CHANNEL } from '../../main/types/message.ts'
 import { Loader2 } from 'lucide-react'
+import ipcService from '@/services/ipc-service.ts'
 
 const Header: React.FC = () => {
   const location = useLocation()
@@ -36,8 +37,8 @@ const Header: React.FC = () => {
   }, [updateDownloaded])
 
   const handleUpdate = () => {
-    window.ipcRenderer.invoke(IPC_QUIT_AND_INSTALL_CHANNEL)
-  }
+    ipcService.updateDeviceInfo(updateInfo?.version)
+  } 
 
   const handleDialogChange = (open: boolean) => {
     setShowUpdateDialog(open)

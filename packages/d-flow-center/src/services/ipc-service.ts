@@ -16,6 +16,7 @@ import {
   IPC_READ_ERROR_LOG_CHANNEL,
   IPCMessage,
   MessageType,
+  IPC_QUIT_AND_INSTALL_CHANNEL,
 } from '../../main/types/message.ts'
 import { toast } from 'sonner'
 import useStatusStore from '@/store/status-store.ts'
@@ -100,7 +101,6 @@ class IPCService {
       setUpdateProgress(null)
       const { version, releaseDate } = message.data?.data || {}
       setUpdateInfo(true, { version, releaseDate })
-      await updateDeviceInfo(await this.getSystemInfo())
       return
     }
 
@@ -168,6 +168,16 @@ class IPCService {
   // System
   async getSystemInfo(): Promise<SystemInfo> {
     return await window.ipcRenderer.invoke(IPC_GET_SYSTEM_INFO_CHANNEL)
+  }
+
+  async updateDeviceInfo(newVersion: string | undefined) {
+    let info = await this.getSystemInfo()
+    if (newVersion) {
+      info.appVersion = newVersion
+    }
+
+    await updateDeviceInfo(info)
+    await window.ipcRenderer.invoke(IPC_QUIT_AND_INSTALL_CHANNEL, newVersion)
   }
 
   // Error Log
