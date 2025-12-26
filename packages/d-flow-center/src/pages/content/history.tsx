@@ -113,7 +113,7 @@ const HistoryPage: React.FC = () => {
 
       await loadAudios()
     } catch (error: any) {
-      toast.error(`转录失败, 请稍后再试刚好那边有日志。啊？`)
+      toast.error(`转录失败, 请稍后再试`)
     } finally {
       setReconvertingId(null)
     }

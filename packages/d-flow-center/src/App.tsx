@@ -10,6 +10,7 @@ import {
 import { toast } from 'sonner'
 import { useEffect } from 'react'
 import useAuthStore from '@/store/auth-store'
+import useUserConfigStore from './store/user-config-store'
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -50,10 +51,12 @@ const queryClient = new QueryClient({
 
 function App() {
   const initAuth = useAuthStore((state) => state.actions.initAuth)
+  const { loadUserConfig } = useUserConfigStore((state) => state.actions)
 
   useEffect(() => {
     initAuth().then()
-  }, [initAuth])
+    loadUserConfig().then()
+  }, [initAuth, loadUserConfig])
 
   return (
     <QueryClientProvider client={queryClient}>

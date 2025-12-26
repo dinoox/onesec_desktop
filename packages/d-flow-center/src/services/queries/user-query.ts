@@ -7,6 +7,7 @@ export const useGetUserInfo = () => {
   const updateUser = useAuthStore((state) => state.actions.updateUser)
 
   return useQuery({
+    staleTime: 0,
     queryKey: ['user-info'],
     queryFn: async () => {
       const resp = await getUserInfo()
