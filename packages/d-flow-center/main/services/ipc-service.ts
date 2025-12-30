@@ -18,12 +18,18 @@ import {
   IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
   IPC_GET_SYSTEM_INFO_CHANNEL,
   IPC_READ_ERROR_LOG_CHANNEL,
+  IPC_CHECK_ACCESSIBILITY_CHANNEL,
+  IPC_REQUEST_ACCESSIBILITY_CHANNEL,
+  IPC_CHECK_MICROPHONE_CHANNEL,
+  IPC_REQUEST_MICROPHONE_CHANNEL,
   MessageTypes,
+  IPC_HOT_KEY_DETECT_START_CHANNEL,
+  IPC_HOT_KEY_DETECT_END_CHANNEL,
 } from '../types/message'
 import os from 'os'
 import userConfigManager from './user-config-manager'
 import nativeProcessManager from './native-process-manager'
-import { ipcMain, shell, dialog } from 'electron'
+import { ipcMain, shell, dialog, systemPreferences } from 'electron'
 import autoUpdater from '../../electron/updater'
 import log from 'electron-log'
 import udsService from './uds-service'
@@ -60,6 +66,12 @@ class IPCService {
     )
     ipcMain.handle(IPC_GET_SYSTEM_INFO_CHANNEL, this.handleGetSystemInfo)
     ipcMain.handle(IPC_READ_ERROR_LOG_CHANNEL, this.handleReadErrorLog)
+    ipcMain.handle(IPC_CHECK_ACCESSIBILITY_CHANNEL, this.handleCheckAccessibility)
+    ipcMain.handle(IPC_REQUEST_ACCESSIBILITY_CHANNEL, this.handleRequestAccessibility)
+    ipcMain.handle(IPC_CHECK_MICROPHONE_CHANNEL, this.handleCheckMicrophone)
+    ipcMain.handle(IPC_REQUEST_MICROPHONE_CHANNEL, this.handleRequestMicrophone)
+    ipcMain.handle(IPC_HOT_KEY_DETECT_START_CHANNEL, this.handleHotKeyDetectStart)
+    ipcMain.handle(IPC_HOT_KEY_DETECT_END_CHANNEL, this.handleHotKeyDetectEnd)
   }
 
   // User Config
@@ -113,6 +125,24 @@ class IPCService {
     })
   }
 
+  // Hot Key Detect
+  private handleHotKeyDetectStart = () => {
+    const timestamp = Date.now()
+
+    udsService.broadcast({
+      type: MessageTypes.HOTKEY_DETECT_STARTED,
+      timestamp,
+    })
+  }
+
+  private handleHotKeyDetectEnd = () => {
+    const timestamp = Date.now()
+
+    udsService.broadcast({
+      type: MessageTypes.HOTKEY_DETECT_ENDED,
+      timestamp,
+    })
+  }
   // First Launch
   private handleIsFirstLaunch = () => userConfigManager.isFirstLaunch()
   private handleMarkAsLaunched = () => userConfigManager.markAsLaunched()
@@ -212,6 +242,23 @@ class IPCService {
       throw 'not exists'
     }
     return fs.readFileSync(logPath)
+  }
+
+  // Permissions
+  private handleCheckAccessibility = () => {
+    return systemPreferences.isTrustedAccessibilityClient(false)
+  }
+
+  private handleRequestAccessibility = () => {
+    return systemPreferences.isTrustedAccessibilityClient(true)
+  }
+
+  private handleCheckMicrophone = async () => {
+    return systemPreferences.getMediaAccessStatus('microphone')
+  }
+
+  private handleRequestMicrophone = async () => {
+    return await systemPreferences.askForMediaAccess('microphone')
   }
 }
 

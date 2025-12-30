@@ -3,6 +3,8 @@ import {
   HotkeyMode,
   IPC_HOT_KEY_SETTING_END_CHANNEL,
   IPC_HOT_KEY_SETTING_START_CHANNEL,
+  IPC_HOT_KEY_DETECT_START_CHANNEL,
+  IPC_HOT_KEY_DETECT_END_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
   IPC_IS_FIRST_LAUNCH_CHANNEL,
   IPC_MARK_AS_LAUNCHED_CHANNEL,
@@ -14,6 +16,10 @@ import {
   IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
   IPC_GET_SYSTEM_INFO_CHANNEL,
   IPC_READ_ERROR_LOG_CHANNEL,
+  IPC_CHECK_ACCESSIBILITY_CHANNEL,
+  IPC_REQUEST_ACCESSIBILITY_CHANNEL,
+  IPC_CHECK_MICROPHONE_CHANNEL,
+  IPC_REQUEST_MICROPHONE_CHANNEL,
   IPCMessage,
   MessageType,
   IPC_QUIT_AND_INSTALL_CHANNEL,
@@ -72,6 +78,14 @@ class IPCService {
       return
     }
 
+    if (action === 'hotkey_detect_update') {
+      const { setHotkeyDetectKeys } = useStatusStore.getState().actions
+      const keys = message.data?.data?.hotkey_combination ?? []
+      const isCompleted = message.data?.data?.is_completed ?? false
+      setHotkeyDetectKeys(keys, isCompleted)
+      return
+    }
+
     if (action === 'app_update_checking') {
       setUpdateChecking(true)
       return
@@ -122,6 +136,15 @@ class IPCService {
 
   async endHotkeySetting(mode: HotkeyMode) {
     return await window.ipcRenderer.invoke(IPC_HOT_KEY_SETTING_END_CHANNEL, mode)
+  }
+
+  // Hotkey Detect
+  async startHotkeyDetect() {
+    return await window.ipcRenderer.invoke(IPC_HOT_KEY_DETECT_START_CHANNEL)
+  }
+
+  async endHotkeyDetect() {
+    return await window.ipcRenderer.invoke(IPC_HOT_KEY_DETECT_END_CHANNEL)
   }
 
   // First Launch
@@ -183,6 +206,23 @@ class IPCService {
   // Error Log
   async readErrorLog(): Promise<Uint8Array> {
     return await window.ipcRenderer.invoke(IPC_READ_ERROR_LOG_CHANNEL)
+  }
+
+  // Permissions
+  async checkAccessibility(): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_CHECK_ACCESSIBILITY_CHANNEL)
+  }
+
+  async requestAccessibility(): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_REQUEST_ACCESSIBILITY_CHANNEL)
+  }
+
+  async checkMicrophone(): Promise<string> {
+    return await window.ipcRenderer.invoke(IPC_CHECK_MICROPHONE_CHANNEL)
+  }
+
+  async requestMicrophone(): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_REQUEST_MICROPHONE_CHANNEL)
   }
 }
 

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import React, { useMemo, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -42,7 +43,7 @@ const ContentPage: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
-  const [newHotWord, setNewHotWord] = useState('')
+  const [newHotWords, setNewHotWords] = useState('')
   const [editingHotWord, setEditingHotWord] = useState<HotWord | null>(null)
   const [editValue, setEditValue] = useState('')
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
@@ -61,13 +62,34 @@ const ContentPage: React.FC = () => {
     )
   }, [hotWords, searchValue])
 
-  // 添加热词
-  const handleCreate = async () => {
-    if (!newHotWord.trim()) {
-      return
+  // 批量添加验证
+  const batchValidation = useMemo(() => {
+    const lines = newHotWords.split('\n').filter((line) => line.trim())
+    const errors: string[] = []
+
+    if (lines.length > 200) {
+      errors.push(`超出最大行数限制：当前 ${lines.length} 行，最多 200 行`)
     }
-    await createHotWordMutation.mutateAsync(newHotWord.trim())
-    setNewHotWord('')
+
+    const overLengthLines = lines
+      .map((line, i) => ({ line: line.trim(), index: i + 1 }))
+      .filter(({ line }) => line.length > 50)
+
+    if (overLengthLines.length > 0) {
+      const preview = overLengthLines.slice(0, 3).map((l) => `第${l.index}行`)
+      errors.push(
+        `${overLengthLines.length} 行超出长度限制（最多50字符）：${preview.join('、')}${overLengthLines.length > 3 ? '...' : ''}`,
+      )
+    }
+
+    return { lines, errors, isValid: lines.length > 0 && errors.length === 0 }
+  }, [newHotWords])
+
+  // 批量添加热词
+  const handleCreate = async () => {
+    if (!batchValidation.isValid) return
+    await createHotWordMutation.mutateAsync(newHotWords.trim())
+    setNewHotWords('')
     setOpen(false)
   }
 
@@ -143,22 +165,30 @@ const ContentPage: React.FC = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>添加新常用词</DialogTitle>
-                  <DialogDescription>在这里添加您的常用词内容</DialogDescription>
+                  <DialogTitle>添加常用词</DialogTitle>
+                  <DialogDescription>
+                    每行一个常用词，上限 200 个，每词不超过 50 字符
+                  </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4">
-                  <InputGroup>
-                    <InputGroupInput
-                      placeholder="请输入常用词..."
-                      value={newHotWord}
-                      onChange={(e) => setNewHotWord(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          handleCreate().then()
-                        }
-                      }}
-                    />
-                  </InputGroup>
+                <div className="grid gap-3">
+                  <Textarea
+                    placeholder="请输入常用词，每行一个..."
+                    value={newHotWords}
+                    onChange={(e) => setNewHotWords(e.target.value)}
+                    className="min-h-[120px] max-h-[193px] resize-none"
+                  />
+                  {batchValidation.errors.length > 0 && (
+                    <div className="text-sm text-destructive space-y-1">
+                      {batchValidation.errors.map((err, i) => (
+                        <p key={i}>{err}</p>
+                      ))}
+                    </div>
+                  )}
+                  {batchValidation.lines.length > 0 && batchValidation.errors.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      共 {batchValidation.lines.length} 个常用词
+                    </p>
+                  )}
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpen(false)}>
@@ -166,7 +196,7 @@ const ContentPage: React.FC = () => {
                   </Button>
                   <Button
                     onClick={handleCreate}
-                    disabled={createHotWordMutation.isPending || !newHotWord.trim()}
+                    disabled={createHotWordMutation.isPending || !batchValidation.isValid}
                   >
                     {createHotWordMutation.isPending ? (
                       <>

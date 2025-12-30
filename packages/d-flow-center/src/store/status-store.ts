@@ -21,6 +21,8 @@ interface StatusStore {
   hotKeySettingStatus: HotkeySettingStatus
   holdIPCMessage: IPCMessage | null
   reconvertingId: string | null
+  hotkeyDetectKeys: string[]
+  hotkeyDetectCompleted: boolean
   actions: {
     setAuthTokenInvalid: (value: boolean) => void
     setUpdateChecking: (value: boolean) => void
@@ -29,6 +31,7 @@ interface StatusStore {
     setHotkeySettingStatus: (status: HotkeySettingStatus) => void
     setIPCMessage: (message: IPCMessage | null) => void
     setReconvertingId: (id: string | null) => void
+    setHotkeyDetectKeys: (keys: string[], completed?: boolean) => void
   }
 }
 
@@ -41,6 +44,8 @@ const useStatusStore = create<StatusStore>((set) => ({
   hotKeySettingStatus: 'idle',
   holdIPCMessage: null,
   reconvertingId: null,
+  hotkeyDetectKeys: [],
+  hotkeyDetectCompleted: false,
   actions: {
     setAuthTokenInvalid: (authTokenInvalid) => set({ authTokenInvalid }),
     setUpdateChecking: (updateChecking) => set({ updateChecking }),
@@ -52,6 +57,8 @@ const useStatusStore = create<StatusStore>((set) => ({
       set({ holdIPCMessage })
     },
     setReconvertingId: (reconvertingId) => set({ reconvertingId }),
+    setHotkeyDetectKeys: (hotkeyDetectKeys, completed = false) =>
+      set({ hotkeyDetectKeys, hotkeyDetectCompleted: completed }),
   },
 }))
 

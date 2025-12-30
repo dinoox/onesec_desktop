@@ -17,6 +17,10 @@ export const MessageTypes = {
   HOTKEY_SETTING_UPDATE: 'hotkey_setting_update',
   HOTKEY_SETTING_RESULT: 'hotkey_setting_result',
   HOTKEY_SETTING_END: 'hotkey_setting_end',
+  // Hot Key Detect
+  HOTKEY_DETECT_STARTED: 'hotkey_detect_start',
+  HOTKEY_DETECT_ENDED: 'hotkey_detect_end',
+  HOTKEY_DETECT_UPDATED: 'hotkey_detect_update',
   //
   USER_AUDIO_SAVED: 'user_audio_saved',
   RECORDING_INTERRUPTED: 'recording_interrupted',
@@ -84,6 +88,9 @@ const IPC_QUIT_AND_INSTALL_CHANNEL = 'quit_and_install_channel'
 const IPC_HOT_KEY_SETTING_START_CHANNEL = 'hot_key_setting_start_channel'
 const IPC_HOT_KEY_SETTING_RESULT_CHANNEL = 'hot_key_setting_result_channel'
 const IPC_HOT_KEY_SETTING_END_CHANNEL = 'hot_key_setting_end_channel'
+// Hot Key Detect
+const IPC_HOT_KEY_DETECT_START_CHANNEL = 'hot_key_detect_start_channel'
+const IPC_HOT_KEY_DETECT_END_CHANNEL = 'hot_key_detect_end_channel'
 // First Launch
 const IPC_IS_FIRST_LAUNCH_CHANNEL = 'is_first_launch_channel'
 const IPC_MARK_AS_LAUNCHED_CHANNEL = 'mark_as_launched_channel'
@@ -98,6 +105,11 @@ const IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL = 'delete_audios_by_retention_chann
 const IPC_GET_SYSTEM_INFO_CHANNEL = 'get_system_info_channel'
 // Error Log
 const IPC_READ_ERROR_LOG_CHANNEL = 'read_error_log_channel'
+// Permissions
+const IPC_CHECK_ACCESSIBILITY_CHANNEL = 'check_accessibility_channel'
+const IPC_REQUEST_ACCESSIBILITY_CHANNEL = 'request_accessibility_channel'
+const IPC_CHECK_MICROPHONE_CHANNEL = 'check_microphone_channel'
+const IPC_REQUEST_MICROPHONE_CHANNEL = 'request_microphone_channel'
 
 export {
   DEFAULT_IPC_CHANNEL,
@@ -109,6 +121,8 @@ export {
   IPC_HOT_KEY_SETTING_START_CHANNEL,
   IPC_HOT_KEY_SETTING_RESULT_CHANNEL,
   IPC_HOT_KEY_SETTING_END_CHANNEL,
+  IPC_HOT_KEY_DETECT_START_CHANNEL,
+  IPC_HOT_KEY_DETECT_END_CHANNEL,
   IPC_OPEN_EXTERNAL_URL_CHANNEL,
   IPC_QUIT_AND_INSTALL_CHANNEL,
   IPC_IS_FIRST_LAUNCH_CHANNEL,
@@ -121,4 +135,8 @@ export {
   IPC_DELETE_AUDIOS_BY_RETENTION_CHANNEL,
   IPC_GET_SYSTEM_INFO_CHANNEL,
   IPC_READ_ERROR_LOG_CHANNEL,
+  IPC_CHECK_ACCESSIBILITY_CHANNEL,
+  IPC_REQUEST_ACCESSIBILITY_CHANNEL,
+  IPC_CHECK_MICROPHONE_CHANNEL,
+  IPC_REQUEST_MICROPHONE_CHANNEL,
 }

@@ -11,7 +11,7 @@ export function KeyDisplay({ keys, className }: KeyDisplayProps) {
     <KbdGroup className={className}>
       {keys.map((key, index) => (
         <Kbd key={`${key}-${index}`}>
-          {key === 'Space' ? <Space size={14} strokeWidth={2.6} /> : key}
+          {key}
         </Kbd>
       ))}
     </KbdGroup>

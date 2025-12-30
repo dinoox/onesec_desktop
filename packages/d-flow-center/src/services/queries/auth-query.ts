@@ -33,7 +33,9 @@ export const useRegisterQuery = () => {
     onSuccess: async (resp) => {
       if (resp.success) {
         await handleAuthSuccess(resp)
-        toast.success(resp.message)
+        if (!(await ipcService.isFirstLaunch())) {
+          toast.success(resp.message)
+        }
         return
       }
 

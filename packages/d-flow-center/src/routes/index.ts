@@ -7,6 +7,7 @@ import { ContentRoutes } from '@/routes/content'
 const DashboardPage = lazy(() => import('@/pages/dashboard'))
 const NotFoundPage = lazy(() => import('@/pages/not-found'))
 const LoginPage = lazy(() => import('@/pages/login'))
+const OnboardingPage = lazy(() => import('@/pages/onboarding'))
 const ErrorBoundaryPage = lazy(() => import('@/pages/error-boundary'))
 
 const router: RouteObject[] = [
@@ -25,6 +26,7 @@ const router: RouteObject[] = [
         ],
       },
       { path: 'login', Component: LoginPage },
+      { path: 'onboarding', Component: OnboardingPage },
       { path: '*', Component: NotFoundPage },
     ],
   },
