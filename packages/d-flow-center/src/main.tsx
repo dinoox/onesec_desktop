@@ -4,9 +4,7 @@ import App from './App.tsx'
 import './global.css'
 import IPCService from '@/services/ipc-service.ts'
 
-createRoot(document.getElementById('root')!).render(
-  <App />,
-)
+createRoot(document.getElementById('root')!).render(<App />)
 ;(async () => {
   await IPCService.initialize()
 })()

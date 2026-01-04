@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef, ReactNode, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
-import { Check, ChevronRight, Info, Space, Mic } from 'lucide-react'
-import IPCService from '@/services/ipc-service'
+import { Check, ChevronRight, Info, Space, Mic, MessageCircle } from 'lucide-react'
+import IPCService, { delay } from '@/services/ipc-service'
 import { cn } from '@/lib/utils'
 import useStatusStore from '@/store/status-store'
 import useUserConfigStore from '@/store/user-config-store'
@@ -52,7 +52,7 @@ const STEPS: { key: StepKey; label: string }[] = [
   { key: 'register', label: '注册' },
   { key: 'permission', label: '权限' },
   { key: 'settings', label: '设置' },
-  { key: 'tryit', label: '试试' },
+  { key: 'tryit', label: '快速体验' },
 ]
 
 export default function OnboardingPage() {
@@ -202,8 +202,8 @@ function PermissionStep({ onNext }: { onNext: () => void }) {
           />
         </div>
 
-        <Button 
-          onClick={onNext} 
+        <Button
+          onClick={onNext}
           className="w-fit"
           disabled={!accessibilityGranted || !microphoneGranted}
         >
@@ -492,8 +492,7 @@ function SettingsStep({ onNext }: { onNext: () => void }) {
               </div>
               <h1 className="text-2xl font-bold mb-2">按下以测试您的语音输入快捷键</h1>
               <p className="text-muted-foreground mb-12">
-                我们推荐使用 <kbd className="px-2 py-1 bg-muted rounded text-xs">fn</kbd>{' '}
-                键，位于键盘左下角。
+                我们推荐使用 <KeyDisplay keys={['Fn']} /> 键，位于键盘左下角。
               </p>
               <p className="font-medium mb-4">按下时，您看到按键显示吗？</p>
               <div className="flex gap-4">
@@ -660,14 +659,16 @@ function VolumeRipple({ level }: { level: number }) {
 }
 
 function TryItStep({ onFinish }: { onFinish: () => void }) {
-  const [subStep, setSubStep] = useState(1) // 1: 输入框测试, 2: 选中翻译
+  const [subStep, setSubStep] = useState(1) // 1: 输入框测试 2: 普通命令测试, 3: 选中翻译测试
   const [subDirection, setSubDirection] = useState(1)
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue1, setInputValue1] = useState('')
+  const [inputValue2, setInputValue2] = useState('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const [sampleText, setSampleText] = useState(
-    'The quick brown fox jumps over the lazy dog. This pangram contains every letter of the English alphabet at least once.',
-  )
+  const defaultSampleText = 'Artificial Intelligence is transforming the world.'
+  const [sampleText, setSampleText] = useState(defaultSampleText)
   const [showCommandHotkeyDialog, setShowCommandHotkeyDialog] = useState(false)
+  const [isTextSelected, setIsTextSelected] = useState(false)
+  const [hasReceivedAudio, setHasReceivedAudio] = useState(false)
 
   const hotkeySettingStatus = useStatusStore((state) => state.hotKeySettingStatus)
   const holdIPCMessage = useStatusStore((state) => state.holdIPCMessage)
@@ -686,6 +687,60 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
     () => KeyMapper.formatKeys(shortcutCommandKeys),
     [shortcutCommandKeys],
   )
+
+  const formattedShortcutCommandKeysString = useMemo(
+    () => KeyMapper.formatKeysAsString(shortcutCommandKeys),
+    [shortcutCommandKeys],
+  )
+
+  useEffect(() => {
+    setHasReceivedAudio(false)
+  }, [subStep])
+
+  useEffect(() => {
+    console.log('holdIPCMessage changed:', holdIPCMessage)
+
+    if (
+      (subStep === 2 || subStep === 3) &&
+      holdIPCMessage?.action === 'user_audio_saved'
+    ) {
+      const mode = holdIPCMessage?.data?.data?.mode
+      const hasSelectedText = holdIPCMessage?.data?.data?.has_text_selected
+
+      if (subStep === 3) {
+        setHasReceivedAudio(true)
+      }
+
+      if (subStep === 3 && !hasSelectedText) {
+        toast.error(`当前未选中文本, 请重新选中文本`)
+        delay(1000).then(() => {
+          setSampleText(defaultSampleText)
+        })
+        return
+      }
+
+      if (subStep === 3 && mode && mode !== 'command') {
+        toast.error(`请按住 ${formattedShortcutCommandKeysString} 使用命令模式重新录音`, {
+          duration: 5000,
+        })
+        delay(1000).then(() => {
+          setSampleText(defaultSampleText)
+        })
+        return
+      }
+
+      if (mode && mode !== 'command') {
+        toast.error(`请按住 ${formattedShortcutCommandKeysString} 使用命令模式重新录音`, {
+          duration: 5000,
+        })
+        if (subStep === 3) {
+          delay(1000).then(() => {
+            setSampleText(defaultSampleText)
+          })
+        }
+      }
+    }
+  }, [holdIPCMessage])
 
   // 处理快捷键设置的 IPC 消息（针对command模式）
   useEffect(() => {
@@ -735,12 +790,12 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
 
   const handleNextSubStep = () => {
     setSubDirection(1)
-    setSubStep(2)
+    setSubStep((prev) => prev + 1)
   }
 
   const handleBackSubStep = () => {
     setSubDirection(-1)
-    setSubStep(1)
+    setSubStep((prev) => prev - 1)
   }
 
   return (
@@ -759,62 +814,167 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
           >
             {/* 左侧内容 */}
             <div className="flex-1 flex flex-col justify-center p-8 max-w-xl">
-              <h1 className="text-2xl font-semibold mb-2">试试语音输入</h1>
-              <p className="text-muted-foreground mb-4 text-[14px]">
-                在下方输入框中，按住{' '}
-                <span className="inline-flex items-center gap-1">
-                  {formattedShortcutKeys.map((key, index) => (
-                    <Kbd key={`${key}-${index}`}>{key}</Kbd>
-                  ))}
-                </span>{' '}
-                开始说话，松开后文字将自动输入
-              </p>
+              <h1 className="text-2xl font-semibold mb-3">语音识别</h1>
 
+              {/* 上半部分：示例问题卡片 */}
+              <div className="flex items-end justify-center pb-6">
+                <div className="w-full max-w-md">
+                  {/* 标题 */}
+                  <div className="flex items-center gap-2 mb-4 text-muted-foreground">
+                    <MessageCircle className="w-4 h-4" />
+                    <span className="text-sm">试着读出这段话</span>
+                  </div>
+                  {/* 虚线边框卡片 */}
+                  <div className="border-2 border-dashed border-muted-foreground/30 rounded-2xl p-8 bg-background/80">
+                    <p className="text-2xl font-bold text-ripple-brand-text dark:text-ripple-brand-text text-center leading-relaxed">
+                      "帮我回复这个邮件，嗯，那个，用英文帮我回复"
+                    </p>
+                  </div>
+                </div>
+              </div>
               <div className="relative">
                 <textarea
                   ref={inputRef}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  autoFocus
+                  value={inputValue1}
+                  onChange={(e) => setInputValue1(e.target.value)}
                   placeholder="按住快捷键开始说话..."
                   className={cn(
-                    'w-full h-32 p-4 rounded-lg border bg-background resize-none',
+                    'w-full h-32 p-4 rounded-lg border resize-none placeholder:text-muted-foreground',
                     'focus:outline-none focus:ring-ripple-brand/50 focus:border-ripple-brand',
                     'transition-all duration-200',
                   )}
                 />
               </div>
 
-              <p className="text-xs text-muted-foreground mt-2">
+              {/* <p className="text-xs text-muted-foreground mt-2">
                 说话时保持清晰，松开快捷键后等待片刻即可看到转写结果
-              </p>
+              </p> */}
 
-              <Button onClick={handleNextSubStep} className="w-fit mt-6">
+              <Button onClick={handleNextSubStep} className="w-fit mt-4">
                 下一步
               </Button>
             </div>
 
             {/* 右侧提示区域 */}
             <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-950/20 p-8">
-              <div className="text-center">
+              <div className="text-center flex flex-col gap-3 items-center justify-center">
                 <div className="mb-6">
-                  <KbdGroup className="gap-4">
+                  <KbdGroup className="gap-12">
                     {formattedShortcutKeys.map((key, index) => (
                       <Kbd
                         key={`${key}-${index}`}
-                        className={cn('scale-150', 'bg-muted')}
+                        className={cn('scale-250', 'bg-ripple-brand', 'text-foreground')}
                       >
                         {key === 'Space' ? <Space size={14} strokeWidth={2.6} /> : key}
                       </Kbd>
                     ))}
                   </KbdGroup>
                 </div>
-                <p className="text-sm text-muted-foreground">{'按住快捷键开始录音'}</p>
+                <p className="text-sm text-muted-foreground">
+                  {'按住以上快捷键开始录音'}
+                </p>
               </div>
             </div>
           </motion.div>
         )}
 
         {subStep === 2 && (
+          <motion.div
+            key="voice-input-2"
+            custom={subDirection}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={slideTransition}
+            className="absolute inset-0 flex"
+          >
+            {/* 左侧内容 */}
+            <div className="flex-1 flex flex-col justify-center p-8 max-w-xl">
+              <h1 className="text-2xl font-semibold mb-3">智能指令</h1>
+
+              {/* 上半部分：示例问题卡片 */}
+              <div className="flex items-end justify-center pb-6">
+                <div className="w-full max-w-md">
+                  {/* 标题 */}
+                  <div className="flex items-center gap-2 mb-4 text-muted-foreground">
+                    <MessageCircle className="w-4 h-4" />
+                    <span className="text-sm">试着说出这个指令</span>
+                  </div>
+                  {/* 虚线边框卡片 */}
+                  <div className="border-2 border-dashed border-muted-foreground/30 rounded-2xl p-8 bg-background/80">
+                    <p className="text-2xl font-bold text-ripple-brand-text text-center leading-relaxed">
+                      “告诉我世界上最高的山是哪座？”
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <textarea
+                  ref={inputRef}
+                  autoFocus
+                  value={inputValue2}
+                  onChange={(e) => setInputValue2(e.target.value)}
+                  placeholder="按住快捷键开始询问..."
+                  className={cn(
+                    'w-full h-32 p-4 rounded-lg border resize-none placeholder:text-muted-foreground',
+                    'focus:outline-none focus:ring-ripple-brand/50 focus:border-ripple-brand',
+                    'transition-all duration-200',
+                  )}
+                />
+              </div>
+
+              {/* <p className="text-xs text-muted-foreground mt-2">
+                说话时保持清晰，松开快捷键后等待片刻即可看到转写结果
+              </p> */}
+              <div className="flex gap-4 mt-4">
+                <Button onClick={handleNextSubStep} className="w-fit">
+                  下一步
+                </Button>
+              </div>
+            </div>
+
+            {/* 右侧提示区域 */}
+            <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-950/20 p-8">
+              {/* 下半部分：快捷键提示 */}
+              <div className=" flex items-start justify-center pt-8">
+                <div className="text-center flex flex-col gap-3 items-center justify-center">
+                  <div className="mb-6 flex items-center justify-center">
+                    <KbdGroup className="gap-12">
+                      {formattedShortcutCommandKeys.map((key, index) => (
+                        <Kbd
+                          key={`${key}-${index}`}
+                          className={cn(
+                            'scale-250',
+                            'bg-ripple-brand',
+                            'text-foreground',
+                          )}
+                        >
+                          {key === 'Space' ? <Space size={14} strokeWidth={2.6} /> : key}
+                        </Kbd>
+                      ))}
+                    </KbdGroup>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {'按住以上快捷键开始发送指令'}
+                  </p>
+
+                  <Button
+                    variant="outline"
+                    onClick={openCommandHotkeyDialog}
+                    className="w-fit text-muted-foreground"
+                  >
+                    换个快捷键
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {subStep === 3 && (
           <motion.div
             key="translate"
             custom={subDirection}
@@ -827,70 +987,184 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
           >
             {/* 左侧内容 */}
             <div className="flex-1 flex flex-col justify-center p-8 max-w-xl">
-              <div className="mb-6">
-                <button
-                  onClick={handleBackSubStep}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <span>←</span>
-                  <span>返回</span>
-                </button>
+              <h1 className="text-2xl font-semibold mb-3">划词指令</h1>
+
+              {/* 上半部分：示例问题卡片 */}
+              <div className="flex items-end justify-center pb-4">
+                <div className="w-full max-w-md">
+                  {/* 标题 */}
+                  <div className="flex items-center gap-2 mb-3 text-muted-foreground">
+                    <MessageCircle className="w-4 h-4" />
+                    <span className="text-sm">选中文字并说出指令</span>
+                  </div>
+                  {/* 虚线边框卡片 */}
+                  <div className="border-2 border-dashed border-muted-foreground/30 rounded-2xl p-8 bg-background/80">
+                    <p className="text-2xl font-bold text-ripple-brand-text text-center leading-relaxed">
+                      "翻译这句话"
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <h1 className="text-2xl font-semibold mb-2">试试选中翻译</h1>
-              <p className="text-muted-foreground mb-4 text-[14px]">
-                选中下方的英文文本，然后按住{' '}
-                <span className="inline-flex items-center gap-1">
-                  {formattedShortcutCommandKeys.map((key, index) => (
-                    <Kbd key={`${key}-${index}`}>{key}</Kbd>
-                  ))}
-                </span>{' '}
-                说"翻译"，即可将选中内容翻译成中文。
-              </p>
+              {/* 选中文本提示 - 带漂浮动画 */}
+              <AnimatePresence>
+                {!hasReceivedAudio && (
+                  <motion.div
+                    initial={{ opacity: 1, height: 'auto', marginBottom: '0.5rem' }}
+                    exit={{
+                      opacity: 0,
+                      height: 0,
+                      marginBottom: 0,
+                      transition: { duration: 0.3, ease: 'easeInOut' },
+                    }}
+                    className="flex justify-center overflow-hidden p-2"
+                  >
+                    <motion.button
+                      onClick={() => {
+                        if (inputRef.current) {
+                          inputRef.current.focus()
+                          inputRef.current.select()
+                        }
+                      }}
+                      animate={{
+                        y: [0, -8, 0],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-ripple-brand/10 hover:bg-ripple-brand/20 text-ripple-brand-text text-sm transition-colors cursor-pointer shadow-xs"
+                    >
+                      <AnimatePresence mode="wait">
+                        {!isTextSelected ? (
+                          <motion.div
+                            key="not-selected"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center gap-2"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M9 18h6" />
+                              <path d="M10 22h4" />
+                              <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
+                            </svg>
+                            点击选中以下文字
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="selected"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center gap-2"
+                          >
+                            <div className="flex gap-1">
+                              {formattedShortcutCommandKeys.map((key, index) => (
+                                <Kbd
+                                  key={`${key}-${index}`}
+                                  className="text-xs bg-ripple-brand text-foreground"
+                                >
+                                  {key === 'Space' ? (
+                                    <Space size={10} strokeWidth={2.6} />
+                                  ) : (
+                                    key
+                                  )}
+                                </Kbd>
+                              ))}
+                            </div>
+                            按住快捷键并说出上述指令
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <textarea
+                ref={inputRef}
+                autoFocus
                 value={sampleText}
                 onChange={(e) => setSampleText(e.target.value)}
+                onSelect={(e) => {
+                  const target = e.target as HTMLTextAreaElement
+                  const hasSelection =
+                    target.selectionStart !== target.selectionEnd &&
+                    target.selectionEnd - target.selectionStart > 0
+                  setIsTextSelected(hasSelection)
+                }}
+                onBlur={() => {
+                  // 延迟检查，因为失去焦点时选区会消失
+                  setTimeout(() => {
+                    if (inputRef.current) {
+                      const hasSelection =
+                        inputRef.current.selectionStart !== inputRef.current.selectionEnd
+                      setIsTextSelected(hasSelection)
+                    }
+                  }, 100)
+                }}
                 className={cn(
-                  'w-full  p-4 rounded-lg border bg-muted/30 resize-none',
+                  'w-full  p-4 rounded-lg border  resize-none',
                   'focus:outline-none focus:ring-ripple-brand/50 focus:border-ripple-brand',
                   'transition-all duration-200 leading-relaxed',
                 )}
               />
 
-              <p className="text-xs text-muted-foreground mt-3">
-                提示：先用鼠标选中文本，再按住快捷键说"翻译"或"翻译成中文"
-              </p>
-
               <div className="flex gap-4 mt-6">
-                <Button
-                  variant="outline"
-                  onClick={openCommandHotkeyDialog}
-                  className="w-fit"
-                >
-                  换个快捷键
-                </Button>
                 <Button onClick={onFinish} className="w-fit">
                   完成
                 </Button>
               </div>
             </div>
 
-            {/* 右侧示意图 */}
+            {/* 右侧提示区域 */}
             <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-950/20 p-8">
-              <div className="rounded-lg overflow-hidden">
-                <img
-                  src={selectedTextImg}
-                  alt="选中文本翻译示意图"
-                  className="max-w-full max-h-[400px] object-contain dark:hidden"
-                />
-                <img
-                  src={selectedTextDarkImg}
-                  alt="选中文本翻译示意图"
-                  className="max-w-full max-h-[400px] object-contain hidden dark:block"
-                />
+              {/* 下半部分：快捷键提示 */}
+              <div className=" flex items-start justify-center pt-8">
+                <div className="text-center flex flex-col gap-3 items-center justify-center">
+                  <div className="mb-6 flex items-center justify-center">
+                    <KbdGroup className="gap-12">
+                      {formattedShortcutCommandKeys.map((key, index) => (
+                        <Kbd
+                          key={`${key}-${index}`}
+                          className={cn(
+                            'scale-250',
+                            'bg-ripple-brand',
+                            'text-foreground',
+                          )}
+                        >
+                          {key === 'Space' ? <Space size={14} strokeWidth={2.6} /> : key}
+                        </Kbd>
+                      ))}
+                    </KbdGroup>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {'按住以上快捷键开始发送指令'}
+                  </p>
+
+                  <Button
+                    variant="outline"
+                    onClick={openCommandHotkeyDialog}
+                    className="w-fit text-muted-foreground"
+                  >
+                    换个快捷键
+                  </Button>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-4">选中文本后说"翻译"</p>
             </div>
           </motion.div>
         )}

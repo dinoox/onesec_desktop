@@ -13,8 +13,22 @@ export interface Audios {
   version: string
 }
 
+export interface Persona {
+  id: number
+  user_id: number | null
+  name: string
+  description: string | null
+  icon: string
+  icon_svg?: string | null
+  content: string
+  is_example: boolean
+  created_at: number | null
+  updated_at: number | null
+}
+
 class DatabaseService {
   private db: Database.Database | null = null
+  private initialized = false
 
   private getDb(): Database.Database {
     if (!this.db) {
@@ -22,7 +36,64 @@ class DatabaseService {
       const dbPath = path.join(configDir, 'db.sqlite3')
       this.db = new Database(dbPath, { readonly: false })
     }
+    if (!this.initialized) {
+      this.initTables()
+      this.initialized = true
+    }
     return this.db
+  }
+
+  private initTables(): void {
+    if (!this.db) return
+
+    // Create audios table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS audios (
+        id TEXT PRIMARY KEY,
+        session_id TEXT,
+        user_id INTEGER,
+        created_at INTEGER,
+        filename TEXT,
+        content TEXT,
+        error TEXT,
+        version TEXT
+      )
+    `)
+
+    // Create audios indexes
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_audios_created_at ON audios(created_at)`)
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_audios_session_id ON audios(session_id)`)
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_audios_user_id ON audios(user_id)`)
+
+    // Create personas table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS personas (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER,
+        name TEXT NOT NULL,
+        description TEXT,
+        icon TEXT NOT NULL,
+        icon_svg TEXT,
+        content TEXT NOT NULL,
+        is_example INTEGER DEFAULT 0,
+        created_at INTEGER,
+        updated_at INTEGER
+      )
+    `)
+
+    // Create apps table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS apps (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        bundle_id TEXT UNIQUE,
+        name TEXT,
+        persona_id INTEGER
+      )
+    `)
+
+    // Create apps indexes
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_apps_bundle_id ON apps(bundle_id)`)
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_apps_persona_id ON apps(persona_id)`)
   }
 
   private normalize(row: any): Audios {
@@ -201,6 +272,207 @@ class DatabaseService {
       this.db.close()
       this.db = null
     }
+  }
+
+  // ==================== Persona Operations ====================
+
+  private normalizePersona(row: any): Persona {
+    return {
+      id: row.id,
+      user_id: row.user_id ?? null,
+      name: row.name,
+      description: row.description ?? null,
+      icon: row.icon,
+      icon_svg: row.icon_svg ?? null,
+      content: row.content,
+      is_example: Boolean(row.is_example),
+      created_at: row.created_at ?? null,
+      updated_at: row.updated_at ?? null,
+    }
+  }
+
+  /**
+   * 获取所有 Persona
+   */
+  getPersonas(): Persona[] {
+    const db = this.getDb()
+    const stmt = db.prepare(
+      'SELECT id, user_id, name, description, icon, icon_svg, content, is_example, created_at, updated_at FROM personas ORDER BY created_at DESC',
+    )
+    const rows = stmt.all() as any[]
+    return rows.map((row) => this.normalizePersona(row))
+  }
+
+  /**
+   * 根据 ID 获取 Persona
+   */
+  getPersonaById(id: number): Persona | null {
+    const db = this.getDb()
+    const stmt = db.prepare(
+      'SELECT id, user_id, name, description, icon, icon_svg, content, is_example, created_at, updated_at FROM personas WHERE id = ?',
+    )
+    const row = stmt.get(id) as any
+    return row ? this.normalizePersona(row) : null
+  }
+
+  /**
+   * 保存 Persona 列表
+   * - 不存在则插入
+   * - 存在但 icon_svg 为空则更新
+   */
+  savePersonas(personas: Persona[]): boolean {
+    const db = this.getDb()
+
+    // 获取已存在的记录及其 icon_svg 状态
+    const existingRecords = new Map(
+      (
+        db.prepare('SELECT id, icon_svg FROM personas').all() as {
+          id: number
+          icon_svg: string | null
+        }[]
+      ).map((row) => [row.id, row.icon_svg]),
+    )
+
+    const insertStmt = db.prepare(
+      'INSERT INTO personas (id, user_id, name, description, icon, icon_svg, content, is_example, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    )
+
+    const updateStmt = db.prepare(
+      'UPDATE personas SET user_id = ?, name = ?, description = ?, icon = ?, icon_svg = ?, content = ?, is_example = ?, created_at = ?, updated_at = ? WHERE id = ?',
+    )
+
+    const transaction = db.transaction(() => {
+      for (const persona of personas) {
+        const existingIconSvg = existingRecords.get(persona.id)
+
+        if (existingIconSvg === undefined) {
+          // 不存在，插入
+          insertStmt.run(
+            persona.id,
+            persona.user_id,
+            persona.name,
+            persona.description,
+            persona.icon,
+            persona.icon_svg ?? null,
+            persona.content,
+            persona.is_example ? 1 : 0,
+            persona.created_at,
+            persona.updated_at,
+          )
+        } else if (!existingIconSvg) {
+          // 存在但 icon_svg 为空，更新
+          updateStmt.run(
+            persona.user_id,
+            persona.name,
+            persona.description,
+            persona.icon,
+            persona.icon_svg ?? null,
+            persona.content,
+            persona.is_example ? 1 : 0,
+            persona.created_at,
+            persona.updated_at,
+            persona.id,
+          )
+        }
+        // 存在且 icon_svg 不为空，跳过
+      }
+    })
+
+    try {
+      transaction()
+      return true
+    } catch (err) {
+      console.error('保存 Persona 列表失败:', err)
+      return false
+    }
+  }
+
+  /**
+   * 创建单个 Persona
+   */
+  createPersona(persona: Persona): boolean {
+    const db = this.getDb()
+    const stmt = db.prepare(
+      'INSERT OR REPLACE INTO personas (id, user_id, name, description, icon, icon_svg, content, is_example, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    )
+
+    try {
+      stmt.run(
+        persona.id,
+        persona.user_id,
+        persona.name,
+        persona.description,
+        persona.icon,
+        persona.icon_svg ?? null,
+        persona.content,
+        persona.is_example ? 1 : 0,
+        persona.created_at,
+        persona.updated_at,
+      )
+      return true
+    } catch (err) {
+      console.error('创建 Persona 失败:', err)
+      return false
+    }
+  }
+
+  /**
+   * 更新单个 Persona
+   */
+  updatePersona(persona: Persona): boolean {
+    const db = this.getDb()
+    const stmt = db.prepare(
+      'UPDATE personas SET user_id = ?, name = ?, description = ?, icon = ?, icon_svg = ?, content = ?, is_example = ?, created_at = ?, updated_at = ? WHERE id = ?',
+    )
+
+    try {
+      const result = stmt.run(
+        persona.user_id,
+        persona.name,
+        persona.description,
+        persona.icon,
+        persona.icon_svg ?? null,
+        persona.content,
+        persona.is_example ? 1 : 0,
+        persona.created_at,
+        persona.updated_at,
+        persona.id,
+      )
+      return result.changes > 0
+    } catch (err) {
+      console.error('更新 Persona 失败:', err)
+      return false
+    }
+  }
+
+  /**
+   * 删除单个 Persona 及其关联的 apps
+   */
+  deletePersona(id: number): boolean {
+    const db = this.getDb()
+
+    const transaction = db.transaction(() => {
+      db.prepare('DELETE FROM apps WHERE persona_id = ?').run(id)
+      return db.prepare('DELETE FROM personas WHERE id = ?').run(id)
+    })
+
+    try {
+      const result = transaction()
+      return result.changes > 0
+    } catch (err) {
+      console.error('删除 Persona 失败:', err)
+      return false
+    }
+  }
+
+  /**
+   * 清空所有 Persona
+   */
+  clearAllPersonas(): number {
+    const db = this.getDb()
+    const stmt = db.prepare('DELETE FROM personas')
+    const result = stmt.run()
+    return result.changes
   }
 }
 

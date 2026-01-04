@@ -45,7 +45,7 @@ export const useUpdateHotWordQuery = () => {
       updateHotWord(hotword_id, hotword),
     onSuccess: async (resp) => {
       if (resp.success) {
-        toast.success('热词创建成功')
+        toast.success(resp.message)
         await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
         return
       }
@@ -62,7 +62,7 @@ export const useDeleteHotWordQuery = () => {
     mutationFn: deleteHotWord,
     onSuccess: async (resp) => {
       if (resp.success) {
-        toast.success('热词删除成功')
+        toast.success(resp.message)
         await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
         return
       }

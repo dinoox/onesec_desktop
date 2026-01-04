@@ -8,9 +8,9 @@ interface KeyDisplayProps {
 
 export function KeyDisplay({ keys, className }: KeyDisplayProps) {
   return (
-    <KbdGroup className={className}>
+    <KbdGroup>
       {keys.map((key, index) => (
-        <Kbd key={`${key}-${index}`}>
+        <Kbd key={`${key}-${index}`} className={className}>
           {key}
         </Kbd>
       ))}

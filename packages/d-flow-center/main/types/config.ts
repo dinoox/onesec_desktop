@@ -23,6 +23,7 @@ const USER_DEFAULT_CONFIG: StoreSchema = {
     },
     { mode: 'command', hotkey_combination: ['Fn', 'LCmd'] },
     { mode: 'free', hotkey_combination: ['Fn', 'Space'] },
+    { mode: 'persona', hotkey_combination: [] },
   ],
   user: null,
   setting: {

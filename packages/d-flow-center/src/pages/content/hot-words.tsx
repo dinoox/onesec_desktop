@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import React, { useMemo, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Textarea } from '@/components/ui/textarea'
@@ -38,6 +37,7 @@ import {
 import { HotWord } from '@/services/api/hotword-api'
 import { Empty, EmptyDescription } from '@/components/ui/empty'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Spinner } from '@/components/ui/spinner'
 
 const ContentPage: React.FC = () => {
   const [open, setOpen] = useState(false)
@@ -184,11 +184,12 @@ const ContentPage: React.FC = () => {
                       ))}
                     </div>
                   )}
-                  {batchValidation.lines.length > 0 && batchValidation.errors.length === 0 && (
-                    <p className="text-sm text-muted-foreground">
-                      共 {batchValidation.lines.length} 个常用词
-                    </p>
-                  )}
+                  {batchValidation.lines.length > 0 &&
+                    batchValidation.errors.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        共 {batchValidation.lines.length} 个常用词
+                      </p>
+                    )}
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpen(false)}>
@@ -254,11 +255,9 @@ const ContentPage: React.FC = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.1 }}
-                className="space-y-2"
+                className="flex items-center justify-center py-12"
               >
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-[44px] w-full rounded-xl" />
-                ))}
+                <Spinner />
               </motion.div>
             ) : filteredHotWords.length === 0 ? (
               <motion.div

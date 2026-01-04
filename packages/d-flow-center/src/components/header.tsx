@@ -37,8 +37,8 @@ const Header: React.FC = () => {
   }, [updateDownloaded])
 
   const handleUpdate = () => {
-    ipcService.updateDeviceInfo(updateInfo?.version)
-  } 
+    ipcService.quitAndInstall(updateInfo?.version)
+  }
 
   const handleDialogChange = (open: boolean) => {
     setShowUpdateDialog(open)

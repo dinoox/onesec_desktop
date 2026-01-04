@@ -152,4 +152,9 @@ export class KeyMapper {
       .sort((a, b) => this.keyPriority(a) - this.keyPriority(b))
       .map(this.getDisplayText)
   }
+
+  // 排序并缩短按键数组，返回用"+"连接的字符串
+  static formatKeysAsString(keys: string[]): string {
+    return this.formatKeys(keys).join(' + ')
+  }
 }

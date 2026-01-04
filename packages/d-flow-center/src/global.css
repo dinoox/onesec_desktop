@@ -162,7 +162,10 @@
     @apply bg-background text-foreground h-svh w-full;
   }
   button, [role="button"] {
-    cursor: pointer
+    cursor: pointer !important;
+  }
+  button:hover, [role="button"]:hover {
+    cursor: pointer !important;
   }
   ::selection {
     background-color: var(--selection);

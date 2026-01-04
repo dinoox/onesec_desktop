@@ -3,6 +3,14 @@ import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import {
   useGetTransactions,
@@ -13,12 +21,14 @@ import { useGetUserInfo } from '@/services/queries/user-query'
 import { ArrowUpRight, ArrowDownRight, Gift, Copy } from 'lucide-react'
 import { IconAward, IconHistory, IconTrophy, IconShare } from '@tabler/icons-react'
 import useAuthStore from '@/store/auth-store'
+import { useState } from 'react'
 const ContentPage: React.FC = () => {
   const user = useAuthStore((s) => s.user)
   const { isLoading: userLoading } = useGetUserInfo()
   const { data: transactions, isLoading: txLoading } = useGetTransactions(10, 0)
   const { data: ranking, isLoading: rankLoading } = useGetRanking(10, 0)
   const exchangeMutation = useExchangeMembership()
+  const [showExchangeDialog, setShowExchangeDialog] = useState(false)
 
   // 是否在注册30天内
   const isWithin30Days = user?.created_at
@@ -35,6 +45,7 @@ const ContentPage: React.FC = () => {
 
   const handleExchange = async () => {
     await exchangeMutation.mutateAsync('pro')
+    setShowExchangeDialog(false)
   }
 
   const handleCopyShareLink = async () => {
@@ -81,12 +92,12 @@ const ContentPage: React.FC = () => {
 
       <div className="flex-1 min-h-0 overflow-y-auto mt-2 space-y-5">
         {/* 积分区域 */}
-        <div className="border p-4 rounded-xl">
+        <div className="bg-setting p-4 rounded-xl">
           <div className="flex items-center gap-2 text-[15px] font-medium">
             <Gift className="w-5 h-5 text-ripple-brand-text" />
             <span>我的积分</span>
           </div>
-          <div className="flex items-center justify-between rounded-xl py-4">
+          <div className="flex items-center justify-between rounded-xl pt-3 pb-4">
             {userLoading ? (
               <Skeleton className="h-[36px] w-20 animate-in fade-in duration-300" />
             ) : (
@@ -96,15 +107,12 @@ const ContentPage: React.FC = () => {
             )}
             <Button
               size="sm"
-              onClick={handleExchange}
-              disabled={
-                exchangeMutation.isPending || userLoading || !user || user.points < 100
-              }
+              onClick={() => setShowExchangeDialog(true)}
+              disabled={userLoading || !user || user.points < 100}
               variant="outline"
             >
-              {exchangeMutation.isPending && <Spinner />}
               <IconAward />
-              <span>兑换会员</span>
+              <span>兑换</span>
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">100 积分可兑换 1 个月 Pro 会员</p>
@@ -226,6 +234,26 @@ const ContentPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={showExchangeDialog} onOpenChange={setShowExchangeDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>确认兑换会员</DialogTitle>
+            <DialogDescription>
+              确认使用 100 积分兑换 1 个月 Pro 会员？兑换后将立即生效。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowExchangeDialog(false)}>
+              取消
+            </Button>
+            <Button onClick={handleExchange} disabled={exchangeMutation.isPending}>
+              {exchangeMutation.isPending && <Spinner />}
+              <span>兑换</span>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -25,6 +25,11 @@ import {
   MessageTypes,
   IPC_HOT_KEY_DETECT_START_CHANNEL,
   IPC_HOT_KEY_DETECT_END_CHANNEL,
+  IPC_GET_PERSONAS_CHANNEL,
+  IPC_SAVE_PERSONAS_CHANNEL,
+  IPC_CREATE_PERSONA_CHANNEL,
+  IPC_UPDATE_PERSONA_CHANNEL,
+  IPC_DELETE_PERSONA_CHANNEL,
 } from '../types/message'
 import os from 'os'
 import userConfigManager from './user-config-manager'
@@ -33,7 +38,7 @@ import { ipcMain, shell, dialog, systemPreferences } from 'electron'
 import autoUpdater from '../../electron/updater'
 import log from 'electron-log'
 import udsService from './uds-service'
-import databaseService from './database-service'
+import databaseService, { Persona } from './database-service'
 import path from 'path'
 import fs from 'fs'
 import windowManager from './window-manager'
@@ -72,6 +77,12 @@ class IPCService {
     ipcMain.handle(IPC_REQUEST_MICROPHONE_CHANNEL, this.handleRequestMicrophone)
     ipcMain.handle(IPC_HOT_KEY_DETECT_START_CHANNEL, this.handleHotKeyDetectStart)
     ipcMain.handle(IPC_HOT_KEY_DETECT_END_CHANNEL, this.handleHotKeyDetectEnd)
+    // Personas
+    ipcMain.handle(IPC_GET_PERSONAS_CHANNEL, this.handleGetPersonas)
+    ipcMain.handle(IPC_SAVE_PERSONAS_CHANNEL, this.handleSavePersonas)
+    ipcMain.handle(IPC_CREATE_PERSONA_CHANNEL, this.handleCreatePersona)
+    ipcMain.handle(IPC_UPDATE_PERSONA_CHANNEL, this.handleUpdatePersona)
+    ipcMain.handle(IPC_DELETE_PERSONA_CHANNEL, this.handleDeletePersona)
   }
 
   // User Config
@@ -148,7 +159,29 @@ class IPCService {
   private handleMarkAsLaunched = () => userConfigManager.markAsLaunched()
 
   // Audios
-  private handleGetAudios = () => databaseService.getAudios()
+  private handleGetAudios = () => {
+    const retention = userConfigManager.getConfig().setting.history_retention
+    if (retention !== 'forever') {
+      const audiosToDelete = databaseService.getAudios()
+      const deletedCount = databaseService.deleteAudiosByRetention(retention)
+
+      if (deletedCount > 0) {
+        const configDir = path.dirname(userConfigManager.getConfigPath())
+        const remainingAudios = databaseService.getAudios()
+        const remainingFilenames = new Set(remainingAudios.map((a) => a.filename))
+
+        audiosToDelete.forEach((audio) => {
+          if (!remainingFilenames.has(audio.filename)) {
+            const audioPath = path.join(configDir, 'audios', audio.filename)
+            if (fs.existsSync(audioPath)) {
+              fs.unlinkSync(audioPath)
+            }
+          }
+        })
+      }
+    }
+    return databaseService.getAudios()
+  }
 
   private handleDownloadAudio = async (_: any, filename: string) => {
     const configDir = path.dirname(userConfigManager.getConfigPath())
@@ -259,6 +292,49 @@ class IPCService {
 
   private handleRequestMicrophone = async () => {
     return await systemPreferences.askForMediaAccess('microphone')
+  }
+
+  // Personas
+  private handleGetPersonas = () => databaseService.getPersonas()
+
+  private handleSavePersonas = (_: any, personas: Persona[]) => {
+    return databaseService.savePersonas(personas)
+  }
+
+  private handleCreatePersona = (_: any, persona: Persona) => {
+    const isSuccess = databaseService.createPersona(persona)
+    if (isSuccess) {
+      udsService.broadcast({
+        type: MessageTypes.PERSONA_UPDATED,
+        timestamp: Date.now(),
+        data: { persona },
+      })
+    }
+    return isSuccess
+  }
+
+  private handleUpdatePersona = (_: any, persona: Persona) => {
+    const isSuccess = databaseService.updatePersona(persona)
+    if (isSuccess) {
+      udsService.broadcast({
+        type: MessageTypes.PERSONA_UPDATED,
+        timestamp: Date.now(),
+        data: { persona },
+      })
+    }
+    return isSuccess
+  }
+
+  private handleDeletePersona = (_: any, id: number) => {
+    const isSuccess = databaseService.deletePersona(id)
+    if (isSuccess) {
+      udsService.broadcast({
+        type: MessageTypes.PERSONA_UPDATED,
+        timestamp: Date.now(),
+        data: { id },
+      })
+    }
+    return isSuccess
   }
 }
 

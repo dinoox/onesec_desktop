@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
     return () => observer.disconnect()
   }, [])
 
-
+  // return <Navigate to={'/onboarding'} replace />
   if (isAuthed) {
     return <Navigate to={isFirstLaunch ? '/onboarding' : '/'} replace />
   }

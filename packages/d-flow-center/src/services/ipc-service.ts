@@ -23,12 +23,17 @@ import {
   IPCMessage,
   MessageType,
   IPC_QUIT_AND_INSTALL_CHANNEL,
+  IPC_GET_PERSONAS_CHANNEL,
+  IPC_SAVE_PERSONAS_CHANNEL,
+  IPC_CREATE_PERSONA_CHANNEL,
+  IPC_UPDATE_PERSONA_CHANNEL,
+  IPC_DELETE_PERSONA_CHANNEL,
 } from '../../main/types/message.ts'
 import { toast } from 'sonner'
 import useStatusStore from '@/store/status-store.ts'
 import useUserConfigStore from '@/store/user-config-store.ts'
 import useAuthStore from '@/store/auth-store.ts'
-import { Audios } from '../../main/services/database-service'
+import { Audios, Persona } from '../../main/services/database-service'
 import router from '@/routes'
 import { SystemInfo } from 'electron/system.ts'
 import { updateDeviceInfo } from '@/services/api/user-api'
@@ -193,14 +198,8 @@ class IPCService {
     return await window.ipcRenderer.invoke(IPC_GET_SYSTEM_INFO_CHANNEL)
   }
 
-  async updateDeviceInfo(newVersion: string | undefined) {
-    let info = await this.getSystemInfo()
-    if (newVersion) {
-      info.appVersion = newVersion
-    }
-
-    await updateDeviceInfo(info)
-    await window.ipcRenderer.invoke(IPC_QUIT_AND_INSTALL_CHANNEL, newVersion)
+  async quitAndInstall(newVersion: string | undefined) {
+    return await window.ipcRenderer.invoke(IPC_QUIT_AND_INSTALL_CHANNEL, newVersion)
   }
 
   // Error Log
@@ -223,6 +222,27 @@ class IPCService {
 
   async requestMicrophone(): Promise<boolean> {
     return await window.ipcRenderer.invoke(IPC_REQUEST_MICROPHONE_CHANNEL)
+  }
+
+  // Personas
+  async getPersonas(): Promise<Persona[]> {
+    return await window.ipcRenderer.invoke(IPC_GET_PERSONAS_CHANNEL)
+  }
+
+  async savePersonas(personas: Persona[]): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_SAVE_PERSONAS_CHANNEL, personas)
+  }
+
+  async createPersonaInDb(persona: Persona): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_CREATE_PERSONA_CHANNEL, persona)
+  }
+
+  async updatePersonaInDb(persona: Persona): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_UPDATE_PERSONA_CHANNEL, persona)
+  }
+
+  async deletePersonaInDb(id: number): Promise<boolean> {
+    return await window.ipcRenderer.invoke(IPC_DELETE_PERSONA_CHANNEL, id)
   }
 }
 

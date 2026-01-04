@@ -1,8 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Mic, FileText, Clock, Send, Trash2, Menu, RefreshCw } from 'lucide-react'
+import {
+  Mic,
+  FileText,
+  Clock,
+  SendHorizonal,
+  Trash2,
+  Menu,
+  RefreshCw,
+} from 'lucide-react'
 import { IconMessageChatbot } from '@tabler/icons-react'
 import {
   DropdownMenu,
@@ -19,23 +27,49 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import useUserConfigStore from '@/store/user-config-store'
 import { KeyMapper } from '@/utils/key'
+import { KeyDisplay } from '@/components/ui/key-display'
+import useStatusStore from '@/store/status-store'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
+import { throttle } from '../../../main/utils/throttle'
+import IPCService from '@/services/ipc-service'
+import { updateDeviceInfo } from '@/services/api/user-api'
+import { throttledUpdateDeviceInfo } from '@/utils/device'
+import CountUp from '@/components/CountUp'
 
 const ContentPage: React.FC = () => {
   const [feedbackContent, setFeedbackContent] = useState('')
   const [isFeedbackFocused, setIsFeedbackFocused] = useState(false)
-  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useUsageStatistics()
-  const { data: feedbackData, isLoading: feedbackLoading, refetch: refetchFeedback } = useFeedbackList()
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    isFetching: statsFetching,
+    refetch: refetchStats,
+  } = useUsageStatistics()
+  const {
+    data: feedbackData,
+    isLoading: feedbackLoading,
+    refetch: refetchFeedback,
+  } = useFeedbackList()
   const createFeedback = useCreateFeedback()
   const deleteFeedback = useDeleteFeedback()
 
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
   const { loadUserConfig } = useUserConfigStore((state) => state.actions)
+  const holdIPCMessage = useStatusStore((state) => state.holdIPCMessage)
 
   const formattedKeys = useMemo(() => KeyMapper.formatKeys(shortcutKeys), [shortcutKeys])
 
   useEffect(() => {
     loadUserConfig()
+    throttledUpdateDeviceInfo()
   }, [])
+
+  useEffect(() => {
+    if (holdIPCMessage?.action === 'user_audio_saved') {
+      refetchStats()
+      refetchFeedback()
+    }
+  }, [holdIPCMessage])
 
   const handleSubmitFeedback = async () => {
     if (!feedbackContent.trim()) return
@@ -83,16 +117,17 @@ const ContentPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {formattedKeys.map((key, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <span className="text-muted-foreground">+</span>}
-                <span className="rounded rounded-xl border px-2 py-1 text-sm font-medium">
+          <div className="flex items-center gap-3">
+            <KbdGroup className="flex items-center gap-3">
+              {formattedKeys.map((key, index) => (
+                <Kbd
+                  key={`${key}-${index}`}
+                  className="bg-ripple-brand/20 text-ripple-brand-text"
+                >
                   {key}
-                </span>
-              </React.Fragment>
-            ))}
-            <span className="text-muted-foreground">+</span>
+                </Kbd>
+              ))}
+            </KbdGroup>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ripple-brand-text/10">
               <Mic className="h-4 w-4 text-ripple-brand-text" />
             </div>
@@ -102,7 +137,7 @@ const ContentPage: React.FC = () => {
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-3 gap-3 mt-2 flex-shrink-0">
-        <div className="rounded-lg border bg-card text-card-foreground px-4 py-3 flex flex-col justify-between gap-1">
+        <div className="rounded-lg bg-setting text-card-foreground px-4 py-3 flex flex-col justify-between gap-1">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">累计输入</span>
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-ripple-brand-text/10">
@@ -110,18 +145,23 @@ const ContentPage: React.FC = () => {
             </div>
           </div>
           <div className=" flex items-baseline gap-1.5">
-            <span className="text-2xl font-semibold text-ripple-brand-text">
-              {statsLoading ? '-' : (stats?.total_characters ?? 0).toLocaleString()}
-            </span>
+            <CountUp
+              to={stats?.total_characters ?? 0}
+              separator=","
+              duration={1}
+              className="text-2xl font-semibold"
+            />
             <span className="text-sm text-muted-foreground">字</span>
           </div>
-          <div className="mt-1.5 flex items-center justify-between text-sm text-muted-foreground">
+          <div className="mt-1.5 flex items-center justify-between text-xs text-muted-foreground">
             <span>转写次数</span>
-            <span>{statsLoading ? '-' : (stats?.total_sessions ?? 0)} 次</span>
+            <span>
+              <CountUp to={stats?.total_sessions ?? 0} duration={1} /> 次
+            </span>
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card text-card-foreground px-4 py-3 flex flex-col justify-between gap-1">
+        <div className="rounded-lg bg-setting text-card-foreground px-4 py-3 flex flex-col justify-between gap-1">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">节省时间</span>
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-ripple-brand-text/10">
@@ -129,18 +169,22 @@ const ContentPage: React.FC = () => {
             </div>
           </div>
           <div className=" flex items-baseline gap-1.5">
-            <span className="text-2xl font-semibold text-ripple-brand-text">
-              {statsLoading ? '-' : Math.round(stats?.saved_time_minutes ?? 0)}
-            </span>
+            <CountUp
+              to={Math.round(stats?.saved_time_minutes ?? 0)}
+              duration={1.5}
+              className="text-2xl font-semibold"
+            />
             <span className="text-sm text-muted-foreground">分钟</span>
           </div>
-          <div className="mt-1.5 flex items-center justify-between text-sm text-muted-foreground">
+          <div className="mt-1.5 flex items-center justify-between text-xs text-muted-foreground">
             <span>预估基准</span>
-            <span>{stats?.estimated_typing_speed ?? 60} 字/分</span>
+            <span>
+              <CountUp to={stats?.estimated_typing_speed ?? 60} duration={1} /> 字/分
+            </span>
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card text-card-foreground  px-4 py-3 flex flex-col justify-between gap-1">
+        <div className="rounded-lg bg-setting text-card-foreground  px-4 py-3 flex flex-col justify-between gap-1">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">总听写时长</span>
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-ripple-brand-text/10">
@@ -148,15 +192,17 @@ const ContentPage: React.FC = () => {
             </div>
           </div>
           <div className=" flex items-baseline gap-1.5">
-            <span className="text-2xl font-semibold text-ripple-brand-text">
-              {statsLoading ? '-' : Math.round(stats?.total_duration_minutes ?? 0)}
-            </span>
+            <CountUp
+              to={Math.round(stats?.total_duration_minutes ?? 0)}
+              duration={1.5}
+              className="text-2xl font-semibold"
+            />
             <span className="text-sm text-muted-foreground">分钟</span>
           </div>
-          <div className="mt-1.5 flex items-center justify-between text-sm text-muted-foreground">
+          <div className="mt-1.5 flex items-center justify-between text-xs text-muted-foreground">
             <span>平均速度</span>
             <span>
-              {statsLoading ? '-' : Math.round(stats?.average_speed ?? 0)} 字/分
+              <CountUp to={Math.round(stats?.average_speed ?? 0)} duration={1} /> 字/分
             </span>
           </div>
         </div>
@@ -168,7 +214,9 @@ const ContentPage: React.FC = () => {
           <span className="text-[15px] font-medium">反馈与建议</span>
         </div>
 
-        <div className={`rounded-lg border text-card-foreground px-3 py-2 flex-shrink-0 shadow-ripple-brand-text/10 transition-colors ${isFeedbackFocused ? 'border-ripple-brand/60' : ''}`}>
+        <div
+          className={`rounded-lg border text-card-foreground px-3 py-2 flex-shrink-0 shadow-ripple-brand-text/10 transition-colors ${isFeedbackFocused ? 'border-ripple-brand/60' : ''}`}
+        >
           <div className="flex items-center gap-3">
             <IconMessageChatbot className="h-4.5 w-4.5 text-muted-foreground flex-shrink-0" />
             <Input
@@ -187,21 +235,26 @@ const ContentPage: React.FC = () => {
             />
             <Button
               onClick={handleSubmitFeedback}
+              size="icon-sm"
+              variant="ghost"
               disabled={!feedbackContent.trim() || createFeedback.isPending}
-              className="bg-ripple-brand-text hover:bg-ripple-brand-text/90 h-8 text-sm"
+              className="h-8 text-sm rounded-full"
             >
-              {createFeedback.isPending ? <Spinner className="mr-1 h-3.5 w-3.5" /> : null}
-              发送
-              <Send className="h-3.5 w-3.5" />
+              {createFeedback.isPending ? (
+                <Spinner className="mr-1 text-muted-foreground" />
+              ) : null}
+              <SendHorizonal className="text-muted-foreground" />
             </Button>
           </div>
         </div>
         {/* 反馈列表 */}
         {(feedbackLoading || (feedbackData?.items && feedbackData.items.length > 0)) && (
-          <div className="flex-1 min-h-0 mt-5 bg-setting/50 rounded-xl px-4 py-4.5 overflow-y-auto">
+          <div
+            className={`flex-1 min-h-0 mt-5 rounded-xl   overflow-y-auto transition-colors duration-200   ${!feedbackLoading ? 'bg-setting/50' : ''}`}
+          >
             {feedbackLoading ? (
-              <div className="flex justify-center py-8">
-                <Spinner />
+              <div className="flex items-center justify-center h-full">
+                <Spinner className="text-muted-foreground" />
               </div>
             ) : (
               <AnimatePresence mode="popLayout">
@@ -213,7 +266,7 @@ const ContentPage: React.FC = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.96 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="group flex items-start gap-4 mb-4 last:mb-0"
+                    className="group flex items-start gap-4 last:border-none px-4 py-4.5 border-b border-border/50"
                   >
                     <div className="mt-1.5 h-2 w-2 rounded-full bg-ripple-brand flex-shrink-0" />
                     <div className="flex-1 min-w-0">

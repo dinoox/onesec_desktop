@@ -1,11 +1,11 @@
 import {
   LucideHome,
-  PuzzleIcon,
-  LucideShell,
+  LucideKeyboard,
   Settings,
   GiftIcon,
   History,
   BookA,
+  Blend,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -36,7 +36,12 @@ export const navMain: NavItem[] = [
   {
     title: '快捷键',
     url: '/content/shortcut-keys',
-    icon: LucideShell,
+    icon: LucideKeyboard,
+  },
+  {
+    title: '输出模式',
+    url: '/content/persona',
+    icon: Blend,
   },
   {
     title: '邀请奖励',

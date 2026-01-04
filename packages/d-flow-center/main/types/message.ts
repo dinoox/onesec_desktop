@@ -24,6 +24,8 @@ export const MessageTypes = {
   //
   USER_AUDIO_SAVED: 'user_audio_saved',
   RECORDING_INTERRUPTED: 'recording_interrupted',
+  // Persona
+  PERSONA_UPDATED: 'persona_updated',
 } as const
 
 export type MessageType = (typeof MessageTypes)[keyof typeof MessageTypes]
@@ -48,7 +50,7 @@ export interface ServerResultOptions {
 }
 //
 
-export type HotkeyMode = 'normal' | 'command' | 'free'
+export type HotkeyMode = 'normal' | 'command' | 'free' | 'persona'
 
 export interface HotkeyConfig {
   mode: HotkeyMode
@@ -110,6 +112,12 @@ const IPC_CHECK_ACCESSIBILITY_CHANNEL = 'check_accessibility_channel'
 const IPC_REQUEST_ACCESSIBILITY_CHANNEL = 'request_accessibility_channel'
 const IPC_CHECK_MICROPHONE_CHANNEL = 'check_microphone_channel'
 const IPC_REQUEST_MICROPHONE_CHANNEL = 'request_microphone_channel'
+// Personas
+const IPC_GET_PERSONAS_CHANNEL = 'get_personas_channel'
+const IPC_SAVE_PERSONAS_CHANNEL = 'save_personas_channel'
+const IPC_CREATE_PERSONA_CHANNEL = 'create_persona_channel'
+const IPC_UPDATE_PERSONA_CHANNEL = 'update_persona_channel'
+const IPC_DELETE_PERSONA_CHANNEL = 'delete_persona_channel'
 
 export {
   DEFAULT_IPC_CHANNEL,
@@ -139,4 +147,9 @@ export {
   IPC_REQUEST_ACCESSIBILITY_CHANNEL,
   IPC_CHECK_MICROPHONE_CHANNEL,
   IPC_REQUEST_MICROPHONE_CHANNEL,
+  IPC_GET_PERSONAS_CHANNEL,
+  IPC_SAVE_PERSONAS_CHANNEL,
+  IPC_CREATE_PERSONA_CHANNEL,
+  IPC_UPDATE_PERSONA_CHANNEL,
+  IPC_DELETE_PERSONA_CHANNEL,
 }

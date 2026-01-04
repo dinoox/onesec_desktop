@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 export const useUsageStatistics = () => {
   return useQuery({
     queryKey: ['usage-statistics'],
-    refetchInterval: 10000,
+    staleTime: 0,
     queryFn: async () => {
       const resp = await getUsageStatistics()
       return resp.success ? resp.data : null
@@ -22,7 +22,6 @@ export const useFeedbackList = () => {
   return useQuery({
     queryKey: ['feedback-list'],
     staleTime: 0,
-    refetchInterval: 10000,
     queryFn: async () => {
       const resp = await getFeedbackList({ limit: 50 })
       return resp.success ? resp.data : null

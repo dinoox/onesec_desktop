@@ -76,7 +76,7 @@ class MenuService {
           },
         ],
       },
-      ...(!app.isPackaged
+      ...(true
         ? [
             {
               label: '开发',

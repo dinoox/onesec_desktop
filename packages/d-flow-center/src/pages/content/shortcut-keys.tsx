@@ -18,9 +18,9 @@ const ContentPage: React.FC = () => {
   const { setShortcutKeys, setShortcutCommandKeys, setShortcutFreeKeys, loadUserConfig } =
     useUserConfigStore((state) => state.actions)
 
-  const [editingMode, setEditingMode] = useState<'normal' | 'command' | 'free' | null>(
-    null,
-  )
+  const [editingMode, setEditingMode] = useState<
+    'normal' | 'command' | 'free' | 'persona' | null
+  >(null)
 
   const normalInputRef = useRef<HTMLDivElement>(null)
   const commandInputRef = useRef<HTMLDivElement>(null)

@@ -224,11 +224,13 @@ const HistoryPage: React.FC = () => {
   const groupedRecords = useMemo(() => {
     if (historyRetention === 'never') {
       if (records.length > 0) {
-        return [{
-          key: 'last-error-record',
-          label: '最近一次转录失败记录',
-          records: [records[0]],
-        }]
+        return [
+          {
+            key: 'last-error-record',
+            label: '最近一次转录失败记录',
+            records: [records[0]],
+          },
+        ]
       }
       return []
     }
@@ -437,7 +439,7 @@ const HistoryPage: React.FC = () => {
                                   variant="ghost"
                                   size="icon"
                                   className="h-3 w-3 relative text-muted-foreground/80"
-                                  disabled={copiedId === record.id  || !!(record.error) }
+                                  disabled={copiedId === record.id || !!record.error}
                                   onClick={() => handleCopy(record.id, record.content)}
                                 >
                                   <Check

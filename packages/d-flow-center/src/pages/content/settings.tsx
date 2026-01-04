@@ -154,7 +154,7 @@ const ContentPage: React.FC = () => {
         </div>
 
         {/* 常用系统 */}
-        {user?.preferred_linux_distro && (
+        {user?.preferred_linux_distro && user.preferred_linux_distro.length > 0 && (
           <div
             data-theme-transition
             className="flex items-center justify-between w-full bg-setting rounded-xl p-3 animate-in fade-in duration-300"
