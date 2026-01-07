@@ -42,7 +42,7 @@ export const useCreatePersonaQuery = () => {
     mutationFn: createPersona,
     onSuccess: async (resp) => {
       if (resp.success && resp.data) {
-        toast.success('人设创建成功')
+        toast.success(resp.message || '输出模式创建成功')
         const personaWithSvg = addIconSvgToPersona(resp.data)
         ipcService.createPersonaInDb(personaWithSvg).catch(console.error)
         await queryClient.invalidateQueries({ queryKey: ['personaList'] })
@@ -60,7 +60,7 @@ export const useUpdatePersonaQuery = () => {
     mutationFn: updatePersona,
     onSuccess: async (resp) => {
       if (resp.success && resp.data) {
-        toast.success('人设更新成功')
+        toast.success(resp.message || '输出模式更新成功')
         const personaWithSvg = addIconSvgToPersona(resp.data)
         ipcService.updatePersonaInDb(personaWithSvg).catch(console.error)
         await queryClient.invalidateQueries({ queryKey: ['personaList'] })
@@ -78,7 +78,7 @@ export const useDeletePersonaQuery = () => {
     mutationFn: deletePersona,
     onSuccess: async (resp, promptId) => {
       if (resp.success) {
-        toast.success('人设删除成功')
+        toast.success(resp.message || '输出模式删除成功')
         ipcService.deletePersonaInDb(promptId).catch(console.error)
         await queryClient.invalidateQueries({ queryKey: ['personaList'] })
         return

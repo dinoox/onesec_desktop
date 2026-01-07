@@ -298,7 +298,15 @@ class IPCService {
   private handleGetPersonas = () => databaseService.getPersonas()
 
   private handleSavePersonas = (_: any, personas: Persona[]) => {
-    return databaseService.savePersonas(personas)
+    const isSuccess = databaseService.savePersonas(personas)
+    if (isSuccess) {
+      udsService.broadcast({
+        type: MessageTypes.PERSONA_UPDATED,
+        timestamp: Date.now(),
+        data: { personas },
+      })
+    }
+    return isSuccess
   }
 
   private handleCreatePersona = (_: any, persona: Persona) => {

@@ -321,9 +321,9 @@ const PersonaPage: React.FC = () => {
           <div className="flex items-center">
             <Blend className="w-4 h-4 mr-[0.7rem]" />
             <div className="flex flex-col gap-1">
-              <span>切换输出模式</span>
+              <span>自定义输出模式</span>
               <p className="text-sm text-muted-foreground">
-                配置不同的输出模式，让文本输出更符合你的场景需求
+                让文本输出更符合你的场景需求。可通过快捷键或底部状态栏切换输出模式
               </p>
             </div>
           </div>
@@ -589,7 +589,7 @@ const PersonaPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle>选择图标</DialogTitle>
             <DialogDescription>
-              从 1600+ 个图标中选择一个图标作为当前人设图标
+              从 1600+ 个图标中选择一个图标作为当前输出模式图标
             </DialogDescription>
           </DialogHeader>
 
@@ -607,7 +607,7 @@ const PersonaPage: React.FC = () => {
           </div>
 
           {/* 图标网格 */}
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(60px,1fr))] gap-3 max-h-[400px] overflow-y-auto flex-1 py-2 justify-items-center">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(60px,1fr))] gap-3 max-h-[400px] overflow-y-auto flex-1 py-2 justify-items-center content-start">
             {filteredIcons.map(([name, Icon]) => (
               <button
                 key={name}
@@ -645,7 +645,7 @@ const PersonaPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle>输出模式快捷键</DialogTitle>
             <DialogDescription>
-              <span>设置后可通过快捷键快速调用输出模式</span>
+              <span>设置后可通过快捷键自定义输出模式</span>
             </DialogDescription>
           </DialogHeader>
 
@@ -714,9 +714,9 @@ const PersonaPage: React.FC = () => {
             <span className="text-xs text-muted-foreground flex items-center gap-2">
               <span>例如设置</span>
               <KeyDisplay keys={['⌘']} />
-              为输出模式快捷键, 则可通过
+              为输出模式快捷键, 可通过
               <KeyDisplay keys={['⌘']} /> + 数字
-              <span>快速切换输出模式</span>
+              <span>快速自定义输出模式</span>
             </span>
           </div>
 
