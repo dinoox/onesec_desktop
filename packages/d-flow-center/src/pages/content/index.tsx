@@ -117,21 +117,7 @@ const ContentPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <KbdGroup className="flex items-center gap-3">
-              {formattedKeys.map((key, index) => (
-                <Kbd
-                  key={`${key}-${index}`}
-                  className="bg-ripple-brand/20 text-ripple-brand-text"
-                >
-                  {key}
-                </Kbd>
-              ))}
-            </KbdGroup>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ripple-brand-text/10">
-              <Mic className="h-4 w-4 text-ripple-brand-text" />
-            </div>
-          </div>
+          <div className="flex items-center gap-3"></div>
         </div>
       </div>
 
