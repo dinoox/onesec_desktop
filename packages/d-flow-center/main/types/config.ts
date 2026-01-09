@@ -12,6 +12,7 @@ interface StoreSchema {
     history_retention: string
   }
   theme: Theme
+  personaID: number
 }
 
 const USER_DEFAULT_CONFIG: StoreSchema = {
@@ -32,6 +33,7 @@ const USER_DEFAULT_CONFIG: StoreSchema = {
     history_retention: 'forever',
   },
   theme: 'system',
+  personaID: 1,
 }
 
 export { USER_DEFAULT_CONFIG }

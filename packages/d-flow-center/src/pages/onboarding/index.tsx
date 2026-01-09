@@ -452,13 +452,17 @@ function SettingsStep({ onNext }: { onNext: () => void }) {
           >
             {/* 左侧内容 */}
             <div className="flex-1 flex flex-col justify-center p-8 max-w-xl">
-              <h1 className="text-2xl font-semibold mb-2">口述以测试您的麦克风</h1>
+              <h1 className="text-2xl font-semibold mb-2">
+                请说几句话，确认麦克风是否正常工作
+              </h1>
               <p className="text-muted-foreground mb-12 text-[14px]">
-                您计算机内置的麦克风将确保最佳的转录效果。
+                我们将通过声音波纹，帮助您确认: 当前麦克风是否成功接收到您的声音
               </p>
-              <p className="font-medium mb-4 text-[14px]">您在说话时看到波纹在扩散吗？</p>
+              <p className="font-medium mb-4 text-[14px]">
+                您在说话时是否看到右侧的波纹在扩散？
+              </p>
               <Button onClick={handleContinueFromMicrophone} className="w-fit">
-                是的，继续
+                是的，看到了，继续
               </Button>
             </div>
             {/* 右侧波纹 */}
@@ -490,17 +494,21 @@ function SettingsStep({ onNext }: { onNext: () => void }) {
                   <span>返回</span>
                 </button>
               </div>
-              <h1 className="text-2xl font-bold mb-2">按下以测试您的语音输入快捷键</h1>
+              <h1 className="text-2xl font-bold mb-2">
+                请按下快捷键，确认是否能被正确识别
+              </h1>
               <p className="text-muted-foreground mb-12">
-                我们推荐使用 <KeyDisplay keys={['Fn']} /> 键，位于键盘左下角。
+                我们推荐使用 <KeyDisplay keys={['Fn']} /> 键，位于键盘左下角
               </p>
-              <p className="font-medium mb-4">按下时，您看到按键显示吗？</p>
+              <p className="font-medium mb-4">
+                按下 快捷键时，您是否看到右侧出现的提示动画？
+              </p>
               <div className="flex gap-4">
                 <Button variant="outline" onClick={openHotkeyDialog} className="w-fit">
-                  不，换个键盘快捷键
+                  没有反应，换一个快捷键
                 </Button>
                 <Button onClick={handleContinueFromShortcut} className="w-fit">
-                  是的，继续
+                  是的，能看到，继续
                 </Button>
               </div>
             </div>
@@ -658,17 +666,34 @@ function VolumeRipple({ level }: { level: number }) {
   )
 }
 
+// 示例文本数组 - 轮询显示
+const SAMPLE_TEXTS = [
+  'Artificial Intelligence is transforming the world.',
+  'Artificial Intelligence will transform the world.',
+  'Artificial Intelligence has the potential to change everything.',
+  'Artificial Intelligence is reshaping our future.',
+]
+
 function TryItStep({ onFinish }: { onFinish: () => void }) {
   const [subStep, setSubStep] = useState(1) // 1: 输入框测试 2: 普通命令测试, 3: 选中翻译测试
   const [subDirection, setSubDirection] = useState(1)
   const [inputValue1, setInputValue1] = useState('')
   const [inputValue2, setInputValue2] = useState('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const defaultSampleText = 'Artificial Intelligence is transforming the world.'
-  const [sampleText, setSampleText] = useState(defaultSampleText)
+
+  const [sampleTextIndex, setSampleTextIndex] = useState(0)
+  const [sampleText, setSampleText] = useState(SAMPLE_TEXTS[0])
+
   const [showCommandHotkeyDialog, setShowCommandHotkeyDialog] = useState(false)
   const [isTextSelected, setIsTextSelected] = useState(false)
   const [hasReceivedAudio, setHasReceivedAudio] = useState(false)
+
+  // 恢复示例文本并切换到下一个
+  const resetSampleText = useCallback(() => {
+    const nextIndex = (sampleTextIndex + 1) % SAMPLE_TEXTS.length
+    setSampleTextIndex(nextIndex)
+    setSampleText(SAMPLE_TEXTS[nextIndex])
+  }, [sampleTextIndex])
 
   const hotkeySettingStatus = useStatusStore((state) => state.hotKeySettingStatus)
   const holdIPCMessage = useStatusStore((state) => state.holdIPCMessage)
@@ -714,7 +739,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
       if (subStep === 3 && !hasSelectedText) {
         toast.error(`当前未选中文本, 请重新选中文本`)
         delay(1000).then(() => {
-          setSampleText(defaultSampleText)
+          resetSampleText()
         })
         return
       }
@@ -724,7 +749,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
           duration: 5000,
         })
         delay(1000).then(() => {
-          setSampleText(defaultSampleText)
+          resetSampleText()
         })
         return
       }
@@ -735,7 +760,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
         })
         if (subStep === 3) {
           delay(1000).then(() => {
-            setSampleText(defaultSampleText)
+            resetSampleText()
           })
         }
       }
@@ -827,8 +852,14 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
                   {/* 虚线边框卡片 */}
                   <div className="border-2 border-dashed border-muted-foreground/30 rounded-2xl p-8 bg-background/80">
                     <p className="text-2xl font-bold text-ripple-brand-text dark:text-ripple-brand-text text-center leading-relaxed">
-                      "帮我回复这个邮件，嗯，那个，用英文帮我回复"
+                      "行吧，那我们就约定好明天，
+                      <br />
+                      那个，明天下午在这见面。"
                     </p>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground mt-2 ml-1">
+                    秒言会自动帮你去除语气词并整理语义
                   </div>
                 </div>
               </div>

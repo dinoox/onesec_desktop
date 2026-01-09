@@ -23,10 +23,17 @@ function getMacOsVersion(): string {
 function getDeviceModel(): string | null {
   if (process.platform !== 'darwin') return null
   try {
-    const output = execSync('sysctl -n hw.model', {
+    const model = execSync('sysctl -n hw.model', {
       encoding: 'utf8',
-    })
-    return output.trim()
+    }).trim()
+
+    const arch = execSync('uname -m', {
+      encoding: 'utf8',
+    }).trim()
+
+    const chipType = arch === 'arm64' ? 'Apple Silicon' : 'Intel'
+
+    return `${model} (${chipType})`
   } catch {
     return null
   }

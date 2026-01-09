@@ -22,6 +22,7 @@ import { SystemFamily } from '@/types/terminal.ts'
 import ipcService from '@/services/ipc-service.ts'
 import { uploadErrorLog } from '@/services/api/error-log-api.ts'
 import { toast } from 'sonner'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const ContentPage: React.FC = () => {
   const user = useAuthStore((state) => state.user)
@@ -66,7 +67,7 @@ const ContentPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-1/2 space-y-3 ">
+    <div className="max-w-1/2 space-y-3 mt-1">
       <div className="absolute right-4 top-4">
         <Button
           type="button"
@@ -154,41 +155,47 @@ const ContentPage: React.FC = () => {
         </div>
 
         {/* 常用系统 */}
-        {user?.preferred_linux_distro && user.preferred_linux_distro.length > 0 && (
-          <div
-            data-theme-transition
-            className="flex items-center justify-between w-full bg-setting rounded-xl p-3 animate-in fade-in duration-300"
-          >
-            <div className="flex flex-col space-y-1">
-              <Label>常用系统</Label>
-              <span className="text-muted-foreground">终端连接远程主机常用系统</span>
-              <Button
-                variant="outline"
-                className="mr-auto mt-1"
-                size="sm"
-                onClick={() => setAdvancedSettingsOpen(true)}
-              >
-                <IconGitBranch />
-                配置
-              </Button>
-            </div>
-
-            <Select
-              value={user?.preferred_linux_distro || 'none'}
-              onValueChange={handleSystemFamilyChange}
-              disabled={updateUserMutation.isPending}
+        <AnimatePresence>
+          {user?.preferred_linux_distro && user.preferred_linux_distro.length > 0 && (
+            <motion.div
+              data-theme-transition
+              className="flex items-center justify-between w-full bg-setting rounded-xl p-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-              <SelectTrigger className="py-4">
-                <SelectValue placeholder="选择系统" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">未设置</SelectItem>
-                <SelectItem value={SystemFamily.Debian}>Debian 系</SelectItem>
-                <SelectItem value={SystemFamily.RedHat}>Red Hat 系</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+              <div className="flex flex-col space-y-1">
+                <Label>常用系统</Label>
+                <span className="text-muted-foreground">终端连接远程主机常用系统</span>
+                <Button
+                  variant="outline"
+                  className="mr-auto mt-1"
+                  size="sm"
+                  onClick={() => setAdvancedSettingsOpen(true)}
+                >
+                  <IconGitBranch />
+                  配置
+                </Button>
+              </div>
+
+              <Select
+                value={user?.preferred_linux_distro || 'none'}
+                onValueChange={handleSystemFamilyChange}
+                disabled={updateUserMutation.isPending}
+              >
+                <SelectTrigger className="py-4">
+                  <SelectValue placeholder="选择系统" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">未设置</SelectItem>
+                  <SelectItem value={SystemFamily.Debian}>Debian 系</SelectItem>
+                  <SelectItem value={SystemFamily.RedHat}>Red Hat 系</SelectItem>
+                </SelectContent>
+              </Select>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="flex gap-2">

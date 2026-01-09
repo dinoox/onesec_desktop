@@ -20,7 +20,7 @@ export default function DashboardLayout() {
         <div className="flex flex-1 overflow-hidden">
           <AppSidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="p-4 flex-1 flex flex-col overflow-y-auto relative">
+            <div className="py-4 px-4.5 flex-1 flex flex-col overflow-y-auto relative">
               {isNavigating && <PageLoading />}
               <Suspense fallback={<PageLoading />}>
                 <Outlet />

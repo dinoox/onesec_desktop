@@ -160,26 +160,6 @@ class IPCService {
 
   // Audios
   private handleGetAudios = () => {
-    const retention = userConfigManager.getConfig().setting.history_retention
-    if (retention !== 'forever') {
-      const audiosToDelete = databaseService.getAudios()
-      const deletedCount = databaseService.deleteAudiosByRetention(retention)
-
-      if (deletedCount > 0) {
-        const configDir = path.dirname(userConfigManager.getConfigPath())
-        const remainingAudios = databaseService.getAudios()
-        const remainingFilenames = new Set(remainingAudios.map((a) => a.filename))
-
-        audiosToDelete.forEach((audio) => {
-          if (!remainingFilenames.has(audio.filename)) {
-            const audioPath = path.join(configDir, 'audios', audio.filename)
-            if (fs.existsSync(audioPath)) {
-              fs.unlinkSync(audioPath)
-            }
-          }
-        })
-      }
-    }
     return databaseService.getAudios()
   }
 
@@ -238,25 +218,7 @@ class IPCService {
 
   private handleDeleteAudiosByRetention = async (_: any, retention: string) => {
     try {
-      const audiosToDelete = databaseService.getAudios()
-      const deletedCount = databaseService.deleteAudiosByRetention(retention)
-
-      if (deletedCount > 0) {
-        const configDir = path.dirname(userConfigManager.getConfigPath())
-        const remainingAudios = databaseService.getAudios()
-        const remainingFilenames = new Set(remainingAudios.map((a) => a.filename))
-
-        audiosToDelete.forEach((audio) => {
-          if (!remainingFilenames.has(audio.filename)) {
-            const audioPath = path.join(configDir, 'audios', audio.filename)
-            if (fs.existsSync(audioPath)) {
-              fs.unlinkSync(audioPath)
-            }
-          }
-        })
-      }
-
-      return deletedCount
+      return databaseService.cleanupAudiosByRetention(retention)
     } catch (error) {
       log.debug('handleDeleteAudiosByRetention: ', error)
       throw error
@@ -291,7 +253,32 @@ class IPCService {
   }
 
   private handleRequestMicrophone = async () => {
-    return await systemPreferences.askForMediaAccess('microphone')
+    let res = await systemPreferences.askForMediaAccess('microphone')
+    log.debug('handleRequestMicrophone: ', res)
+
+    if (!res) {
+      const { response } = await dialog.showMessageBox(
+        windowManager.getContentWindow()!,
+        {
+          type: 'warning',
+          title: '申请麦克风访问权限',
+          message: '为使用语音输入功能',
+          detail: '请在系统设置中手动为「秒言」开启麦克风权限。',
+          buttons: ['打开系统设置', '取消'],
+          defaultId: 0,
+          cancelId: 1,
+        },
+      )
+
+      if (response === 0) {
+        // 打开系统设置麦克风权限页面
+        await shell.openExternal(
+          'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
+        )
+      }
+    }
+
+    return res
   }
 
   // Personas

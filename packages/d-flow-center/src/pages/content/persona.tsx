@@ -44,6 +44,7 @@ import {
   Command,
   Keyboard,
   Blend,
+  Info,
 } from 'lucide-react'
 import {
   usePersonaListQuery,
@@ -645,7 +646,7 @@ const PersonaPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle>输出模式快捷键</DialogTitle>
             <DialogDescription>
-              <span>设置后可通过快捷键自定义输出模式</span>
+              <span>设置快捷键，用于快速切换输出模式</span>
             </DialogDescription>
           </DialogHeader>
 
@@ -711,13 +712,48 @@ const PersonaPage: React.FC = () => {
               </div>
             </div>
 
-            <span className="text-xs text-muted-foreground flex items-center gap-2">
-              <span>例如设置</span>
-              <KeyDisplay keys={['⌘']} />
-              为输出模式快捷键, 可通过
-              <KeyDisplay keys={['⌘']} /> + 数字
-              <span>快速自定义输出模式</span>
-            </span>
+            {/* 快捷键提示卡片 */}
+            <AnimatePresence>
+              {shortcutPersonaKeys.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 0 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  className="bg-setting rounded-lg px-3 py-4 space-y-3"
+                >
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>使用以下快捷键，即可在不同输出模式间快速切换</span>
+                  </div>
+                  <div className="space-y-2">
+                    {personas.slice(0, 4).map((persona, index) => {
+                      const Icon = getIconComponent(persona.icon)
+                      return (
+                        <div
+                          key={persona.id}
+                          className="flex items-center justify-between text-sm"
+                        >
+                          <div className="flex items-center gap-2">
+                            <KeyDisplay
+                              keys={[...formattedPersonaKeys, (index + 1).toString()]}
+                              className="bg-ripple-brand text-foreground dark:text-background"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 rounded flex items-center justify-center bg-sidebar">
+                              <Icon className="w-3 h-3 text-muted-foreground" />
+                            </div>
+                            <span className="text-muted-foreground text-xs">
+                              {persona.name}模式
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <DialogFooter>

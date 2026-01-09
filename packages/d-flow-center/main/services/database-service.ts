@@ -1,6 +1,8 @@
 import path from 'path'
+import fs from 'fs'
 import Database from 'better-sqlite3'
 import userConfigManager from './user-config-manager'
+import log from 'electron-log'
 
 export interface Audios {
   id: string
@@ -29,6 +31,7 @@ export interface Persona {
 class DatabaseService {
   private db: Database.Database | null = null
   private initialized = false
+  private cleanupTimer: NodeJS.Timeout | null = null
 
   private getDb(): Database.Database {
     if (!this.db) {
@@ -39,6 +42,10 @@ class DatabaseService {
     if (!this.initialized) {
       this.initTables()
       this.initialized = true
+
+      // 启动周期性清理任务
+      this.startPeriodicCleanup()
+      // this.generateMockData()
     }
     return this.db
   }
@@ -80,20 +87,74 @@ class DatabaseService {
         updated_at INTEGER
       )
     `)
+  }
 
-    // Create apps table
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS apps (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        bundle_id TEXT UNIQUE,
-        name TEXT,
-        persona_id INTEGER
-      )
-    `)
+  /**
+   * 启动周期性清理任务，每天执行一次
+   * @param intervalMs 清理间隔时间，默认为 24 小时
+   */
+  private startPeriodicCleanup(intervalMs: number = 24 * 60 * 60 * 1000): void {
+    // 定义清理函数
+    const cleanup = () => {
+      try {
+        const retention = userConfigManager.getConfig().setting?.history_retention
+        if (!retention || retention === 'forever') {
+          return
+        }
 
-    // Create apps indexes
-    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_apps_bundle_id ON apps(bundle_id)`)
-    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_apps_persona_id ON apps(persona_id)`)
+        const deletedCount = this.cleanupAudiosByRetention(retention)
+        if (deletedCount > 0) {
+          log.info(
+            `Database periodic cleanup: deleted ${deletedCount} expired audio records`,
+          )
+        }
+      } catch (error) {
+        log.error('Database periodic cleanup failed:', error)
+      }
+    }
+
+    // 立即执行一次清理
+    cleanup()
+
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer)
+    }
+
+    this.cleanupTimer = setInterval(cleanup, intervalMs)
+
+    log.info(
+      `Periodic cleanup started: will run every ${intervalMs / (60 * 60 * 1000)} hours`,
+    )
+  }
+
+  /**
+   * 清理过期音频记录及对应的文件
+   * @param retention 保留策略
+   * @returns 删除的记录数
+   */
+  cleanupAudiosByRetention(retention: string): number {
+    // 获取删除前的音频列表
+    const audiosToDelete = this.getAudios()
+    const deletedCount = this.deleteAudiosByRetention(retention)
+
+    if (deletedCount > 0) {
+      // 获取删除后的剩余音频
+      const remainingAudios = this.getAudios()
+      const remainingFilenames = new Set(remainingAudios.map((a) => a.filename))
+
+      // 删除对应的音频文件
+      const configDir = path.dirname(userConfigManager.getConfigPath())
+      audiosToDelete.forEach((audio) => {
+        if (!remainingFilenames.has(audio.filename)) {
+          const audioPath = path.join(configDir, 'audios', audio.filename)
+          if (fs.existsSync(audioPath)) {
+            fs.unlinkSync(audioPath)
+          }
+        }
+      })
+    }
+
+    return deletedCount
   }
 
   private normalize(row: any): Audios {
@@ -221,7 +282,7 @@ class DatabaseService {
     )
 
     timePeriods.forEach((period) => {
-      const count = Math.floor(Math.random() * 5) + 8 // 8-12条
+      const count = Math.floor(Math.random() * 5) + 80 // 8-12条
       for (let i = 0; i < count; i++) {
         const randomHoursOffset =
           period.hours + Math.random() * (period.maxHours - period.hours)
@@ -268,9 +329,16 @@ class DatabaseService {
   }
 
   close() {
+    // 停止周期性清理任务
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer)
+      this.cleanupTimer = null
+    }
+
     if (this.db) {
       this.db.close()
       this.db = null
+      this.initialized = false
     }
   }
 
@@ -319,6 +387,7 @@ class DatabaseService {
    * 保存 Persona 列表
    * - 不存在则插入
    * - 存在但 icon_svg 为空则更新
+   * - 数据库中存在但新数据中不存在的记录将被删除
    */
   savePersonas(personas: Persona[]): boolean {
     const db = this.getDb()
@@ -333,6 +402,14 @@ class DatabaseService {
       ).map((row) => [row.id, row.icon_svg]),
     )
 
+    // 收集新数据中的所有 ID
+    const newPersonaIds = new Set(personas.map((p) => p.id))
+
+    // 找出需要删除的 ID（数据库中有但新数据中没有）
+    const idsToDelete = Array.from(existingRecords.keys()).filter(
+      (id) => !newPersonaIds.has(id),
+    )
+
     const insertStmt = db.prepare(
       'INSERT INTO personas (id, user_id, name, description, icon, icon_svg, content, is_example, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     )
@@ -341,7 +418,15 @@ class DatabaseService {
       'UPDATE personas SET user_id = ?, name = ?, description = ?, icon = ?, icon_svg = ?, content = ?, is_example = ?, created_at = ?, updated_at = ? WHERE id = ?',
     )
 
+    const deletePersonaStmt = db.prepare('DELETE FROM personas WHERE id = ?')
+
     const transaction = db.transaction(() => {
+      // 删除多余的记录
+      for (const id of idsToDelete) {
+        deletePersonaStmt.run(id)
+      }
+
+      // 插入或更新新数据
       for (const persona of personas) {
         const existingIconSvg = existingRecords.get(persona.id)
 
@@ -446,18 +531,14 @@ class DatabaseService {
   }
 
   /**
-   * 删除单个 Persona 及其关联的 apps
+   * 删除单个 Persona
    */
   deletePersona(id: number): boolean {
     const db = this.getDb()
-
-    const transaction = db.transaction(() => {
-      db.prepare('DELETE FROM apps WHERE persona_id = ?').run(id)
-      return db.prepare('DELETE FROM personas WHERE id = ?').run(id)
-    })
+    const stmt = db.prepare('DELETE FROM personas WHERE id = ?')
 
     try {
-      const result = transaction()
+      const result = stmt.run(id)
       return result.changes > 0
     } catch (err) {
       console.error('删除 Persona 失败:', err)

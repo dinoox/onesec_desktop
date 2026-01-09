@@ -125,7 +125,7 @@ const ContentPage: React.FC = () => {
 
   return (
     <div className="max-w-1/2 flex flex-col justify-between gap-5">
-      <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
+      <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4 mt-1">
         <div className="flex flex-col justify-center space-y-1">
           <span className="text-[15px] font-medium">普通模式</span>
           <span className="text-sm text-muted-foreground">

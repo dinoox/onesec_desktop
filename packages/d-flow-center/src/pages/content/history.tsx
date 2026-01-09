@@ -11,7 +11,8 @@ import {
   BadgeAlert,
   Database,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { List } from 'react-window'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import {
@@ -62,7 +63,7 @@ const HistoryPage: React.FC = () => {
   const { setReconvertingId } = useStatusStore((state) => state.actions)
   const prevMessageIdRef = useRef<string | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const groupRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const [containerHeight, setContainerHeight] = useState(500)
 
   const loadAudios = async () => {
     try {
@@ -124,6 +125,7 @@ const HistoryPage: React.FC = () => {
     try {
       if (await ipcService.deleteAudio(filename)) {
         toast.success('音频删除成功')
+        loadedRecordsRef.current.delete(id)
         setRecords((prev) => prev.filter((record) => record.id !== id))
       } else {
         toast.error('删除失败')
@@ -152,6 +154,7 @@ const HistoryPage: React.FC = () => {
 
       if (successCount > 0) {
         toast.success(`已删除 ${successCount} 条记录`)
+        loadedRecordsRef.current.clear()
         await loadAudios()
       } else {
         toast.error('删除失败')
@@ -257,6 +260,224 @@ const HistoryPage: React.FC = () => {
     return groups
   }, [records, historyRetention])
 
+  // 展平列表数据用于虚拟化
+  const flattenedList = useMemo(() => {
+    const items: Array<{
+      type: 'header' | 'record'
+      data: any
+      groupIndex: number
+      recordIndex?: number
+    }> = []
+    groupedRecords.forEach((group, groupIndex) => {
+      if (groupIndex > 0) {
+        items.push({ type: 'header', data: group, groupIndex })
+      }
+      group.records.forEach((record, recordIndex) => {
+        items.push({ type: 'record', data: record, groupIndex, recordIndex })
+      })
+    })
+    return items
+  }, [groupedRecords])
+
+  const listRef = useRef<any>(null)
+  const [initialLoad, setInitialLoad] = useState(true)
+  const loadedRecordsRef = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (initialLoad && records.length > 0) {
+      const timer = setTimeout(() => setInitialLoad(false), 800)
+      return () => clearTimeout(timer)
+    }
+  }, [records.length, initialLoad])
+
+  // 重置已加载记录的跟踪
+  useEffect(() => {
+    if (records.length === 0) {
+      loadedRecordsRef.current.clear()
+    }
+  }, [records.length])
+
+  // 动态计算每行高度
+  const getRowHeight = (index: number) => {
+    const item = flattenedList[index]
+    if (item.type === 'header') {
+      return 46
+    }
+    const content = item.data.content || item.data.error || ''
+    const lines = Math.min(Math.ceil(content.length / 35), 3)
+    return 46 + Math.max(0, lines - 1) * 20
+  }
+
+  const RowComponent = ({
+    index,
+    style,
+  }: {
+    index: number
+    style: React.CSSProperties
+    ariaAttributes?: any
+  }) => {
+    const item = flattenedList[index]
+
+    if (item.type === 'header') {
+      return (
+        <div style={style}>
+          <motion.div
+            className="text-xs text-muted-foreground mb-2 pt-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {item.data.label}
+          </motion.div>
+        </div>
+      )
+    }
+
+    const record = item.data
+    const isFirstInGroup = item.recordIndex === 0
+    const isLastInGroup =
+      item.recordIndex === groupedRecords[item.groupIndex].records.length - 1
+
+    // 检查是否为新记录
+    const isNewRecord = !loadedRecordsRef.current.has(record.id)
+    if (isNewRecord) {
+      loadedRecordsRef.current.add(record.id)
+    }
+
+    return (
+      <div style={style}>
+        <motion.div
+          initial={initialLoad || isNewRecord ? { opacity: 0, scale: 0.96 } : false}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            type: 'spring',
+            stiffness: 300,
+            damping: 24,
+            mass: 0.8,
+            delay: initialLoad ? Math.min(index * 0.025, 0.4) : isNewRecord ? 0.1 : 0,
+          }}
+        >
+          <div
+            className={`group flex items-center gap-3 border-x border-b pl-4 pr-5 py-3 hover:bg-muted/50 transition-colors ${
+              isFirstInGroup ? 'border-t rounded-t-lg' : ''
+            } ${isLastInGroup ? 'rounded-b-lg' : ''}`}
+          >
+            <span className="text-xs text-muted-foreground w-[70px] flex-shrink-0 pt-0.5 tabular-nums">
+              {formatTime(record.created_at)}
+            </span>
+            <div className="flex-1 min-w-0 text-sm flex items-center gap-2">
+              {reconvertingId === record.id ? (
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
+                  转录中...
+                </span>
+              ) : record.error ? (
+                <span
+                  className="flex items-center gap-2"
+                  style={{ color: 'var(--ripple-error-text)' }}
+                >
+                  <BadgeAlert className="h-4 w-4 flex-shrink-0" />
+                  {record.error}
+                </span>
+              ) : record.content ? (
+                <span className="line-clamp-3">{record.content}</span>
+              ) : (
+                <span className="text-muted-foreground">未识别到内容</span>
+              )}
+            </div>
+            <div className="flex items-center gap-4.5 text-muted-foreground opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-3 w-3 relative text-muted-foreground/80"
+                    disabled={copiedId === record.id || !!record.error}
+                    onClick={() => handleCopy(record.id, record.content)}
+                  >
+                    <Check
+                      className={`h-2 w-2 absolute transition-all duration-200 ${
+                        copiedId === record.id
+                          ? 'opacity-100 scale-100'
+                          : 'opacity-0 scale-50'
+                      }`}
+                    />
+                    <Copy
+                      className={`h-2 w-2 absolute transition-all duration-200 ${
+                        copiedId === record.id
+                          ? 'opacity-0 scale-50'
+                          : 'opacity-100 scale-100'
+                      }`}
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {copiedId === record.id ? '已复制' : '复制'}
+                </TooltipContent>
+              </Tooltip>
+
+              <DropdownMenu
+                modal={false}
+                open={openMenuId === record.id}
+                onOpenChange={(open) => setOpenMenuId(open ? record.id : null)}
+              >
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-3 w-3 text-muted-foreground/80"
+                  >
+                    <Menu className="h-2 w-2" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  onPointerDownOutside={(e) => {
+                    const target = e.target as HTMLElement
+                    if (target.closest('.group')) {
+                      e.preventDefault()
+                    }
+                  }}
+                >
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault()
+                      handleDownload(record.filename)
+                    }}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    音频另存
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={reconvertingId !== null}
+                    onSelect={(e) => {
+                      e.preventDefault()
+                      handleReconvert(record.id, record.filename)
+                    }}
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    重新转录
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={reconvertingId === record.id}
+                    onSelect={(e) => {
+                      e.preventDefault()
+                      handleDelete(record.id, record.filename)
+                    }}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    删除音频
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
+
   // 初始化第一个分组的标题
   useEffect(() => {
     if (groupedRecords.length > 0 && !currentGroupLabel) {
@@ -264,39 +485,41 @@ const HistoryPage: React.FC = () => {
     }
   }, [groupedRecords, currentGroupLabel])
 
-  // 使用滚动事件监听当前分组
+  // 监听容器高度变化
   useEffect(() => {
-    const scrollContainer = scrollContainerRef.current
-    if (!scrollContainer || groupedRecords.length === 0) return
+    const container = scrollContainerRef.current
+    if (!container) return
 
-    const handleScroll = () => {
-      const containerTop = scrollContainer.getBoundingClientRect().top
-
-      // 找到当前应该显示的分组（最后一个 top <= containerTop 的分组）
-      let currentGroup = groupedRecords[0]
-
-      for (const group of groupedRecords) {
-        const el = groupRefs.current.get(group.key)
-        if (el) {
-          const rect = el.getBoundingClientRect()
-          // 如果分组顶部还在容器顶部之上或刚好在顶部，这就是当前分组
-          if (rect.top <= containerTop - 14) {
-            currentGroup = group
-          } else {
-            break
-          }
-        }
-      }
-
-      setCurrentGroupLabel(currentGroup.label)
+    const updateHeight = () => {
+      setContainerHeight(container.clientHeight)
     }
 
-    scrollContainer.addEventListener('scroll', handleScroll, { passive: true })
-    // 初始化时也执行一次
-    handleScroll()
+    updateHeight()
+    const resizeObserver = new ResizeObserver(updateHeight)
+    resizeObserver.observe(container)
 
-    return () => scrollContainer.removeEventListener('scroll', handleScroll)
-  }, [groupedRecords])
+    return () => resizeObserver.disconnect()
+  }, [])
+
+  const handleRowsRendered = ({
+    startIndex,
+  }: {
+    startIndex: number
+    stopIndex: number
+  }) => {
+    if (flattenedList.length === 0 || groupedRecords.length === 0) return
+
+    // 使用偏移量，让标题在滚动更深时才切换
+    const checkIndex = Math.min(startIndex - 1, flattenedList.length - 1)
+    const visibleItem = flattenedList[checkIndex]
+
+    if (visibleItem) {
+      const currentGroup = groupedRecords[visibleItem.groupIndex]
+      if (currentGroup && currentGroup.label !== currentGroupLabel) {
+        setCurrentGroupLabel(currentGroup.label)
+      }
+    }
+  }
 
   return (
     <div className="max-w-2xl h-full flex flex-col">
@@ -367,166 +590,22 @@ const HistoryPage: React.FC = () => {
           </div>
 
           <div
-            className={`space-y-6 transition-opacity duration-300 ${
+            className={`transition-opacity duration-300 ${
               isLoading ? 'opacity-0' : 'opacity-100'
             }`}
           >
             {groupedRecords.length > 0 ? (
-              groupedRecords.map((group, groupIndex) => (
-                <motion.div
-                  key={group.key}
-                  ref={(el) => {
-                    if (el) groupRefs.current.set(group.key, el)
-                    else groupRefs.current.delete(group.key)
-                  }}
-                  data-group-key={group.key}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  {/* 第一个分组不显示标题（已在顶部固定显示），其他分组显示标题 */}
-                  {groupIndex > 0 && (
-                    <div className="text-xs text-muted-foreground mb-2">
-                      {group.label}
-                    </div>
-                  )}
-                  <div className="border rounded-lg overflow-hidden">
-                    <AnimatePresence>
-                      {group.records.map((record, recordIndex) => (
-                        <motion.div
-                          key={record.id}
-                          layout
-                          initial={{ opacity: 0, scale: 0.96 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 1 }}
-                          transition={{
-                            type: 'spring',
-                            stiffness: 300,
-                            damping: 24,
-                            mass: 0.8,
-                            delay: groupIndex * 0.04 + recordIndex * 0.025,
-                            layout: { type: 'spring', stiffness: 500, damping: 35 },
-                          }}
-                          className="group flex items-center gap-3 border-b pl-4 pr-5 py-3 hover:bg-muted/50 transition-colors last:border-b-0"
-                        >
-                          <span className="text-xs text-muted-foreground w-[70px] flex-shrink-0 pt-0.5 tabular-nums">
-                            {formatTime(record.created_at)}
-                          </span>
-                          <div className="flex-1 min-w-0 text-sm flex items-center gap-2">
-                            {reconvertingId === record.id ? (
-                              <span className="flex items-center gap-2 text-muted-foreground">
-                                <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
-                                转录中...
-                              </span>
-                            ) : record.error ? (
-                              <span
-                                className="flex items-center gap-2"
-                                style={{ color: 'var(--ripple-error-text)' }}
-                              >
-                                <BadgeAlert className="h-4 w-4 flex-shrink-0" />
-                                {record.error}
-                              </span>
-                            ) : record.content ? (
-                              <span className="line-clamp-4">{record.content}</span>
-                            ) : (
-                              <span className="text-muted-foreground">未识别到内容</span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4.5 text-muted-foreground opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-3 w-3 relative text-muted-foreground/80"
-                                  disabled={copiedId === record.id || !!record.error}
-                                  onClick={() => handleCopy(record.id, record.content)}
-                                >
-                                  <Check
-                                    className={`h-2 w-2 absolute transition-all duration-200 ${
-                                      copiedId === record.id
-                                        ? 'opacity-100 scale-100'
-                                        : 'opacity-0 scale-50'
-                                    }`}
-                                  />
-                                  <Copy
-                                    className={`h-2 w-2 absolute transition-all duration-200 ${
-                                      copiedId === record.id
-                                        ? 'opacity-0 scale-50'
-                                        : 'opacity-100 scale-100'
-                                    }`}
-                                  />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {copiedId === record.id ? '已复制' : '复制'}
-                              </TooltipContent>
-                            </Tooltip>
-
-                            <DropdownMenu
-                              modal={false}
-                              open={openMenuId === record.id}
-                              onOpenChange={(open) =>
-                                setOpenMenuId(open ? record.id : null)
-                              }
-                            >
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-3 w-3 text-muted-foreground/80"
-                                >
-                                  <Menu className="h-2 w-2" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent
-                                align="end"
-                                onPointerDownOutside={(e) => {
-                                  const target = e.target as HTMLElement
-                                  if (target.closest('.group')) {
-                                    e.preventDefault()
-                                  }
-                                }}
-                              >
-                                <DropdownMenuItem
-                                  onSelect={(e) => {
-                                    e.preventDefault()
-                                    handleDownload(record.filename)
-                                  }}
-                                >
-                                  <Download className="mr-2 h-4 w-4" />
-                                  音频另存
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  disabled={reconvertingId !== null}
-                                  onSelect={(e) => {
-                                    e.preventDefault()
-                                    handleReconvert(record.id, record.filename)
-                                  }}
-                                >
-                                  <RefreshCw className="mr-2 h-4 w-4" />
-                                  重新转录
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  disabled={reconvertingId === record.id}
-                                  onSelect={(e) => {
-                                    e.preventDefault()
-                                    handleDelete(record.id, record.filename)
-                                  }}
-                                  className="text-destructive focus:text-destructive"
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  删除音频
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
-                </motion.div>
-              ))
+              <div style={{ height: containerHeight, width: '100%' }}>
+                <List
+                  listRef={listRef}
+                  rowCount={flattenedList.length}
+                  rowHeight={getRowHeight}
+                  rowComponent={RowComponent as any}
+                  rowProps={{} as any}
+                  overscanCount={5}
+                  onRowsRendered={handleRowsRendered}
+                />
+              </div>
             ) : (
               <div className="text-center py-12 text-muted-foreground">暂无历史记录</div>
             )}

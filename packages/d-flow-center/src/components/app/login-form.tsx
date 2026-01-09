@@ -57,11 +57,11 @@ export function LoginForm({
   async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
     const params = isRegisterMode
       ? {
-          phone: data.phone,
+          phone: data.phone.trim(),
           code: data.verification_code,
           ...(data.share_code && { share_code: data.share_code }),
         }
-      : { phone: data.phone, code: data.verification_code }
+      : { phone: data.phone.trim(), code: data.verification_code }
     await mutation.mutateAsync(params)
   }
 
@@ -167,7 +167,10 @@ export function LoginForm({
                   name="share_code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="gap-0.5">邀请码</FormLabel>
+                      <FormLabel className="gap-0.5">
+                        邀请码
+                        <span className="text-muted-foreground´">(选填)</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="选择输入邀请码"
