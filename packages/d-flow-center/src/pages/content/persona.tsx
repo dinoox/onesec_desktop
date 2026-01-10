@@ -642,7 +642,10 @@ const PersonaPage: React.FC = () => {
 
       {/* 快捷键设置弹框 */}
       <Dialog open={hotkeyDialogOpen} onOpenChange={setHotkeyDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent
+          className="sm:max-w-md"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>输出模式快捷键</DialogTitle>
             <DialogDescription>

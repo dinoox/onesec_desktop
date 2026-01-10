@@ -7,13 +7,39 @@ import {
 } from '@/services/api/dashboard-api'
 import { toast } from 'sonner'
 
+const STATS_CACHE_KEY = 'usage-statistics-cache'
+
+// 从 localStorage 读取缓存的统计数据
+const getCachedStats = () => {
+  try {
+    const cached = localStorage.getItem(STATS_CACHE_KEY)
+    return cached ? JSON.parse(cached) : null
+  } catch {
+    return null
+  }
+}
+
+// 保存统计数据到 localStorage
+const setCachedStats = (data: any) => {
+  try {
+    localStorage.setItem(STATS_CACHE_KEY, JSON.stringify(data))
+  } catch {
+    // 忽略存储错误
+  }
+}
+
 export const useUsageStatistics = () => {
   return useQuery({
     queryKey: ['usage-statistics'],
     staleTime: 0,
+    placeholderData: getCachedStats(), // 使用缓存数据作为占位
     queryFn: async () => {
       const resp = await getUsageStatistics()
-      return resp.success ? resp.data : null
+      if (resp.success && resp.data) {
+        setCachedStats(resp.data) // 成功后更新缓存
+        return resp.data
+      }
+      return null
     },
   })
 }

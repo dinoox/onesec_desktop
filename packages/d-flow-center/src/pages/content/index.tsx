@@ -92,19 +92,20 @@ const ContentPage: React.FC = () => {
       <div className="flex-shrink-0 space-y-3 pb-3">
         <div className="flex items-center justify-between">
           <span className="text-[15px] font-medium">概览</span>
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Menu className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={handleRefreshData}>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                刷新数据
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="h-8 w-8"></div>
+          {/*<DropdownMenu modal={false}>*/}
+          {/*  <DropdownMenuTrigger asChild>*/}
+          {/*    <Button variant="ghost" size="icon" className="h-8 w-8">*/}
+          {/*      <Menu className="h-4 w-4" />*/}
+          {/*    </Button>*/}
+          {/*  </DropdownMenuTrigger>*/}
+          {/*  <DropdownMenuContent align="end">*/}
+          {/*    <DropdownMenuItem onSelect={handleRefreshData}>*/}
+          {/*      <RefreshCw className="mr-2 h-4 w-4" />*/}
+          {/*      刷新数据*/}
+          {/*    </DropdownMenuItem>*/}
+          {/*  </DropdownMenuContent>*/}
+          {/*</DropdownMenu>*/}
         </div>
         {/* 快捷提示 */}
         <div className="flex items-center justify-between bg-setting rounded-xl px-4 py-3">
@@ -136,13 +137,14 @@ const ContentPage: React.FC = () => {
               separator=","
               duration={1}
               className="text-2xl font-semibold"
+              cacheKey="total_characters"
             />
             <span className="text-sm text-muted-foreground">字</span>
           </div>
           <div className="mt-1.5 flex items-center justify-between text-xs text-muted-foreground">
             <span>转写次数</span>
             <span>
-              <CountUp to={stats?.total_sessions ?? 0} duration={1} /> 次
+              <CountUp to={stats?.total_sessions ?? 0} duration={1} cacheKey="total_sessions" /> 次
             </span>
           </div>
         </div>
@@ -159,13 +161,19 @@ const ContentPage: React.FC = () => {
               to={Math.round(stats?.saved_time_minutes ?? 0)}
               duration={1.5}
               className="text-2xl font-semibold"
+              cacheKey="saved_time_minutes"
             />
             <span className="text-sm text-muted-foreground">分钟</span>
           </div>
           <div className="mt-1.5 flex items-center justify-between text-xs text-muted-foreground">
             <span>预估基准</span>
             <span>
-              <CountUp to={stats?.estimated_typing_speed ?? 60} duration={1} /> 字/分
+              <CountUp
+                to={stats?.estimated_typing_speed ?? 60}
+                duration={1}
+                cacheKey="estimated_typing_speed"
+              />{' '}
+              字/分
             </span>
           </div>
         </div>
@@ -182,13 +190,19 @@ const ContentPage: React.FC = () => {
               to={Math.round(stats?.total_duration_minutes ?? 0)}
               duration={1.5}
               className="text-2xl font-semibold"
+              cacheKey="total_duration_minutes"
             />
             <span className="text-sm text-muted-foreground">分钟</span>
           </div>
           <div className="mt-1.5 flex items-center justify-between text-xs text-muted-foreground">
             <span>平均速度</span>
             <span>
-              <CountUp to={Math.round(stats?.average_speed ?? 0)} duration={1} /> 字/分
+              <CountUp
+                to={Math.round(stats?.average_speed ?? 0)}
+                duration={1}
+                cacheKey="average_speed"
+              />{' '}
+              字/分
             </span>
           </div>
         </div>
@@ -234,17 +248,10 @@ const ContentPage: React.FC = () => {
           </div>
         </div>
         {/* 反馈列表 */}
-        {(feedbackLoading || (feedbackData?.items && feedbackData.items.length > 0)) && (
-          <div
-            className={`flex-1 min-h-0 mt-5 rounded-xl   overflow-y-auto transition-colors duration-200   ${!feedbackLoading ? 'bg-setting/50' : ''}`}
-          >
-            {feedbackLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <Spinner className="text-muted-foreground" />
-              </div>
-            ) : (
-              <AnimatePresence mode="popLayout">
-                {feedbackData?.items.map((item) => (
+        {feedbackData?.items && feedbackData.items.length > 0 && (
+          <div className="flex-1 min-h-0 mt-5 rounded-xl bg-setting/50 overflow-y-auto transition-colors duration-200">
+            <AnimatePresence mode="popLayout">
+              {feedbackData?.items.map((item) => (
                   <motion.div
                     key={item.id}
                     layout
@@ -281,7 +288,6 @@ const ContentPage: React.FC = () => {
                   </motion.div>
                 ))}
               </AnimatePresence>
-            )}
           </div>
         )}
       </div>

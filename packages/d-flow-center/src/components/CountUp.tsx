@@ -12,6 +12,7 @@ interface CountUpProps {
   separator?: string
   onStart?: () => void
   onEnd?: () => void
+  cacheKey?: string // 用于在 sessionStorage 中缓存动画状态
 }
 
 export default function CountUp({
@@ -25,11 +26,39 @@ export default function CountUp({
   separator = '',
   onStart,
   onEnd,
+  cacheKey,
 }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null)
   const motionValue = useMotionValue(direction === 'down' ? to : from)
 
   const isInView = useInView(ref, { once: true, margin: '0px' })
+
+  // 从 sessionStorage 获取上次的值和动画状态
+  const getCachedState = useCallback(() => {
+    if (!cacheKey) return { previousValue: null, hasAnimated: false }
+    try {
+      const cached = sessionStorage.getItem(`countup-${cacheKey}`)
+      return cached ? JSON.parse(cached) : { previousValue: null, hasAnimated: false }
+    } catch {
+      return { previousValue: null, hasAnimated: false }
+    }
+  }, [cacheKey])
+
+  // 保存到 sessionStorage
+  const setCachedState = useCallback(
+    (value: number) => {
+      if (!cacheKey) return
+      try {
+        sessionStorage.setItem(
+          `countup-${cacheKey}`,
+          JSON.stringify({ previousValue: value, hasAnimated: true }),
+        )
+      } catch {
+        // 忽略存储错误
+      }
+    },
+    [cacheKey],
+  )
 
   const getDecimalPlaces = (num: number): number => {
     const str = num.toString()
@@ -68,12 +97,20 @@ export default function CountUp({
   }, [from, to, direction, formatValue])
 
   useEffect(() => {
-    if (isInView && startWhen) {
+    const shouldAnimate = isInView && startWhen
+    const cachedState = getCachedState()
+    const valueChanged = cachedState.previousValue !== null && cachedState.previousValue !== to
+    const isFirstTime = !cachedState.hasAnimated
+
+    // 首次加载或数值真正变化时才播放动画
+    if (shouldAnimate && (isFirstTime || valueChanged)) {
       if (typeof onStart === 'function') {
         onStart()
       }
 
       const timeoutId = setTimeout(() => {
+        setCachedState(to)
+
         // 使用 animate 函数进行精确时长控制
         const controls = animate(motionValue, direction === 'down' ? from : to, {
           duration,
@@ -91,6 +128,9 @@ export default function CountUp({
       return () => {
         clearTimeout(timeoutId)
       }
+    } else if (shouldAnimate && !valueChanged && !isFirstTime) {
+      // 如果值没变且不是首次，直接设置为最终值，不播放动画
+      motionValue.set(to)
     }
   }, [
     isInView,
@@ -103,6 +143,8 @@ export default function CountUp({
     onStart,
     onEnd,
     duration,
+    getCachedState,
+    setCachedState,
   ])
 
   useEffect(() => {
