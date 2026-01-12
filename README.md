@@ -3,15 +3,19 @@
 > 一款基于语音识别的智能输入桌面应用，支持快捷键触发、实时语音转文字等功能
 
 秒言是一个使用 Electron + React 构建的跨平台桌面应用，专注于提供高效的语音识别和智能输入体验。应用采用多窗口架构，支持主窗口和悬浮状态窗口，通过 Unix Domain Socket 实现进程间通信。
+主要功能如图
 
-<img width="1136" height="812" alt="截屏2026-01-12 11 45 19" src="https://github.com/user-attachments/assets/b3234b8d-4ae3-443c-abb7-e3eef96fdf11" />
+![onesec drawio](./docs/images/1.png)
+![onesec drawio](./docs/images/2.png)
+![onesec drawio](./docs/images/3.png)
+![onesec drawio](./docs/images/4.png)
+![onesec drawio](./docs/images/5.png)
+![onesec drawio](./docs/images/6.png)
+![onesec drawio](./docs/images/7.png)
 
-<img width="1136" height="812" alt="截屏2026-01-12 11 46 59" src="https://github.com/user-attachments/assets/061b0217-498e-472d-bfc0-f6449b1b8813" />
-<img width="1136" height="812" alt="截屏2026-01-12 11 47 05" src="https://github.com/user-attachments/assets/dd16fece-5be7-46d6-88e7-65ce0a31697d" />
-<img width="1136" height="812" alt="截屏2026-01-12 11 47 08" src="https://github.com/user-attachments/assets/9faf713f-35a7-4fa4-91cc-df7a9a39e2cd" />
-<img width="1136" height="812" alt="截屏2026-01-12 11 47 36" src="https://github.com/user-attachments/assets/6b26c816-c88f-41b2-8152-7da68ca1fc72" />
-<img width="1136" height="812" alt="截屏2026-01-12 11 47 47" src="https://github.com/user-attachments/assets/bf6b2678-991f-4e42-83a0-ebe31c57bb38" />
-<img width="1136" height="812" alt="截屏2026-01-12 11 51 38" src="https://github.com/user-attachments/assets/7e97073e-c707-46b3-8b22-400ec4386d55" />
+
+---
+**下面是 AI 生成的总结**
 
 
 ### ✨ 核心功能
@@ -303,16 +307,14 @@ app.commandLine.appendSwitch('--disable-web-security')
 
 ### 👥 团队
 
-© 2024 秒言团队
+© 2025 秒言团队
 
 
 
 ### 🔗 相关链接
 
-- 官网：https://miaoyan.app
-- 版本：1.0.0
+- 官网：https://miaoyan.cn
+- 版本：1.1.4 (Finally)
 
 ---
-
-**注意**：本项目处于开发阶段，部分功能可能还在完善中。
 
