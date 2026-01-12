@@ -93,8 +93,7 @@ class DatabaseService {
    * 启动周期性清理任务，每天执行一次
    * @param intervalMs 清理间隔时间，默认为 24 小时
    */
-  private startPeriodicCleanup(intervalMs: number = 24 * 60 * 60 * 1000): void {
-    // 定义清理函数
+  private startPeriodicCleanup(intervalMs: number = 12 * 60 * 60 * 1000): void {
     const cleanup = () => {
       try {
         const retention = userConfigManager.getConfig().setting?.history_retention
