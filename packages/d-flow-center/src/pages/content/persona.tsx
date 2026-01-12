@@ -739,7 +739,7 @@ const PersonaPage: React.FC = () => {
                           <div className="flex items-center gap-2">
                             <KeyDisplay
                               keys={[...formattedPersonaKeys, (index + 1).toString()]}
-                              className="bg-ripple-brand text-foreground dark:text-background"
+                              className="bg-ripple-brand-text/66 dark:bg-ripple-brand-text text-foreground dark:text-background"
                             />
                           </div>
                           <div className="flex items-center gap-2">

@@ -92,11 +92,11 @@
   --ripple-yellow-brand: #ffcc00;
   --ripple-brand: #2EDDA8;
 
-  --ripple-green-text: oklch(0.703 0.143 167.842);
+  --ripple-green-text: #5AB23EFF;
   --ripple-yellow-text: oklch(0.832 0.165 86.343);
   --ripple-error-text: oklch(0.578 0.203 24.8);
 
-  --ripple-brand-text: oklch(0.703 0.143 167.842);
+  --ripple-brand-text: #5AB23EFF;
 
   --selection: oklch(0.703 0.143 167.842 / 0.3);
   --setting: oklch(0.98 0 0);
@@ -140,7 +140,7 @@
   --ripple-yellow-brand: #ffcc00;
   --ripple-brand: #ffcc00;
 
-  --ripple-green-text: oklch(0.703 0.143 167.842);
+  --ripple-green-text: #5AB23EFF;
   --ripple-yellow-text: oklch(0.832 0.165 86.343);
   --ripple-error-text: oklch(0.578 0.203 24.8);
   --ripple-brand-text: oklch(0.832 0.165 86.343);
