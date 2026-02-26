@@ -8,8 +8,6 @@ gameData
 **/mongo
 env/.env.local
 package-lock.json
-packages/d-flow-center/dist-electron/
-
-packages/d-flow-center/release/
-
-packages/d-flow-center/.env
+dist-electron/
+release/
+.env

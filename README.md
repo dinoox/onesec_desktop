@@ -74,51 +74,46 @@
 ### 📁 项目结构
 
 ```
-ddxh-flow/
-├── packages/
-│   └── d-flow-center/              # 主应用包
-│       ├── electron/               # Electron 主进程
-│       │   ├── main.ts            # 主进程入口
-│       │   └── preload.ts         # 预加载脚本
-│       ├── main/                  # 主进程业务逻辑
-│       │   ├── communications/    # 进程间通信
-│       │   │   ├── process-manager.ts   # 进程管理器
-│       │   │   └── uds-service.ts      # Unix Socket 服务
-│       │   ├── services/         # 核心服务
-│       │   │   ├── window-manager.ts        # 窗口管理
-│       │   │   ├── user-config-manager.ts   # 配置管理
-│       │   │   └── native-process-manager.ts # 原生进程管理
-│       │   └── types/            # 类型定义
-│       │       ├── config.ts
-│       │       └── message.ts
-│       ├── src/                  # 渲染进程源码
-│       │   ├── components/       # React 组件
-│       │   │   ├── app/         # 应用组件
-│       │   │   ├── layout/      # 布局组件
-│       │   │   └── ui/          # UI 组件库
-│       │   ├── pages/           # 页面组件
-│       │   │   ├── content/     # 内容管理页面
-│       │   │   ├── dashboard/   # 仪表盘
-│       │   │   └── login/       # 登录页面
-│       │   ├── routes/          # 路由配置
-│       │   ├── services/        # 服务层
-│       │   │   ├── api/        # API 接口
-│       │   │   ├── queries/    # React Query 配置
-│       │   │   └── ipc-service.ts  # IPC 通信服务
-│       │   ├── store/          # 状态管理
-│       │   ├── hooks/          # 自定义 Hooks
-│       │   ├── lib/            # 工具函数
-│       │   └── types/          # 类型定义
-│       ├── assets/             # 静态资源
-│       │   ├── icon.icns       # 应用图标
-│       │   └── entitlements.mac.plist  # macOS 权限配置
-│       ├── index.html          # 主窗口 HTML
-│       ├── status.html         # 状态窗口 HTML
-│       ├── package.json
-│       ├── vite.config.ts      # Vite 配置
-│       └── electron-builder.json5  # 打包配置
+onesec_desktop/
+├── electron/               # Electron 主进程
+│   ├── main.ts            # 主进程入口
+│   └── preload.ts         # 预加载脚本
+├── main/                  # 主进程业务逻辑
+│   ├── communications/    # 进程间通信
+│   │   ├── process-manager.ts   # 进程管理器
+│   │   └── uds-service.ts      # Unix Socket 服务
+│   ├── services/         # 核心服务
+│   │   ├── window-manager.ts        # 窗口管理
+│   │   ├── user-config-manager.ts   # 配置管理
+│   │   └── native-process-manager.ts # 原生进程管理
+│   └── types/            # 类型定义
+│       ├── config.ts
+│       └── message.ts
+├── src/                  # 渲染进程源码
+│   ├── components/       # React 组件
+│   │   ├── app/         # 应用组件
+│   │   ├── layout/      # 布局组件
+│   │   └── ui/          # UI 组件库
+│   ├── pages/           # 页面组件
+│   │   ├── content/     # 内容管理页面
+│   │   ├── dashboard/   # 仪表盘
+│   │   └── login/       # 登录页面
+│   ├── routes/          # 路由配置
+│   ├── services/        # 服务层
+│   │   ├── api/        # API 接口
+│   │   ├── queries/    # React Query 配置
+│   │   └── ipc-service.ts  # IPC 通信服务
+│   ├── store/          # 状态管理
+│   ├── hooks/          # 自定义 Hooks
+│   ├── lib/            # 工具函数
+│   └── types/          # 类型定义
+├── assets/             # 静态资源
+│   ├── icon.icns       # 应用图标
+│   └── entitlements.mac.plist  # macOS 权限配置
+├── index.html          # 主窗口 HTML
 ├── package.json
-└── pnpm-workspace.yaml
+├── vite.config.ts      # Vite 配置
+└── electron-builder.json5  # 打包配置
 ```
 
 
@@ -215,14 +210,12 @@ pnpm install
 #### 开发模式
 
 ```bash
-cd packages/d-flow-center
 pnpm dev
 ```
 
 #### 构建应用
 
 ```bash
-cd packages/d-flow-center
 pnpm build
 ```
 

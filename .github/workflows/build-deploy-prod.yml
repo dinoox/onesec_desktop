@@ -49,10 +49,10 @@ jobs:
       # Build Artifact
       - name: Build
         run: |
-          cd packages/d-flow-center && rm -rf release
-          npm i && pnpm build
+          rm -rf release
+          pnpm install && pnpm build
 
       # Upload Artifact
       - name: Upload artifact to OSS
         run: |
-          aliyun oss cp -f --recursive packages/d-flow-center/release oss://$ALIYUN_OSS_BUCKET_NAME/apps/$APP_NAME/
+          aliyun oss cp -f --recursive release oss://$ALIYUN_OSS_BUCKET_NAME/apps/$APP_NAME/
