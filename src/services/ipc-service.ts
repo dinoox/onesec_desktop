@@ -127,6 +127,26 @@ class IPCService {
       await router.navigate('/content/history')
       return
     }
+
+    if (action === 'login_data_received') {
+      const info = message.data?.data
+      if (!info) return
+
+      const user = {
+        id: info.id,
+        email: info.email,
+        display_name: info.display_name,
+      }
+      const loginData = {
+        access_token: info.access_token,
+        refresh_token: info.refresh_token,
+        tokenExpirationTime: info.tokenExpirationTime,
+      }
+
+      await useAuthStore.getState().actions.setAuthed(user, loginData)
+      await router.navigate('/')
+      return
+    }
   }
 
   // External URL

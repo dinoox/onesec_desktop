@@ -1,5 +1,5 @@
 {
-  "name": "ai.sayso.app",
+  "name": "ai.sayso",
   "author": "SaySo Developer",
   "description": "The implementation of SaySo electron desktop",
   "private": true,
@@ -9,9 +9,8 @@
   "packageManager": "pnpm@10.11.0",
   "scripts": {
     "dev": "vite",
+    "dev:prod": "vite --mode production",
     "build": "tsc && vite build && electron-builder --mac",
-    "build:x64": "tsc && vite build && electron-builder --mac --x64",
-    "build:arm64": "tsc && vite build && electron-builder --mac --arm64",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier -w '**/*.{js,jsx,ts,tsx}'"
   },

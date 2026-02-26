@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import Store from 'electron-store'
 import { StoreSchema, USER_DEFAULT_CONFIG } from '../types/config.ts'
+import log from 'electron-log'
 
 class UserConfigManager {
   private store: Store<StoreSchema>
@@ -13,6 +14,8 @@ class UserConfigManager {
       defaults: USER_DEFAULT_CONFIG,
       clearInvalidConfig: true,
     })
+
+    log.info(`Store Path: ${this.store.path}`)
     this.launchMarkerPath = path.join(path.dirname(this.store.path), '.launched')
   }
 

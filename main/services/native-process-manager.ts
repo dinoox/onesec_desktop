@@ -145,7 +145,7 @@ class NativeProcessManager {
     const config = userConfigManager.getConfig()
 
     // 1. 获取 Auth token
-    const authToken = config.auth_token
+    const authToken = config.login_data?.access_token || ''
 
     // 2. 获取 UDS channel 路径
     const udsChannel = udsService.socketPath

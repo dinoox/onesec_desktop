@@ -25,7 +25,7 @@ class ProcessManager {
       await udsService.start()
       await this.setupUDSForward()
       await ipcService.initialize()
-      await nativeProcessManager.start()
+      // await nativeProcessManager.start()
     } catch (err) {
       log.error(err)
     }
@@ -58,7 +58,7 @@ class ProcessManager {
   async ipcInterceptor(message: IPCMessage) {
     switch (message.action) {
       case 'auth_token_failed': {
-        if (!userConfigManager.getConfig().auth_token) return
+        if (!userConfigManager.getConfig().login_data?.access_token) return
         this.ensureContentWindowAndShow(message)
         return
       }
@@ -78,7 +78,7 @@ class ProcessManager {
         userConfigManager.setConfig({
           user: {
             ...currentUser,
-            preferred_linux_distro,
+            // preferred_linux_distro,
           },
         })
         return

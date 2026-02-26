@@ -7,6 +7,11 @@ import menuService from '../main/services/menu-service.ts'
 import userConfigManager from '../main/services/user-config-manager.ts'
 import { checkForUpdates, startPeriodicUpdateCheck } from './updater.ts'
 import { throttle } from '../main/utils/throttle.ts'
+import {
+  DEFAULT_IPC_CHANNEL,
+  MessageTypes,
+  buildIPCMessage,
+} from '../main/types/message.ts'
 
 import { version } from '../package.json'
 import { log } from 'electron-log'
@@ -30,6 +35,52 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   : RENDERER_DIST
 
 let win: BrowserWindow | null = null
+let pendingLoginData: Record<string, any> | null = null
+
+// Register sayso:// protocol
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('sayso', process.execPath, [
+      path.resolve(process.argv[1]),
+    ])
+  }
+} else {
+  app.setAsDefaultProtocolClient('sayso')
+}
+
+function handleDeepLink(url: string) {
+  try {
+    const parsed = new URL(url)
+    if (parsed.hostname === 'login') {
+      const info = parsed.searchParams.get('info')
+      if (!info) return
+
+      const data = JSON.parse(decodeURIComponent(info))
+      const contentWindow = windowManager.getWindow(WINDOW_CONTENT_ID)
+
+      if (contentWindow && !contentWindow.isDestroyed()) {
+        contentWindow.show()
+        windowManager.broadcast(
+          DEFAULT_IPC_CHANNEL,
+          buildIPCMessage(MessageTypes.LOGIN_DATA_RECEIVED, {
+            type: MessageTypes.LOGIN_DATA_RECEIVED,
+            data,
+          }),
+        )
+      } else {
+        pendingLoginData = data
+      }
+    }
+  } catch (e) {
+    log('Failed to handle deep link:', e)
+  }
+}
+
+// macOS: open-url event
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  handleDeepLink(url)
+})
 
 function createWindow(onWebLoaded: Function = () => {}) {
   const theme = userConfigManager.getConfig().theme
@@ -59,6 +110,18 @@ function createWindow(onWebLoaded: Function = () => {}) {
     windowManager.register(win!, WINDOW_CONTENT_ID)
     menuService.initialize()
     await onWebLoaded()
+
+    // Send pending login data if available
+    if (pendingLoginData) {
+      windowManager.broadcast(
+        DEFAULT_IPC_CHANNEL,
+        buildIPCMessage(MessageTypes.LOGIN_DATA_RECEIVED, {
+          type: MessageTypes.LOGIN_DATA_RECEIVED,
+          data: pendingLoginData,
+        }),
+      )
+      pendingLoginData = null
+    }
   })
 
   if (VITE_DEV_SERVER_URL) {

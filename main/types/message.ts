@@ -26,6 +26,8 @@ export const MessageTypes = {
   RECORDING_INTERRUPTED: 'recording_interrupted',
   // Persona
   PERSONA_UPDATED: 'persona_updated',
+  // OAuth Login
+  LOGIN_DATA_RECEIVED: 'login_data_received',
 } as const
 
 export type MessageType = (typeof MessageTypes)[keyof typeof MessageTypes]

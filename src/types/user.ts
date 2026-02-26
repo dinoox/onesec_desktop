@@ -1,24 +1,11 @@
-export type AccessToken = {
+export type User = {
+  id: string
+  email: string
+  display_name: string
+}
+
+export type LoginData = {
   access_token: string
   refresh_token: string
-  type: string
-  expiresIn: number
-}
-
-export type User = {
-  user_id: number
-  user_name: string
-  phone: string
-  is_active: string
-  preferred_linux_distro?: string | null
-  share_code: string
-  points: number
-  membership_type: string
-  membership_expires_at: number
-  created_at: number
-}
-
-export type LoginResp = {
-  user: User
-  access_token: string
+  tokenExpirationTime: string
 }

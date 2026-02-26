@@ -1,6 +1,5 @@
 import { create } from 'zustand'
-import type { User } from '@/types/user'
-import { logout } from '@/services/api/auth-api.ts'
+import type { User, LoginData } from '@/types/user'
 import { UserService } from '@/services/user-service.ts'
 
 interface AuthStore {
@@ -9,7 +8,7 @@ interface AuthStore {
   isAuthed: boolean
   actions: {
     initAuth: () => Promise<void>
-    setAuthed: (user: User, accessToken: string) => Promise<void>
+    setAuthed: (user: User, loginData: LoginData) => Promise<void>
     updateUser: (user: User) => Promise<void>
     logout: () => Promise<void>
   }
@@ -22,23 +21,23 @@ const useAuthStore = create<AuthStore>((set) => ({
   actions: {
     initAuth: async () => {
       const config = await UserService.getConfig()
-      const hasToken = !!config.auth_token
+      const token = config.login_data?.access_token || ''
       set({
-        isAuthed: hasToken,
-        accessToken: config.auth_token,
+        isAuthed: !!token,
+        accessToken: token,
         user: config.user,
       })
     },
 
-    setAuthed: async (user, accessToken) => {
+    setAuthed: async (user, loginData) => {
       await UserService.setPartialConfig({
-        auth_token: accessToken,
+        login_data: loginData,
         user,
       })
 
       set({
         user,
-        accessToken,
+        accessToken: loginData.access_token,
         isAuthed: true,
       })
 
@@ -51,10 +50,8 @@ const useAuthStore = create<AuthStore>((set) => ({
     },
 
     logout: async () => {
-      logout().then()
-
       await UserService.setPartialConfig({
-        auth_token: '',
+        login_data: null,
         user: null,
       })
 

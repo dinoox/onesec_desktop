@@ -14,26 +14,17 @@ import {
 } from '@/components/ui/pure-select.tsx'
 import { useTheme } from '@/components/theme-provider.tsx'
 import useUserConfigStore, { useUserConfigActions } from '@/store/user-config-store.ts'
-import { useUIActions } from '@/store/ui-store.ts'
-import { useGetUserInfo, useUpdateUserInfo } from '@/services/queries/user-query.ts'
-import { IconGitBranch } from '@tabler/icons-react'
-import { AdvancedSettingsDialog } from '@/components/advanced-settings-dialog.tsx'
-import { SystemFamily } from '@/types/terminal.ts'
 import ipcService from '@/services/ipc-service.ts'
 import { uploadErrorLog } from '@/services/api/error-log-api.ts'
 import { toast } from 'sonner'
-import { AnimatePresence, motion } from 'framer-motion'
 
 const ContentPage: React.FC = () => {
   const user = useAuthStore((state) => state.user)
   const mutation = useLogoutQuery()
-  useGetUserInfo()
-  const updateUserMutation = useUpdateUserInfo()
   const { theme, setTheme } = useTheme()
   const showComparison = useUserConfigStore((state) => state.showComparison)
   const hideStatusPanel = useUserConfigStore((state) => state.hideStatusPanel)
   const { setShowComparison, setHideStatusPanel } = useUserConfigActions()
-  const { setAdvancedSettingsOpen } = useUIActions()
   const [uploadingLog, setUploadingLog] = useState(false)
 
   async function logout() {
@@ -56,16 +47,6 @@ const ContentPage: React.FC = () => {
     }
   }
 
-  const handleSystemFamilyChange = async (value: string) => {
-    let preferred_linux_distro: string | null = null
-
-    if (value === SystemFamily.Debian || value === SystemFamily.RedHat) {
-      preferred_linux_distro = value
-    }
-
-    await updateUserMutation.mutateAsync({ preferred_linux_distro })
-  }
-
   return (
     <div className="max-w-1/2 space-y-3 mt-1">
       <div className="absolute right-4 top-4">
@@ -83,17 +64,13 @@ const ContentPage: React.FC = () => {
       <div className=" flex flex-col justify-between self-start space-y-2 gap-x-4">
         <div className="text-[15px]">基础设置</div>
         <div className="flex items-center justify-between w-full bg-setting rounded-xl px-3 py-3">
-          <Label htmlFor="picture">手机号</Label>
+          <Label htmlFor="picture">邮箱</Label>
           <Input
-            className="w-[84px] h-[21px] border-none bg-transparent! p-0"
+            className="w-fit h-[21px] border-none bg-transparent! p-0"
             disabled
             type="email"
             placeholder="Email"
-            value={
-              user?.phone
-                ? user.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
-                : '未设置'
-            }
+            value={user?.email || '未设置'}
           />
         </div>
 
@@ -154,48 +131,6 @@ const ContentPage: React.FC = () => {
           </Select>
         </div>
 
-        {/* 常用系统 */}
-        <AnimatePresence>
-          {user?.preferred_linux_distro && user.preferred_linux_distro.length > 0 && (
-            <motion.div
-              data-theme-transition
-              className="flex items-center justify-between w-full bg-setting rounded-xl p-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-            >
-              <div className="flex flex-col space-y-1">
-                <Label>常用系统</Label>
-                <span className="text-muted-foreground">终端连接远程主机常用系统</span>
-                <Button
-                  variant="outline"
-                  className="mr-auto mt-1"
-                  size="sm"
-                  onClick={() => setAdvancedSettingsOpen(true)}
-                >
-                  <IconGitBranch />
-                  配置
-                </Button>
-              </div>
-
-              <Select
-                value={user?.preferred_linux_distro || 'none'}
-                onValueChange={handleSystemFamilyChange}
-                disabled={updateUserMutation.isPending}
-              >
-                <SelectTrigger className="py-4">
-                  <SelectValue placeholder="选择系统" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">未设置</SelectItem>
-                  <SelectItem value={SystemFamily.Debian}>Debian 系</SelectItem>
-                  <SelectItem value={SystemFamily.RedHat}>Red Hat 系</SelectItem>
-                </SelectContent>
-              </Select>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <div className="flex gap-2">
@@ -209,8 +144,6 @@ const ContentPage: React.FC = () => {
           退出登录
         </Button>
       </div>
-
-      <AdvancedSettingsDialog />
     </div>
   )
 }

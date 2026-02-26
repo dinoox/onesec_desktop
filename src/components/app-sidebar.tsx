@@ -1,11 +1,7 @@
 import React from 'react'
 import { Link, useLocation, matchPath } from 'react-router'
 import { navMain, type NavItem } from '@/configs/navigation'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import useUIStore from '@/store/ui-store'
-import useAuthStore from '@/store/auth-store'
-import { CircleFadingArrowUpIcon } from 'lucide-react'
 import {
   Tooltip,
   TooltipContent,
@@ -23,16 +19,10 @@ function checkIsActive(href: string, item: NavItem) {
   return false
 }
 
-const membershipLabels: Record<string, string> = {
-  normal: '普通用户',
-  pro: 'Pro',
-}
-
 const AppSidebar: React.FC = () => {
   const location = useLocation()
   const { pathname } = location
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
-  const user = useAuthStore((state) => state.user)
 
   return (
     <div
@@ -45,11 +35,6 @@ const AppSidebar: React.FC = () => {
         <div className="p-3 pt-5 transition-colors duration-300">
           <div className="flex items-center gap-2 px-2 py-2">
             <span className="text-base font-semibold">SaySo</span>
-            {user && user.membership_type && !sidebarCollapsed && (
-              <Badge variant="secondary" className="text-ripple-brand-text">
-                {membershipLabels[user.membership_type] || user.membership_type}
-              </Badge>
-            )}
           </div>
         </div>
       )}
@@ -110,44 +95,6 @@ const AppSidebar: React.FC = () => {
           })}
         </TooltipProvider>
       </nav>
-
-      {/* 会员信息 */}
-      {user &&
-        user.membership_type &&
-        user.membership_type != 'normal' &&
-        !sidebarCollapsed && (
-          <div className="p-2">
-            <div className="flex items-center px-3 py-2 gap-2 text-sm bg-sidebar-accent/40 rounded-md">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-ripple-brand-text">
-                  {membershipLabels[user.membership_type] || user.membership_type}
-                </Badge>
-              </div>
-              {user.membership_expires_at && (
-                <>
-                  <div className="text-xs">
-                    还剩{' '}
-                    {Math.max(
-                      0,
-                      Math.ceil(
-                        (user.membership_expires_at * 1000 - Date.now()) /
-                          (1000 * 60 * 60 * 24),
-                      ),
-                    )}{' '}
-                    天到期
-                  </div>
-                  {/*<Button*/}
-                  {/*  variant="outline"*/}
-                  {/*  size="sm"*/}
-                  {/*  className="w-fit text-xs px-2 bg-sidebar-accent text-ripple-brand-text hover:text-ripple-brand-text"*/}
-                  {/*>*/}
-                  {/*  升级*/}
-                  {/*</Button>*/}
-                </>
-              )}
-            </div>
-          </div>
-        )}
     </div>
   )
 }

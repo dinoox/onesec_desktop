@@ -1,9 +1,9 @@
 import { HotkeyConfig } from './message'
-import { User } from '@/types/user.ts'
+import { User, LoginData } from '@/types/user.ts'
 import { Theme } from '@/components/theme-provider.tsx'
 
 interface StoreSchema {
-  auth_token: string
+  login_data: LoginData | null
   hotkey_configs: HotkeyConfig[]
   user: User | null
   setting: {
@@ -16,7 +16,7 @@ interface StoreSchema {
 }
 
 const USER_DEFAULT_CONFIG: StoreSchema = {
-  auth_token: '',
+  login_data: null,
   hotkey_configs: [
     {
       mode: 'normal',

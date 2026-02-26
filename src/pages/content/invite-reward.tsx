@@ -17,31 +17,17 @@ import {
   useGetRanking,
   useExchangeMembership,
 } from '@/services/queries/points-query'
-import { useGetUserInfo } from '@/services/queries/user-query'
 import { ArrowUpRight, ArrowDownRight, Gift, Copy } from 'lucide-react'
 import { IconAward, IconHistory, IconTrophy, IconShare } from '@tabler/icons-react'
 import useAuthStore from '@/store/auth-store'
 import { useState } from 'react'
+
 const ContentPage: React.FC = () => {
   const user = useAuthStore((s) => s.user)
-  const { isLoading: userLoading } = useGetUserInfo()
   const { data: transactions, isLoading: txLoading } = useGetTransactions(10, 0)
   const { data: ranking, isLoading: rankLoading } = useGetRanking(10, 0)
   const exchangeMutation = useExchangeMembership()
   const [showExchangeDialog, setShowExchangeDialog] = useState(false)
-
-  // 是否在注册30天内
-  const isWithin30Days = user?.created_at
-    ? Date.now() - Number(user.created_at) * 1000 < 30 * 24 * 60 * 60 * 1000
-    : false
-
-  // 是否已邀请过用户
-  const hasInvited = transactions?.transactions.some(
-    (tx) => tx.reason === '分享码被使用奖励',
-  )
-
-  // 新人专享条件：30天内 + 未邀请过
-  const isNewUserPromo = isWithin30Days && !hasInvited
 
   const handleExchange = async () => {
     await exchangeMutation.mutateAsync('pro')
@@ -49,8 +35,7 @@ const ContentPage: React.FC = () => {
   }
 
   const handleCopyShareLink = async () => {
-    const shareCode = user?.share_code ?? ''
-    const text = `SaySo 语音输入又快又准。注册解锁专属会员权益，立即开启高效输入！邀请链接：https://www.miaoyan.cn/download.html 邀请码：${shareCode}`
+    const text = `SaySo - Intelligent speech-to-text input. Try it now: https://www.sayso.ai`
     await navigator.clipboard.writeText(text)
     toast.success('已复制邀请链接')
   }
@@ -70,16 +55,13 @@ const ContentPage: React.FC = () => {
         <div className="flex items-center justify-between min-h-[32px]">
           <span className="text-[15px] font-medium">邀请奖励</span>
         </div>
-        {/* 新人专享/邀请好友 提示 */}
         <div className="flex items-center justify-between bg-ripple-brand-text/10 text-ripple-brand-text rounded-xl px-4 py-3 ">
           <div className="flex items-center ">
             <IconShare className="w-4 h-4 mr-[0.7rem]" />
             <div className="flex flex-col gap-1">
-              <span>{isNewUserPromo ? '新人专享' : '邀请好友'}</span>
+              <span>邀请好友</span>
               <p className="text-sm text-ripple-brand-text">
-                {isNewUserPromo
-                  ? '限时: 邀请好友注册,解锁 23 天会员! 任务自注册日起 30 天有效'
-                  : `我的邀请码：${user?.share_code ?? '-'}，邀请好友注册可获得积分奖励`}
+                邀请好友注册可获得积分奖励
               </p>
             </div>
           </div>
@@ -98,17 +80,13 @@ const ContentPage: React.FC = () => {
             <span>我的积分</span>
           </div>
           <div className="flex items-center justify-between rounded-xl pt-3 pb-4">
-            {userLoading ? (
-              <Skeleton className="h-[36px] w-20 animate-in fade-in duration-300" />
-            ) : (
-              <span className="text-3xl font-medium animate-in fade-in duration-300">
-                {user?.points ?? 0}
-              </span>
-            )}
+            <span className="text-3xl font-medium animate-in fade-in duration-300">
+              -
+            </span>
             <Button
               size="sm"
               onClick={() => setShowExchangeDialog(true)}
-              disabled={userLoading || !user || user.points < 100}
+              disabled
               variant="outline"
             >
               <IconAward />
@@ -145,7 +123,7 @@ const ContentPage: React.FC = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          <p className="">{tx.reason}</p>
+                          <p>{tx.reason}</p>
                           <p className="text-xs text-muted-foreground">
                             {formatDate(tx.created_at)}
                           </p>
@@ -175,11 +153,6 @@ const ContentPage: React.FC = () => {
                 <IconTrophy className="w-5 h-5 text-ripple-brand-text" />
                 <span>积分排行榜</span>
               </div>
-              {/* {ranking?.current_user_rank && (
-              <span className="text-xs text-muted-foreground">
-                当前第 {ranking.current_user_rank} 名
-              </span>
-            )} */}
             </div>
             <div className="max-h-[160px] overflow-y-auto flex-1">
               {rankLoading ? (
@@ -194,21 +167,11 @@ const ContentPage: React.FC = () => {
                     {ranking.ranking.map((item) => (
                       <TableRow key={item.rank}>
                         <TableCell className="w-10 pl-0">
-                          <span
-                            className={` flex items-center justify-center  ${
-                              item.rank === 1
-                                ? ''
-                                : item.rank === 2
-                                  ? ''
-                                  : item.rank === 3
-                                    ? ''
-                                    : ''
-                            }`}
-                          >
+                          <span className="flex items-center justify-center">
                             {item.rank}
                           </span>
                         </TableCell>
-                        <TableCell className=" truncate max-w-[100px]">
+                        <TableCell className="truncate max-w-[100px]">
                           {item.phone}
                         </TableCell>
                         <TableCell className="text-right text-ripple-brand-text">
@@ -225,7 +188,7 @@ const ContentPage: React.FC = () => {
               )}
             </div>
 
-            <div className="text-xs text-muted-foreground  mt-auto">
+            <div className="text-xs text-muted-foreground mt-auto">
               累计积分 {ranking?.current_user_points ?? 0}
               {ranking?.current_user_points
                 ? `, 当前第 ${ranking?.current_user_rank ?? 0} 名`
