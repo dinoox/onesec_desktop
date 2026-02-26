@@ -263,7 +263,7 @@ class IPCService {
           type: 'warning',
           title: '申请麦克风访问权限',
           message: '为使用语音输入功能',
-          detail: '请在系统设置中手动为「秒言」开启麦克风权限。',
+          detail: '请在系统设置中手动为「SaySo」开启麦克风权限。',
           buttons: ['打开系统设置', '取消'],
           defaultId: 0,
           cancelId: 1,

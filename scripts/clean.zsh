@@ -1,7 +1,7 @@
 #!/bin/bash
 
-APP_NAME="秒言"
-BUNDLE_ID="com.ripplestar.miaoyan"  # 替换为实际的 Bundle ID
+APP_NAME="SaySo"
+BUNDLE_ID="ai.sayso.app"  # 替换为实际的 Bundle ID
 
 # 删除应用
 sudo rm -rf "/Applications/${APP_NAME}.app"

@@ -1,8 +1,8 @@
-### 秒言 - 智能语音输入工具
+### SaySo - 智能语音输入工具
 
 > 一款基于语音识别的智能输入桌面应用，支持快捷键触发、实时语音转文字等功能
 
-秒言是一个使用 Electron + React 构建的跨平台桌面应用，专注于提供高效的语音识别和智能输入体验。应用采用多窗口架构，支持主窗口和悬浮状态窗口，通过 Unix Domain Socket 实现进程间通信。
+SaySo 是一个使用 Electron + React 构建的跨平台桌面应用，专注于提供高效的语音识别和智能输入体验。应用采用多窗口架构，支持主窗口和悬浮状态窗口，通过 Unix Domain Socket 实现进程间通信。
 主要功能如图
 
 ![onesec drawio](./docs/images/1.png)
@@ -74,7 +74,7 @@
 ### 📁 项目结构
 
 ```
-onesec_desktop/
+sayso-desktop/
 ├── electron/               # Electron 主进程
 │   ├── main.ts            # 主进程入口
 │   └── preload.ts         # 预加载脚本
@@ -300,7 +300,7 @@ app.commandLine.appendSwitch('--disable-web-security')
 
 ### 👥 团队
 
-© 2025 秒言团队
+© 2025 SaySo Team
 
 
 

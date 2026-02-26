@@ -37,7 +37,7 @@ function createWindow(onWebLoaded: Function = () => {}) {
     theme === 'system' ? nativeTheme.shouldUseDarkColors : theme === 'dark'
 
   win = new BrowserWindow({
-    title: '秒言',
+    title: 'SaySo',
     width: 1024,
     height: 700,
     minWidth: 1024,
@@ -100,11 +100,11 @@ app.on('activate', () => {
 
 app.whenReady().then(async () => {
   app.setAboutPanelOptions({
-    applicationName: '秒言',
+    applicationName: 'SaySo',
     applicationVersion: version,
     copyright: `© 杭州点动星河科技有限公司`,
     credits:
-      '秒言是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
+      'SaySo 是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
     website: 'https://miaoyan.cn',
   })
 

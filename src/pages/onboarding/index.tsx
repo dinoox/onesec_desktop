@@ -143,7 +143,7 @@ export default function OnboardingPage() {
 function RegisterStep() {
   return (
     <StepContainer title="注册完成">
-      <div className="text-center text-muted-foreground">您已成功注册秒言账号</div>
+      <div className="text-center text-muted-foreground">您已成功注册 SaySo 账号</div>
     </StepContainer>
   )
 }
@@ -179,23 +179,23 @@ function PermissionStep({ onNext }: { onNext: () => void }) {
   return (
     <div className="flex h-full">
       <div className="flex-1 flex flex-col justify-center p-8 max-w-xl">
-        <h1 className="text-2xl font-semibold mb-2">在您的计算机上设置秒言</h1>
+        <h1 className="text-2xl font-semibold mb-2">在您的计算机上设置 SaySo</h1>
         <p className="text-muted-foreground mb-8 text-[14px]">
-          允许关键权限，确保秒言可以在任意输入框中正常工作。
+          允许关键权限，确保 SaySo 可以在任意输入框中正常工作。
         </p>
 
         <div className="space-y-4 mb-8">
           <PermissionCard
-            title="允许秒言将文本粘贴到任何文本框中"
-            description="这让秒言能够将您的口述内容放入正确的文本框中"
+            title="允许 SaySo 将文本粘贴到任何文本框中"
+            description="这让 SaySo 能够将您的口述内容放入正确的文本框中"
             granted={accessibilityGranted}
             onRequest={handleRequestAccessibility}
-            infoTooltip='点击"允许"后，系统将打开"隐私与安全性"设置，请在"辅助功能"中勾选秒言应用'
+            infoTooltip='点击"允许"后，系统将打开"隐私与安全性"设置，请在"辅助功能"中勾选 SaySo 应用'
           />
 
           <PermissionCard
-            title="允许秒言使用您的麦克风"
-            description="这让秒言能够录制您的语音并转换为文字"
+            title="允许 SaySo 使用您的麦克风"
+            description="这让 SaySo 能够录制您的语音并转换为文字"
             granted={microphoneGranted}
             onRequest={handleRequestMicrophone}
             infoTooltip='点击"允许"后，系统将弹出麦克风权限请求，请点击"好"以授予权限'
@@ -859,7 +859,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
                   </div>
 
                   <div className="text-xs text-muted-foreground mt-2 ml-1">
-                    秒言会自动帮你去除语气词并整理语义
+                    SaySo 会自动帮你去除语气词并整理语义
                   </div>
                 </div>
               </div>

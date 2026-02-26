@@ -217,7 +217,7 @@ const ContentPage: React.FC = () => {
         <div className="flex items-center bg-setting rounded-xl px-4 py-3">
           <PopcornIcon className="w-4 h-4 mr-[0.7rem]" />
           <div className="flex flex-col gap-1">
-            <span>让秒言更懂你</span>
+            <span>让 SaySo 更懂你</span>
             <p className="text-sm text-muted-foreground">
               添加常用的人名、地名或术语，系统会优先识别，避免识别错误或遗漏
             </p>

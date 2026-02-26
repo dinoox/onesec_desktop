@@ -3,7 +3,8 @@
     "allow": [
       "Bash(pnpm install:*)",
       "Bash(timeout 15 pnpm dev:*)",
-      "Bash(gtimeout 15 pnpm dev:*)"
+      "Bash(gtimeout 15 pnpm dev:*)",
+      "Bash(ls:*)"
     ]
   }
 }

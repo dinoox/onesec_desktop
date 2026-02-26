@@ -1,9 +1,9 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "com.ripplestar.miaoyan",
+  "appId": "ai.sayso.app",
   "asar": true,
-  "productName": "秒言",
+  "productName": "SaySo",
   "directories": {
     "output": "release"
   },
@@ -13,8 +13,8 @@
   ],
   "extraResources": [
     {
-      "from": "assets/OnesecCore.app",
-      "to": "Helpers/OnesecCore.app"
+      "from": "assets/SaysoMacos.app",
+      "to": "Helpers/SaysoMacos.app"
     }
   ],
   "mac": {
@@ -74,7 +74,7 @@
   "publish": [
     {
       "provider": "generic",
-      "url": "https://release-ripplestar-cn.oss-cn-beijing.aliyuncs.com/apps/com.ripplestar.miaoyan"
+      "url": "https://release-ripplestar-cn.oss-cn-beijing.aliyuncs.com/apps/ai.sayso.app"
     }
   ],
   "linux": {

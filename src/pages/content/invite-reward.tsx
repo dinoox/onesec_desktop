@@ -50,7 +50,7 @@ const ContentPage: React.FC = () => {
 
   const handleCopyShareLink = async () => {
     const shareCode = user?.share_code ?? ''
-    const text = `秒言语音输入又快又准。注册解锁专属会员权益，立即开启高效输入！邀请链接：https://www.miaoyan.cn/download.html 邀请码：${shareCode}`
+    const text = `SaySo 语音输入又快又准。注册解锁专属会员权益，立即开启高效输入！邀请链接：https://www.miaoyan.cn/download.html 邀请码：${shareCode}`
     await navigator.clipboard.writeText(text)
     toast.success('已复制邀请链接')
   }

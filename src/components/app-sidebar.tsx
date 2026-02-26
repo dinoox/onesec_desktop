@@ -44,7 +44,7 @@ const AppSidebar: React.FC = () => {
       {!sidebarCollapsed && (
         <div className="p-3 pt-5 transition-colors duration-300">
           <div className="flex items-center gap-2 px-2 py-2">
-            <span className="text-base font-semibold">秒言</span>
+            <span className="text-base font-semibold">SaySo</span>
             {user && user.membership_type && !sidebarCollapsed && (
               <Badge variant="secondary" className="text-ripple-brand-text">
                 {membershipLabels[user.membership_type] || user.membership_type}

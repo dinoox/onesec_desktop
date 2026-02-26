@@ -6,10 +6,10 @@ import log from 'electron-log'
 
 /**
  * UDS (Unix Domain Socket) 服务
- * 实现秒言 Electron 主进程与 Native 进程之间的 UDS 通信协议
+ * 实现 SaySo Electron 主进程与 Native 进程之间的 UDS 通信协议
  */
 class UDSService extends EventEmitter {
-  readonly socketPath: string = '/tmp/com.ripplestars.miaoyan.uds.test'
+  readonly socketPath: string = '/tmp/ai.sayso.app.uds'
   private server: net.Server | null = null
   private clients: Map<string, ClientInfo> = new Map()
 

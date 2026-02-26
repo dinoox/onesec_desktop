@@ -30,7 +30,7 @@ class NativeProcessManager {
         fs.chmodSync(appPath, '755')
       } catch (chmodError) {
         console.warn(
-          '[MiaoyanSwiftManager] Failed to set executable permission:',
+          '[SaysoNativeManager] Failed to set executable permission:',
           chmodError,
         )
       }
@@ -128,13 +128,13 @@ class NativeProcessManager {
     if (!app.isPackaged) {
       return path.join(
         app.getAppPath(),
-        'assets/OnesecCore.app/Contents/MacOS/OnesecCore',
+        'assets/SaysoMacos.app/Contents/MacOS/SaysoMacos',
       )
     }
 
     return path.join(
       process.resourcesPath,
-      'Helpers/OnesecCore.app/Contents/MacOS/OnesecCore',
+      'Helpers/SaysoMacos.app/Contents/MacOS/SaysoMacos',
     )
   }
 

@@ -16,10 +16,10 @@ class MenuService {
   private buildTemplate(): MenuItemConstructorOptions[] {
     return [
       {
-        label: '秒言',
+        label: 'SaySo',
         submenu: [
           {
-            label: '关于秒言',
+            label: '关于 SaySo',
             click: app.showAboutPanel,
           },
           {
@@ -34,7 +34,7 @@ class MenuService {
           },
           { type: 'separator' },
           {
-            label: '退出秒言',
+            label: '退出 SaySo',
             accelerator: 'Command+Q',
             click: app.quit,
           },

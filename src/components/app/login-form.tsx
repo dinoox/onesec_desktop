@@ -95,7 +95,7 @@ export function LoginForm({
     <div className="w-[350px] bg-background border border-border/60 backdrop-blur rounded-2xl">
       <div className="flex flex-col items-center p-5 mb-2">
         <LogoIcon />
-        <h2 className="text-xl font-semibold">秒言</h2>
+        <h2 className="text-xl font-semibold">SaySo</h2>
         <p className="text-base text-muted-foreground">从说到做，只需一秒</p>
       </div>
       <div className="p-6 pt-0">

@@ -36,7 +36,7 @@ const AuthOverlay: React.FC = () => {
             <IconBell />
           </EmptyMedia>
           <EmptyTitle>鉴权失败</EmptyTitle>
-          <EmptyDescription>用户凭证鉴权失败，请重新登陆以授权秒言</EmptyDescription>
+          <EmptyDescription>用户凭证鉴权失败，请重新登陆以授权 SaySo</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
           <Button variant="outline" size="sm" onClick={logout}>
