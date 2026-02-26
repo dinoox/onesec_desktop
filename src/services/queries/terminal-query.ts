@@ -12,7 +12,7 @@ export const useListTerminals = () => {
     queryKey: ['terminals'],
     queryFn: async () => {
       const res = await listTerminals()
-      return res.data
+      return res.result
     },
   })
 }
@@ -23,7 +23,7 @@ export const useBindTerminal = () => {
   return useMutation({
     mutationFn: bindTerminal,
     onSuccess: (resp) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         queryClient.invalidateQueries({ queryKey: ['terminals'] })
         toast.success('添加成功')
         return
@@ -39,7 +39,7 @@ export const useUpdateTerminal = () => {
   return useMutation({
     mutationFn: updateTerminal,
     onSuccess: (resp) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         queryClient.invalidateQueries({ queryKey: ['terminals'] })
         toast.success('更新成功')
         return
@@ -55,7 +55,7 @@ export const useDeleteTerminal = () => {
   return useMutation({
     mutationFn: deleteTerminal,
     onSuccess: (resp) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         queryClient.invalidateQueries({ queryKey: ['terminals'] })
         toast.success('删除成功')
         return

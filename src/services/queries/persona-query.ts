@@ -24,7 +24,7 @@ export const usePersonaListQuery = () => {
     queryFn: async () => {
       const resp = await getPersonaList()
       console.log(resp)
-      const personas = resp.data || []
+      const personas = resp.result || []
       if (personas.length > 0) {
         // 为每个 persona 添加 icon_svg 后再存入数据库
         const personasWithSvg = personas.map(addIconSvgToPersona)
@@ -41,9 +41,9 @@ export const useCreatePersonaQuery = () => {
   return useMutation({
     mutationFn: createPersona,
     onSuccess: async (resp) => {
-      if (resp.success && resp.data) {
+      if (resp.code === 200 && resp.result) {
         toast.success(resp.message || '输出模式创建成功')
-        const personaWithSvg = addIconSvgToPersona(resp.data)
+        const personaWithSvg = addIconSvgToPersona(resp.result)
         ipcService.createPersonaInDb(personaWithSvg).catch(console.error)
         await queryClient.invalidateQueries({ queryKey: ['personaList'] })
         return
@@ -59,9 +59,9 @@ export const useUpdatePersonaQuery = () => {
   return useMutation({
     mutationFn: updatePersona,
     onSuccess: async (resp) => {
-      if (resp.success && resp.data) {
+      if (resp.code === 200 && resp.result) {
         toast.success(resp.message || '输出模式更新成功')
-        const personaWithSvg = addIconSvgToPersona(resp.data)
+        const personaWithSvg = addIconSvgToPersona(resp.result)
         ipcService.updatePersonaInDb(personaWithSvg).catch(console.error)
         await queryClient.invalidateQueries({ queryKey: ['personaList'] })
         return
@@ -77,7 +77,7 @@ export const useDeletePersonaQuery = () => {
   return useMutation({
     mutationFn: deletePersona,
     onSuccess: async (resp, promptId) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         toast.success(resp.message || '输出模式删除成功')
         ipcService.deletePersonaInDb(promptId).catch(console.error)
         await queryClient.invalidateQueries({ queryKey: ['personaList'] })

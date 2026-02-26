@@ -262,8 +262,8 @@ const PersonaPage: React.FC = () => {
         icon: editForm.icon,
         content: editForm.description.trim(),
       })
-      if (resp.success && resp.data?.id) {
-        setSelectedId(String(resp.data.id))
+      if (resp.code === 200 && resp.result?.id) {
+        setSelectedId(String(resp.result.id))
       }
     } else if (editingPersona) {
       await updateMutation.mutateAsync({

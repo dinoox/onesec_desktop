@@ -7,19 +7,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 每次给出最佳最精简的实现
 - 用中文回复
 
-## Build & Development Commands
-
-```bash
-pnpm dev              # Start Vite dev server with Electron hot reload
-pnpm build            # TypeScript check + Vite build + electron-builder (macOS)
-pnpm build:x64        # Build for x64 architecture
-pnpm build:arm64      # Build for ARM64 (Apple Silicon)
-pnpm lint             # ESLint (strict: --max-warnings 0)
-pnpm format           # Prettier formatting
-```
-
-No test framework is configured.
-
 ## Code Style
 
 - Prettier: no semicolons, single quotes, 90 char width, trailing commas

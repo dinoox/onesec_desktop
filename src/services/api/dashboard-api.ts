@@ -9,33 +9,32 @@ export interface UsageStatistics {
   average_speed: number
 }
 
-export interface FeedbackItem {
-  id: number
-  content: string
-  admin_reply: string | null
-  created_at: number
-  replied_at: number | null
-}
-
-export interface FeedbackListResponse {
-  items: FeedbackItem[]
-  total_count: number
-  limit: number
-  offset: number
+export interface OssUploadSignature {
+  upload_url: string
+  form_fields: Record<string, string>
+  access_url: string
 }
 
 export const getUsageStatistics = () => {
   return request.post<UsageStatistics>('/usage/statistics')
 }
 
-export const getFeedbackList = (params?: { limit?: number; offset?: number }) => {
-  return request.post<FeedbackListResponse>('/feedback/list', { params })
+export const getOssUploadSignature = (params: {
+  directory: string
+  content_type: string
+  file_name: string
+  file_size: number
+}) => {
+  return request.post<OssUploadSignature>('/oss/upload-signature', { params })
 }
 
-export const createFeedback = (content: string) => {
-  return request.post<FeedbackItem>('/feedback/create', { params: { content } })
-}
-
-export const deleteFeedback = (feedback_id: number) => {
-  return request.post('/feedback/delete', { params: { feedback_id } })
+export const createFeedback = (params: {
+  content: string
+  app_version: string
+  os: string
+  image_urls?: string[]
+  video_urls?: string[]
+  audio_urls?: string[]
+}) => {
+  return request.post('/api/v1/users-feedbacks', { params })
 }

@@ -2,7 +2,6 @@ import queryString from 'query-string'
 import authStore from '@/store/auth-store.ts'
 import useStatusStore from '@/store/status-store.ts'
 import { UserService } from '@/services/user-service.ts'
-import { generateSignature } from '@/services/sign-service.ts'
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 type Config = { cache: 'no-store' } | { cache: 'force-cache' }
@@ -18,26 +17,61 @@ interface Props extends Params {
   method: Method
 }
 
+let refreshingPromise: Promise<boolean> | null = null
+
+async function tryRefreshToken(): Promise<boolean> {
+  const { refreshToken } = authStore.getState()
+  if (!refreshToken) return false
+  try {
+    const res = await fetch(
+      import.meta.env.VITE_API_BASEURL + '/auth/refresh',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      },
+    )
+    const data = await res.json()
+    if (data.code === 200 && data.result) {
+      const newLoginData = {
+        access_token: data.result.access_token,
+        refresh_token: data.result.refresh_token,
+        tokenExpirationTime: data.result.tokenExpirationTime ?? '',
+      }
+      await UserService.setPartialConfig({ login_data: newLoginData })
+      authStore.setState({
+        accessToken: newLoginData.access_token,
+        refreshToken: newLoginData.refresh_token,
+      })
+      return true
+    }
+    return false
+  } catch {
+    return false
+  }
+}
+
+async function handleAuthFailed() {
+  const { setAuthTokenInvalid } = useStatusStore.getState().actions
+  setAuthTokenInvalid(true)
+  await UserService.claimAuthTokenFailed()
+}
+
 class Request {
-  /**
-   * 请求拦截器
-   */
   interceptorsRequest({ url, method, params, cache, headers = {} }: Props) {
-    let queryParams = '' //url参数
-    let requestPayload = '' //请求体数据
+    let queryParams = ''
+    let requestPayload = ''
     const config: Config = cache || { cache: 'no-store' }
     Object.assign(headers, {
       Authorization: `Bearer ${authStore.getState().accessToken}`,
     })
 
     if (method === 'GET' || method === 'DELETE') {
-      //fetch对GET请求等，不支持将参数传在body上，只能拼接url
       if (params) {
         queryParams = queryString.stringify(params)
         url = `${url}?${queryParams}`
       }
     } else {
-      //非form-data传输JSON数据格式
       if (
         !['[object FormData]', '[object URLSearchParams]'].includes(
           Object.prototype.toString.call(params),
@@ -58,20 +92,10 @@ class Request {
     }
   }
 
-  /**
-   * 响应拦截器
-   */
   async interceptorsResponse<T>(res: Response): Promise<T> {
     const requestUrl = res.url
     if (res.ok) {
-      const data = await res.json()
-      if (data.error_code === 'TOKEN_MISMATCH' || data.code === 401) {
-        const { setAuthTokenInvalid } = useStatusStore.getState().actions
-        setAuthTokenInvalid(true)
-        await UserService.claimAuthTokenFailed()
-        console.log('TOKEN_MISMATCH', data)
-      }
-      return data as T
+      return (await res.json()) as T
     } else {
       const text = await res.clone().text()
       try {
@@ -83,14 +107,35 @@ class Request {
   }
 
   async httpFactory<T>({ url = '', params = {}, method }: Props): Promise<T> {
-    const req = this.interceptorsRequest({
-      url: url.startsWith('http') ? url : import.meta.env.VITE_API_BASEURL + url,
-      method,
-      params: params.params,
-      cache: params.cache,
-      headers: params.headers,
-    })
-    let res = await fetch(req.url, req.options)
+    const fullUrl = url.startsWith('http')
+      ? url
+      : import.meta.env.VITE_API_BASEURL + url
+    const buildReq = () =>
+      this.interceptorsRequest({
+        url: fullUrl,
+        method,
+        params: params.params,
+        cache: params.cache,
+        headers: { ...params.headers },
+      })
+
+    let res = await fetch(buildReq().url, buildReq().options)
+
+    if (res.status === 401) {
+      if (!refreshingPromise) {
+        refreshingPromise = tryRefreshToken().finally(
+          () => (refreshingPromise = null),
+        )
+      }
+      const refreshed = await refreshingPromise
+      if (refreshed) {
+        const retry = buildReq()
+        res = await fetch(retry.url, retry.options)
+        return this.interceptorsResponse<T>(res)
+      }
+      await handleAuthFailed()
+    }
+
     return this.interceptorsResponse<T>(res)
   }
 
@@ -102,10 +147,9 @@ class Request {
     // 非 GET 请求自动添加签名
     if (method !== 'GET') {
       const requestParams = params?.params ?? {}
-      const signature = await generateSignature(requestParams)
       params = {
         ...params,
-        params: { ...requestParams, ...signature },
+        params: requestParams,
       }
     }
     return this.httpFactory<DataResponse<T>>({ url, params, method })
@@ -130,42 +174,15 @@ class Request {
   patch<T>(url: string, params?: Params): Promise<DataResponse<T>> {
     return this.request('PATCH', url, params)
   }
-
-  async upload<T>(url: string, formData: FormData): Promise<DataResponse<T>> {
-    const signature = await generateSignature({})
-    formData.append('time', signature.time)
-    formData.append('sign', signature.sign)
-
-    const res = await fetch(
-      url.startsWith('http') ? url : import.meta.env.VITE_API_BASEURL + url,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${authStore.getState().accessToken}`,
-        },
-        body: formData,
-      },
-    )
-
-    return this.interceptorsResponse<DataResponse<T>>(res)
-  }
 }
 
 const request = new Request()
 
 export interface DataResponse<T> {
   code: number
+  error: string
   message: string
-  success: boolean
-  data: T
-}
-
-export interface PageData<T> {
-  totalElements: number
-  pageNum: number
-  pageSize: number
-  totalPage: number
-  content: T[]
+  result: T
 }
 
 export default request

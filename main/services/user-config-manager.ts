@@ -8,6 +8,7 @@ class UserConfigManager {
   private store: Store<StoreSchema>
   private readonly launchMarkerPath: string
 
+
   constructor() {
     this.store = new Store<StoreSchema>({
       name: 'config',

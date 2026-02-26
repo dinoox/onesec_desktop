@@ -19,8 +19,6 @@ import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { MessageTypes } from '../../../main/types/message'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { toast } from 'sonner'
-import selectedTextImg from '@/assets/selectedText.jpg'
-import selectedTextDarkImg from '@/assets/selectedTextDark.png'
 import onBoardingVideo from '@/assets/videos/onBoarding.mp4'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 

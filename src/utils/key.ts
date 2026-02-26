@@ -138,7 +138,7 @@ export class KeyMapper {
     if (keyName.includes('Control') || keyName.includes('⌃') || keyName.includes('Ctrl'))
       return '⌃'
     if (keyName.includes('Shift') || keyName.includes('⇧')) return '⇧'
-    if (keyName === 'Space') return 'Space'
+    if (keyName === 'Space') return '⎵'
     if (keyName === 'Return') return '↩'
     if (keyName === 'Delete') return '⌫'
     if (keyName === 'Escape') return '⎋'

@@ -12,8 +12,8 @@ export const useGetTransactions = (limit = 20, offset = 0) => {
     staleTime: 0,
     queryFn: async () => {
       const resp = await getTransactions({ limit, offset })
-      if (!resp.success) throw new Error(resp.message)
-      return resp.data
+      if (resp.code !== 200) throw new Error(resp.message)
+      return resp.result
     },
   })
 }
@@ -24,8 +24,8 @@ export const useGetRanking = (limit = 10, offset = 0) => {
     staleTime: 0,
     queryFn: async () => {
       const resp = await getRanking({ limit, offset })
-      if (!resp.success) throw new Error(resp.message)
-      return resp.data
+      if (resp.code !== 200) throw new Error(resp.message)
+      return resp.result
     },
   })
 }
@@ -35,7 +35,7 @@ export const useExchangeMembership = () => {
   return useMutation({
     mutationFn: (membershipType: string) => exchangeMembership(membershipType),
     onSuccess: async (resp) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         toast.success('兑换成功')
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ['user-info'] }),

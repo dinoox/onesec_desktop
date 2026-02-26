@@ -5,6 +5,7 @@ import { UserService } from '@/services/user-service.ts'
 interface AuthStore {
   user: User | null
   accessToken: string
+  refreshToken: string
   isAuthed: boolean
   actions: {
     initAuth: () => Promise<void>
@@ -18,6 +19,7 @@ const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   isAuthed: false,
   accessToken: '',
+  refreshToken: '',
   actions: {
     initAuth: async () => {
       const config = await UserService.getConfig()
@@ -25,6 +27,7 @@ const useAuthStore = create<AuthStore>((set) => ({
       set({
         isAuthed: !!token,
         accessToken: token,
+        refreshToken: config.login_data?.refresh_token || '',
         user: config.user,
       })
     },
@@ -38,6 +41,7 @@ const useAuthStore = create<AuthStore>((set) => ({
       set({
         user,
         accessToken: loginData.access_token,
+        refreshToken: loginData.refresh_token,
         isAuthed: true,
       })
 
@@ -58,6 +62,7 @@ const useAuthStore = create<AuthStore>((set) => ({
       set({
         user: null,
         accessToken: '',
+        refreshToken: '',
         isAuthed: false,
       })
 

@@ -15,7 +15,7 @@ export const useReconvertAudio = () => {
   return useMutation({
     mutationFn: (audioData: string) => reconvertAudio(audioData),
     onSuccess: (resp) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         toast.success('转换成功')
       } else {
         toast.error('转换失败')

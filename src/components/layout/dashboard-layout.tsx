@@ -3,8 +3,8 @@ import { Outlet, useNavigation } from 'react-router'
 import AppSidebar from '@/components/app-sidebar'
 import Header from '@/components/header'
 import PageLoading from '@/components/page-loading'
-import Footer from '@/components/footer'
 import AuthGuardContainer from '@/components/app/auth-guard-container'
+import { SettingsDialog } from '@/components/settings-dialog'
 
 export default function DashboardLayout() {
   const navigation = useNavigation()
@@ -12,24 +12,23 @@ export default function DashboardLayout() {
 
   return (
     <AuthGuardContainer>
-      <div className="flex flex-col h-screen overflow-hidden">
-        <div className="flex-none app-drag-region">
-          <Header />
-        </div>
-
-        <div className="flex flex-1 overflow-hidden">
-          <AppSidebar />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="py-4 px-4.5 flex-1 flex flex-col overflow-y-auto relative">
+      <div className="flex h-screen overflow-hidden">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col overflow-hidden pr-4 pb-4">
+          <div className="flex-none app-drag-region">
+            <Header />
+          </div>
+          <div className="flex-1 overflow-y-auto rounded-xl bg-white dark:bg-zinc-900">
+            <div className="py-7 px-8 flex-1 flex flex-col relative">
               {isNavigating && <PageLoading />}
               <Suspense fallback={<PageLoading />}>
                 <Outlet />
               </Suspense>
             </div>
-            <Footer />
           </div>
         </div>
       </div>
+      <SettingsDialog />
     </AuthGuardContainer>
   )
 }

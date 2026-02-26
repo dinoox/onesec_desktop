@@ -1,11 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  getUsageStatistics,
-  getFeedbackList,
-  createFeedback,
-  deleteFeedback,
-} from '@/services/api/dashboard-api'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { getUsageStatistics, createFeedback } from '@/services/api/dashboard-api'
 import { toast } from 'sonner'
+import ipcService from '@/services/ipc-service'
+import { type AttachmentItem, uploadToOss } from '@/utils/oss-upload'
 
 const STATS_CACHE_KEY = 'usage-statistics-cache'
 
@@ -35,51 +32,51 @@ export const useUsageStatistics = () => {
     placeholderData: getCachedStats(), // 使用缓存数据作为占位
     queryFn: async () => {
       const resp = await getUsageStatistics()
-      if (resp.success && resp.data) {
-        setCachedStats(resp.data) // 成功后更新缓存
-        return resp.data
+      if (resp.code === 200 && resp.result) {
+        setCachedStats(resp.result)
+        return resp.result
       }
       return null
     },
   })
 }
 
-export const useFeedbackList = () => {
-  return useQuery({
-    queryKey: ['feedback-list'],
-    staleTime: 0,
-    queryFn: async () => {
-      const resp = await getFeedbackList({ limit: 50 })
-      return resp.success ? resp.data : null
-    },
-  })
-}
-
 export const useCreateFeedback = () => {
-  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: createFeedback,
+    mutationFn: async ({
+      content,
+      attachments = [],
+    }: {
+      content: string
+      attachments?: AttachmentItem[]
+    }) => {
+      const [info, ...uploadedUrls] = await Promise.all([
+        ipcService.getSystemInfo(),
+        ...attachments.map((item) => uploadToOss('feedback', item.file)),
+      ])
+      const image_urls: string[] = []
+      const video_urls: string[] = []
+      const audio_urls: string[] = []
+      attachments.forEach((item, i) => {
+        const url = uploadedUrls[i] as string
+        if (item.kind === 'image') image_urls.push(url)
+        else if (item.kind === 'video') video_urls.push(url)
+        else audio_urls.push(url)
+      })
+      return createFeedback({
+        content,
+        app_version: info.appVersion,
+        os: info.osVersion,
+        image_urls,
+        video_urls,
+        audio_urls,
+      })
+    },
     onSuccess: (resp) => {
-      if (resp.success) {
-        queryClient.invalidateQueries({ queryKey: ['feedback-list'] })
+      if (resp.code === 200) {
         toast.success('反馈提交成功')
       } else {
         toast.error(resp.message || '提交失败')
-      }
-    },
-  })
-}
-
-export const useDeleteFeedback = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: deleteFeedback,
-    onSuccess: (resp) => {
-      if (resp.success) {
-        queryClient.invalidateQueries({ queryKey: ['feedback-list'] })
-        toast.success('删除成功')
-      } else {
-        toast.error(resp.message || '删除失败')
       }
     },
   })

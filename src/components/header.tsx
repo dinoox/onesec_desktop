@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useLocation } from 'react-router'
-import { navMain } from '@/configs/navigation'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,15 +12,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import useStatusStore, { useStatusActions } from '@/store/status-store'
-import { IPC_QUIT_AND_INSTALL_CHANNEL } from '../../main/types/message.ts'
 import { Loader2 } from 'lucide-react'
 import ipcService from '@/services/ipc-service.ts'
 
 const Header: React.FC = () => {
-  const location = useLocation()
-  const currentTitle =
-    navMain.find((item) => item.url === location.pathname)?.title || '首页'
-
   const updateChecking = useStatusStore((state) => state.updateChecking)
   const updateProgress = useStatusStore((state) => state.updateProgress)
   const updateDownloaded = useStatusStore((state) => state.updateDownloaded)
@@ -49,13 +42,9 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="flex shrink-0 items-center justify-between py-0 border-b h-[55px] px-[1.15px]">
-        <div className="w-22"></div>
-        <div className="flex items-center gap-4 justify-center">
-          <div className="text-base">{currentTitle}</div>
-        </div>
+      <header className="flex shrink-0 items-center justify-end py-0 h-[25px] px-4">
         {/* 更新按钮 */}
-        <div className="w-22 app-no-drag flex justify-end pr-5">
+        <div className="app-no-drag flex items-center">
           <div className="relative w-5 h-5">
             {/* 检查更新状态 - 旋转加载 */}
             <div

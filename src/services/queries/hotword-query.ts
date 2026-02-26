@@ -13,7 +13,7 @@ export const useHotWordListQuery = () => {
     queryKey: ['hotWordList'],
     queryFn: async () => {
       const resp = await getHotWordList()
-      return resp.data || []
+      return resp.result || []
     },
   })
 }
@@ -25,7 +25,7 @@ export const useCreateHotWordQuery = () => {
   return useMutation({
     mutationFn: createHotWord,
     onSuccess: async (resp) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         toast.success('热词创建成功')
         await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
         return
@@ -44,7 +44,7 @@ export const useUpdateHotWordQuery = () => {
     mutationFn: ({ hotword_id, hotword }: { hotword_id: number; hotword: string }) =>
       updateHotWord(hotword_id, hotword),
     onSuccess: async (resp) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         toast.success(resp.message)
         await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
         return
@@ -61,7 +61,7 @@ export const useDeleteHotWordQuery = () => {
   return useMutation({
     mutationFn: deleteHotWord,
     onSuccess: async (resp) => {
-      if (resp.success) {
+      if (resp.code === 200) {
         toast.success(resp.message)
         await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
         return
