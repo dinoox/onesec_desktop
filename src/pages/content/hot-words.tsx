@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import React, { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -48,6 +49,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Spinner } from '@/components/ui/spinner'
 
 const ContentPage: React.FC = () => {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
@@ -76,7 +78,7 @@ const ContentPage: React.FC = () => {
     const errors: string[] = []
 
     if (lines.length > 200) {
-      errors.push(`超出最大行数限制：当前 ${lines.length} 行，最多 200 行`)
+      errors.push(t('hotWords.overLimit', { count: lines.length }))
     }
 
     const overLengthLines = lines
@@ -84,9 +86,11 @@ const ContentPage: React.FC = () => {
       .filter(({ line }) => line.length > 50)
 
     if (overLengthLines.length > 0) {
-      const preview = overLengthLines.slice(0, 3).map((l) => `第${l.index}行`)
+      const preview = overLengthLines.slice(0, 3).map((l) => t('hotWords.lineNumber', { n: l.index }))
       errors.push(
-        `${overLengthLines.length} 行超出长度限制（最多50字符）：${preview.join('、')}${overLengthLines.length > 3 ? '...' : ''}`,
+        t('hotWords.overLength', { count: overLengthLines.length }) +
+          preview.join(t('hotWords.separator')) +
+          (overLengthLines.length > 3 ? '...' : ''),
       )
     }
 
@@ -133,14 +137,14 @@ const ContentPage: React.FC = () => {
     <div className="max-w-2xl h-full flex flex-col">
       <div className="flex-shrink-0 space-y-4 pb-3">
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-semibold">常用词</span>
+          <span className="text-2xl font-semibold">{t('hotWords.title')}</span>
 
           {/* 搜索框 */}
           <div className="flex items-center gap-2">
             <div className="flex-shrink-0 ">
               <InputGroup className="max-w-md h-[32px] w-[212px]">
                 <InputGroupInput
-                  placeholder="搜索常用词..."
+                  placeholder={t('hotWords.searchPlaceholder')}
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                 />
@@ -158,7 +162,7 @@ const ContentPage: React.FC = () => {
                         transition={{ duration: 0.2 }}
                         className="text-xs font-normal"
                       >
-                        {filteredHotWords.length} 个结果
+                        {t('hotWords.resultCount', { count: filteredHotWords.length })}
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -173,14 +177,14 @@ const ContentPage: React.FC = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>添加常用词</DialogTitle>
+                  <DialogTitle>{t('hotWords.addTitle')}</DialogTitle>
                   <DialogDescription>
-                    每行一个常用词，上限 200 个，每词不超过 50 字符
+                    {t('hotWords.addDesc')}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-3">
                   <Textarea
-                    placeholder="请输入常用词，每行一个..."
+                    placeholder={t('hotWords.addPlaceholder')}
                     value={newHotWords}
                     onChange={(e) => setNewHotWords(e.target.value)}
                     className="min-h-[120px] max-h-[193px] resize-none"
@@ -195,13 +199,13 @@ const ContentPage: React.FC = () => {
                   {batchValidation.lines.length > 0 &&
                     batchValidation.errors.length === 0 && (
                       <p className="text-sm text-muted-foreground">
-                        共 {batchValidation.lines.length} 个常用词
+                        {t('hotWords.wordCount', { count: batchValidation.lines.length })}
                       </p>
                     )}
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpen(false)}>
-                    取消
+                    {t('hotWords.cancel')}
                   </Button>
                   <Button
                     onClick={handleCreate}
@@ -210,10 +214,10 @@ const ContentPage: React.FC = () => {
                     {createHotWordMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        创建中...
+                        {t('hotWords.creating')}
                       </>
                     ) : (
-                      '确定'
+                      t('hotWords.confirm')
                     )}
                   </Button>
                 </DialogFooter>
@@ -223,11 +227,11 @@ const ContentPage: React.FC = () => {
         </div>
         {/* 提示 */}
         <div className="flex items-center bg-setting rounded-xl px-4 py-3">
-          <PopcornIcon className="w-4 h-4 mr-[0.7rem]" />
+          <PopcornIcon className="w-4 h-4 mr-3" />
           <div className="flex flex-col gap-1">
-            <span>让 SaySo 更懂你</span>
+            <span>{t('hotWords.tagline')}</span>
             <p className="text-sm text-muted-foreground">
-              添加常用的人名、地名或术语，系统会优先识别，避免识别错误或遗漏
+              {t('hotWords.taglineDesc')}
             </p>
           </div>
         </div>
@@ -236,7 +240,7 @@ const ContentPage: React.FC = () => {
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="mt-4">
           <div className="flex-shrink-0 text-xs text-muted-foreground pb-2  min-h-[24px]">
-            {filteredHotWords.length > 0 && !isLoading ? '常用词' : '搜索词'}
+            {filteredHotWords.length > 0 && !isLoading ? t('hotWords.listLabel') : t('hotWords.searchLabel')}
           </div>
 
           <AnimatePresence mode="wait">
@@ -250,9 +254,9 @@ const ContentPage: React.FC = () => {
               >
                 <Alert variant="destructive">
                   <AlertCircle />
-                  <AlertTitle>连接失败</AlertTitle>
+                  <AlertTitle>{t('hotWords.connectionFailed')}</AlertTitle>
                   <AlertDescription>
-                    无法连接到服务器，请检查网络连接或稍后重试
+                    {t('hotWords.connectionFailedDesc')}
                   </AlertDescription>
                 </Alert>
               </motion.div>
@@ -280,18 +284,18 @@ const ContentPage: React.FC = () => {
                     <EmptyMedia variant="icon">
                       <BookA />
                     </EmptyMedia>
-                    <EmptyTitle>{searchValue ? '未找到匹配的常用词' : '暂无条目'}</EmptyTitle>
+                    <EmptyTitle>{searchValue ? t('hotWords.notFound') : t('hotWords.empty')}</EmptyTitle>
                     <EmptyDescription>
                       {searchValue
-                        ? '请尝试其他关键词'
-                        : '点击添加按钮创建您的第一个条目'}
+                        ? t('hotWords.tryOtherKeyword')
+                        : t('hotWords.clickToAdd')}
                     </EmptyDescription>
                   </EmptyHeader>
                   {!searchValue && (
                     <EmptyContent className="flex-row justify-center">
                       <Button size="sm" onClick={() => setOpen(true)}>
                         <Plus className="h-4 w-4" />
-                        添加常用词
+                        {t('hotWords.addHotWord')}
                       </Button>
                     </EmptyContent>
                   )}
@@ -358,7 +362,7 @@ const ContentPage: React.FC = () => {
                               }}
                             >
                               <Edit className="mr-2 h-4 w-4" />
-                              编辑
+                              {t('hotWords.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onSelect={(e) => {
@@ -369,7 +373,7 @@ const ContentPage: React.FC = () => {
                               className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              删除
+                              {t('hotWords.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -387,13 +391,13 @@ const ContentPage: React.FC = () => {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>编辑常用词</DialogTitle>
-            <DialogDescription>修改您的常用词内容</DialogDescription>
+            <DialogTitle>{t('hotWords.editTitle')}</DialogTitle>
+            <DialogDescription>{t('hotWords.editDesc')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
             <InputGroup>
               <InputGroupInput
-                placeholder="请输入常用词..."
+                placeholder={t('hotWords.editPlaceholder')}
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
                 onKeyDown={(e) => {
@@ -406,7 +410,7 @@ const ContentPage: React.FC = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>
-              取消
+              {t('hotWords.cancel')}
             </Button>
             <Button
               onClick={handleEdit}
@@ -415,10 +419,10 @@ const ContentPage: React.FC = () => {
               {updateHotWordMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  更新中...
+                  {t('hotWords.updating')}
                 </>
               ) : (
-                '确定'
+                t('hotWords.confirm')
               )}
             </Button>
           </DialogFooter>

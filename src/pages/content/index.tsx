@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ChevronDown, Info, Paperclip, X } from 'lucide-react'
@@ -22,6 +23,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 const ContentPage: React.FC = () => {
+  const { t } = useTranslation()
   const [feedbackContent, setFeedbackContent] = useState('')
   const [attachments, setAttachments] = useState<AttachmentItem[]>([])
   const [lastRecord, setLastRecord] = useState<Audios | null>(null)
@@ -61,7 +63,7 @@ const ContentPage: React.FC = () => {
     for (const file of files) {
       const kind = getAttachmentKind(file)
       if (!kind) {
-        toast.warning(`不支持的文件类型: ${file.name}`)
+        toast.warning(`${t('home.unsupportedFile')} ${file.name}`)
         continue
       }
       if (existingKeys.has(`${file.name}|${file.size}`)) continue
@@ -86,20 +88,18 @@ const ContentPage: React.FC = () => {
     <div className="max-w-2xl h-full flex flex-col overflow-hidden">
       <div className="flex-shrink-0 space-y-4 pb-3">
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-semibold">欢迎回来！</span>
+          <span className="text-2xl font-semibold">{t('home.welcome')}</span>
           <div className="h-8 w-8"></div>
         </div>
         {/* 快捷提示 */}
         <div className="flex items-center justify-between bg-setting rounded-xl px-5 py-4">
           <div className="flex items-center">
             <div className="flex flex-col gap-1">
-              <span className="font-medium">
-                无需切换窗口，只要语音唤起，立刻解决问题
-              </span>
+              <span className="font-medium">{t('home.tagline')}</span>
               <div className="text-sm text-muted-foreground space-x-1">
-                <span>按住</span>
+                <span>{t('home.holdKey')}</span>
                 <KeyDisplay keys={formattedKeys} />
-                <span>键，并在任何文本框中说话，松开结束</span>
+                <span>{t('home.thenSpeak')}</span>
               </div>
             </div>
           </div>
@@ -116,16 +116,15 @@ const ContentPage: React.FC = () => {
               <div className="flex items-center justify-between px-3 py-2">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[13px] font-semibold text-foreground">
-                    最后的转录
+                    {t('home.lastTranscript')}
                   </span>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info className="h-3 w-3 text-muted-foreground/60 cursor-default" />
+                      <Info className="h-3 w-3 mt-0.5 font-bold text-muted-foreground cursor-default" />
                     </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        此转录及其对应的音频文件将与您的反馈一起提交，以帮助我们提高转录质量。此信息不会用于模型训练
-                      </p>
+                    <TooltipContent className="max-w-68">
+                      <p>{t('home.tooltipLine1')}</p>
+                      <p>{t('home.tooltipLine2')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </div>
@@ -137,7 +136,7 @@ const ContentPage: React.FC = () => {
                         size="sm"
                         className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground gap-0.5"
                       >
-                        更多
+                        {t('home.more')}
                         <ChevronDown className="h-3 w-3" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -145,10 +144,10 @@ const ContentPage: React.FC = () => {
                       <DropdownMenuItem
                         onClick={() => setFeedbackContent(lastRecord?.content ?? '')}
                       >
-                        引用转录内容
+                        {t('home.quoteTranscript')}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={loadLastRecord}>
-                        刷新转录记录
+                        {t('home.refreshTranscript')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -168,7 +167,7 @@ const ContentPage: React.FC = () => {
                     {lastRecord.content}
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground/40 italic">暂无转录记录</p>
+                  <p className="text-sm text-muted-foreground/40 italic">{t('home.noTranscript')}</p>
                 )}
               </div>
             </div>
@@ -177,7 +176,7 @@ const ContentPage: React.FC = () => {
           {/* 反馈输入区 */}
           <div className="px-4 pt-2 pb-1 flex-1">
             <Textarea
-              placeholder="你可以反馈任何意见！有效反馈可以获得3天奖励！"
+              placeholder={t('home.feedbackPlaceholder')}
               value={feedbackContent}
               onChange={(e) => setFeedbackContent(e.target.value)}
               onKeyDown={(e) => {
@@ -241,7 +240,7 @@ const ContentPage: React.FC = () => {
               className="h-8 px-4 text-sm"
             >
               {createFeedback.isPending && <Spinner className="mr-1.5 h-3.5 w-3.5" />}
-              发送反馈
+              {t('home.sendFeedback')}
             </Button>
           </div>
         </div>

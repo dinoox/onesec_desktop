@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link, matchPath, useLocation } from 'react-router'
+import { useTranslation } from 'react-i18next'
 import { type NavItem, navMain, settingsNav } from '@/configs/navigation'
 import useUIStore, { useUIActions } from '@/store/ui-store'
 import {
@@ -21,6 +22,7 @@ function checkIsActive(href: string, item: NavItem) {
 }
 
 const AppSidebar: React.FC = () => {
+  const { t } = useTranslation()
   const location = useLocation()
   const { pathname } = location
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
@@ -77,7 +79,7 @@ const AppSidebar: React.FC = () => {
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent side="right">
-                    <p>{item.title}</p>
+                    <p>{t(item.title)}</p>
                   </TooltipContent>
                 </Tooltip>
               )
@@ -97,7 +99,7 @@ const AppSidebar: React.FC = () => {
                 {item.icon && (
                   <item.icon className={`w-4 h-4 ${isActive && 'flash-icon'}`} />
                 )}
-                <span className={`text-sm ${isActive && ''}`}>{item.title}</span>
+                <span className={`text-sm ${isActive && ''}`}>{t(item.title)}</span>
               </Link>
             )
           })}
@@ -109,8 +111,8 @@ const AppSidebar: React.FC = () => {
         {/* Trial Card */}
         {!sidebarCollapsed && (
           <div className="mb-2 rounded-lg bg-white px-3 py-4">
-            <p className="text-xs text-muted-foreground">Trail Plan</p>
-            <p className="mt-1 text-sm font-semibold">已使用 0 / 30 天</p>
+            <p className="text-xs text-muted-foreground">{t('sidebar.trialPlan')}</p>
+            <p className="mt-1 text-sm font-semibold">{t('sidebar.daysUsed', { used: 0, total: 30 })}</p>
             {/* Progress bar */}
             <div className="mt-2">
               <div className="h-1 w-full rounded-full bg-muted">
@@ -121,10 +123,10 @@ const AppSidebar: React.FC = () => {
               </div>
             </div>
             <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground">
-              在试用期结束前升级到 SaySo Pro
+              {t('sidebar.upgradeHint')}
             </p>
             <button className="mt-2 w-full rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background transition-opacity hover:opacity-90">
-              升级
+              {t('sidebar.upgrade')}
             </button>
           </div>
         )}
@@ -153,7 +155,7 @@ const AppSidebar: React.FC = () => {
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>{settingsNav.title}</p>
+                <p>{t(settingsNav.title)}</p>
               </TooltipContent>
             </Tooltip>
           ) : (
@@ -172,7 +174,7 @@ const AppSidebar: React.FC = () => {
                 />
               )}
               <span className={`text-sm ${settingsActive && ''}`}>
-                {settingsNav.title}
+                {t(settingsNav.title)}
               </span>
             </button>
           )}

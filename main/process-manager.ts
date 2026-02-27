@@ -25,7 +25,7 @@ class ProcessManager {
       await udsService.start()
       await this.setupUDSForward()
       await ipcService.initialize()
-      // await nativeProcessManager.start()
+      await nativeProcessManager.start()
     } catch (err) {
       log.error(err)
     }

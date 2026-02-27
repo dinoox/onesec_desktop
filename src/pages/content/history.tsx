@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Copy,
   Check,
@@ -48,6 +49,7 @@ import { MessageTypes } from '../../../main/types/message'
 import { formatDateGroup, formatTime, getDateKey } from '@/utils/time'
 
 const HistoryPage: React.FC = () => {
+  const { t } = useTranslation()
   const [records, setRecords] = useState<Audios[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
@@ -70,7 +72,7 @@ const HistoryPage: React.FC = () => {
       const audios = await ipcService.getAudios()
       setRecords(audios)
     } catch (error) {
-      console.error('加载音频列表失败:', error)
+      console.error('loadAudios failed:', error)
     }
   }
 
@@ -92,7 +94,7 @@ const HistoryPage: React.FC = () => {
 
   const handleReconvert = async (id: string, filename: string) => {
     if (reconvertingId) {
-      toast.error('已有转录任务正在运行，请稍候')
+      toast.error(t('history.reconvertRunning'))
       return
     }
 
@@ -107,14 +109,14 @@ const HistoryPage: React.FC = () => {
         const content = (result.result as any)?.text || ''
         await ipcService.updateAudio(id, content, null)
       } else {
-        const error = result.message || '转录失败'
+        const error = result.message || t('history.reconvertFailed')
         await ipcService.updateAudio(id, '', error)
         toast.error(error)
       }
 
       await loadAudios()
     } catch (error: any) {
-      toast.error(`转录失败, 请稍后再试`)
+      toast.error(t('history.reconvertFailed'))
     } finally {
       setReconvertingId(null)
     }
@@ -124,15 +126,15 @@ const HistoryPage: React.FC = () => {
     setOpenMenuId(null)
     try {
       if (await ipcService.deleteAudio(filename)) {
-        toast.success('音频删除成功')
+        toast.success(t('history.deleteSuccess'))
         loadedRecordsRef.current.delete(id)
         setRecords((prev) => prev.filter((record) => record.id !== id))
       } else {
-        toast.error('删除失败')
+        toast.error(t('history.deleteFailed'))
       }
     } catch (error) {
       console.log(error)
-      toast.error('删除失败')
+      toast.error(t('history.deleteFailed'))
     }
   }
 
@@ -153,15 +155,15 @@ const HistoryPage: React.FC = () => {
       ).length
 
       if (successCount > 0) {
-        toast.success(`已删除 ${successCount} 条记录`)
+        toast.success(t('history.deletedCount', { count: successCount }))
         loadedRecordsRef.current.clear()
         await loadAudios()
       } else {
-        toast.error('删除失败')
+        toast.error(t('history.deleteFailed'))
       }
     } catch (error) {
       console.log(error)
-      toast.error('删除失败')
+      toast.error(t('history.deleteFailed'))
     }
   }
 
@@ -180,13 +182,13 @@ const HistoryPage: React.FC = () => {
     try {
       const deletedCount = await ipcService.deleteAudiosByRetention(value)
 
-      toast.success('设置已保存')
+      toast.success(t('history.settingSaved'))
 
       if (deletedCount > 0) {
         await loadAudios()
       }
     } catch (error) {
-      toast.error('设置失败')
+      toast.error(t('history.settingFailed'))
     } finally {
       setShowRetentionDialog(false)
     }
@@ -194,22 +196,22 @@ const HistoryPage: React.FC = () => {
 
   const getRetentionTitleMessage = (value: string) => {
     const messages: Record<string, string> = {
-      never: '永不保存历史记录？',
-      '24hours': '删除旧历史记录？',
-      '1week': '删除旧历史记录？',
-      '1month': '删除旧历史记录？',
+      never: t('history.retentionNeverTitle'),
+      '24hours': t('history.retentionDeleteTitle'),
+      '1week': t('history.retentionDeleteTitle'),
+      '1month': t('history.retentionDeleteTitle'),
     }
-    return messages[value] || '此操作可能会删除部分历史数据'
+    return messages[value] || t('history.retentionDefault')
   }
 
   const getRetentionWarningMessage = (value: string) => {
     const messages: Record<string, string> = {
-      never: '将删除本设备中所有历史记录。该操作会立即生效，删除后无法恢复',
-      '24hours': '将删除本设备中早于 1 天的历史记录。该操作会立即生效，删除后无法恢复',
-      '1week': '将删除本设备中早于 1 周的历史记录。该操作会立即生效，删除后无法恢复',
-      '1month': '将删除本设备中早于 1 月的历史记录。该操作会立即生效，删除后无法恢复',
+      never: t('history.retentionWarnNever'),
+      '24hours': t('history.retentionWarn24h'),
+      '1week': t('history.retentionWarn1week'),
+      '1month': t('history.retentionWarn1month'),
     }
-    return messages[value] || '此操作可能会删除部分历史数据'
+    return messages[value] || t('history.retentionDefault')
   }
 
   useEffect(() => {
@@ -228,9 +230,9 @@ const HistoryPage: React.FC = () => {
     if (historyRetention === 'never') {
       if (records.length > 0) {
         return [
-          {
+              {
             key: 'last-error-record',
-            label: '最近一次转录失败记录',
+            label: t('history.lastErrorRecord'),
             records: [records[0]],
           },
         ]
@@ -369,7 +371,7 @@ const HistoryPage: React.FC = () => {
               {reconvertingId === record.id ? (
                 <span className="flex items-center gap-2 text-muted-foreground">
                   <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
-                  转录中...
+                  {t('history.transcribing')}
                 </span>
               ) : record.error ? (
                 <span
@@ -382,7 +384,7 @@ const HistoryPage: React.FC = () => {
               ) : record.content ? (
                 <span className="line-clamp-3">{record.content}</span>
               ) : (
-                <span className="text-muted-foreground">未识别到内容</span>
+                  <span className="text-muted-foreground">{t('history.noContent')}</span>
               )}
             </div>
             <div className="flex items-center gap-4.5 text-muted-foreground opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
@@ -412,7 +414,7 @@ const HistoryPage: React.FC = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {copiedId === record.id ? '已复制' : '复制'}
+                  {copiedId === record.id ? t('history.copied') : t('history.copy')}
                 </TooltipContent>
               </Tooltip>
 
@@ -446,7 +448,7 @@ const HistoryPage: React.FC = () => {
                     }}
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    音频另存
+                    {t('history.saveAudio')}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={reconvertingId !== null}
@@ -456,7 +458,7 @@ const HistoryPage: React.FC = () => {
                     }}
                   >
                     <RefreshCw className="mr-2 h-4 w-4" />
-                    重新转录
+                    {t('history.reconvert')}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={reconvertingId === record.id}
@@ -467,7 +469,7 @@ const HistoryPage: React.FC = () => {
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    删除音频
+                    {t('history.deleteAudio')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -525,7 +527,7 @@ const HistoryPage: React.FC = () => {
     <div className="max-w-2xl h-full flex flex-col">
       <div className="flex-shrink-0 space-y-4 pb-3">
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-semibold">历史记录</span>
+          <span className="text-2xl font-semibold">{t('history.title')}</span>
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -542,7 +544,7 @@ const HistoryPage: React.FC = () => {
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                删除所有
+                {t('history.deleteAll')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -550,11 +552,11 @@ const HistoryPage: React.FC = () => {
         {/* 提示 */}
         <div className="flex items-center justify-between bg-setting rounded-xl px-4 py-3">
           <div className="flex items-center">
-            <LockIcon className="w-4 h-4 mr-[0.7rem]" />
+            <LockIcon className="w-4 h-4 mr-3" />
             <div className="flex flex-col gap-1">
-              <span>历史记录保存</span>
+              <span>{t('history.retention')}</span>
               <p className="text-sm text-muted-foreground">
-                设置语音输入记录在本地的保存时长
+                {t('history.retentionDesc')}
               </p>
             </div>
           </div>
@@ -563,11 +565,11 @@ const HistoryPage: React.FC = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="never">永不保存</SelectItem>
-              <SelectItem value="24hours">24 小时</SelectItem>
-              <SelectItem value="1week">一周</SelectItem>
-              <SelectItem value="1month">一月</SelectItem>
-              <SelectItem value="forever">始终保存</SelectItem>
+              <SelectItem value="never">{t('history.never')}</SelectItem>
+              <SelectItem value="24hours">{t('history.hours24')}</SelectItem>
+              <SelectItem value="1week">{t('history.week1')}</SelectItem>
+              <SelectItem value="1month">{t('history.month1')}</SelectItem>
+              <SelectItem value="forever">{t('history.forever')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -607,7 +609,7 @@ const HistoryPage: React.FC = () => {
                 />
               </div>
             ) : (
-              <div className="text-center py-12 text-muted-foreground">暂无历史记录</div>
+              <div className="text-center py-12 text-muted-foreground">{t('history.noHistory')}</div>
             )}
           </div>
         </div>
@@ -624,9 +626,9 @@ const HistoryPage: React.FC = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>{t('history.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={() => confirmRetentionChange(pendingRetention)}>
-              确定
+              {t('history.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -635,14 +637,14 @@ const HistoryPage: React.FC = () => {
       <AlertDialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
         <AlertDialogContent className="max-w-[400px]!">
           <AlertDialogHeader>
-            <AlertDialogTitle>删除所有历史记录？</AlertDialogTitle>
+            <AlertDialogTitle>{t('history.deleteAllTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              将删除本设备中所有历史记录，删除后将无法恢复
+              {t('history.deleteAllDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteAll}>确定</AlertDialogAction>
+            <AlertDialogCancel>{t('history.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteAll}>{t('history.confirm')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

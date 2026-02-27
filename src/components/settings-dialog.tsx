@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ExternalLink, Info, Settings2, User, X } from 'lucide-react'
+import { ExternalLink, Info, Settings2, SlidersHorizontal, User, X } from 'lucide-react'
 import { Label } from '@radix-ui/react-label'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -26,19 +26,31 @@ import { MessageTypes } from '../../main/types/message.ts'
 import { KeyMapper } from '@/utils/key.ts'
 import { KeyDisplay } from '@/components/ui/key-display.tsx'
 import { IconGitBranch, IconRefresh } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 
-type Tab = 'account' | 'settings' | 'about'
-
-const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
-  { key: 'account', label: '账户', icon: <User className="h-4 w-4" /> },
-  { key: 'settings', label: '设置', icon: <Settings2 className="h-4 w-4" /> },
-  { key: 'about', label: '关于', icon: <Info className="h-4 w-4" /> },
-]
+type Tab = 'account' | 'general' | 'shortcuts' | 'about'
 
 export const SettingsDialog: React.FC = () => {
+  const { t } = useTranslation()
   const settingsDialogOpen = useUIStore((state) => state.settingsDialogOpen)
   const { setSettingsDialogOpen } = useUIActions()
   const [activeTab, setActiveTab] = useState<Tab>('account')
+
+  const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
+    { key: 'account', label: t('settings.tabs.account'), icon: <User className="h-4 w-4" /> },
+    {
+      key: 'general',
+      label: t('settings.tabs.general'),
+      icon: <SlidersHorizontal className="h-4 w-4" />,
+    },
+    {
+      key: 'shortcuts',
+      label: t('settings.tabs.shortcuts'),
+      icon: <Settings2 className="h-4 w-4" />,
+    },
+    { key: 'about', label: t('settings.tabs.about'), icon: <Info className="h-4 w-4" /> },
+  ]
 
   return (
     <AnimatePresence>
@@ -87,7 +99,8 @@ export const SettingsDialog: React.FC = () => {
             {/* 右侧内容 */}
             <div className="flex-1 overflow-y-auto px-6 py-5 mt-1">
               {activeTab === 'account' && <AccountTab />}
-              {activeTab === 'settings' && <SettingsTab />}
+              {activeTab === 'general' && <GeneralTab />}
+              {activeTab === 'shortcuts' && <ShortcutsTab />}
               {activeTab === 'about' && <AboutTab />}
             </div>
           </motion.div>
@@ -98,6 +111,7 @@ export const SettingsDialog: React.FC = () => {
 }
 
 function AccountTab() {
+  const { t } = useTranslation()
   const user = useAuthStore((state) => state.user)
   const mutation = useLogoutQuery()
   const { theme, setTheme } = useTheme()
@@ -117,12 +131,12 @@ function AccountTab() {
     try {
       const res = await uploadErrorLog(await ipcService.readErrorLog())
       if (res.success) {
-        toast.success('日志上传成功')
+        toast.success(t('settings.logUploadSuccess'))
       } else {
-        toast.error(res.message || '上传失败')
+        toast.error(res.message || t('settings.uploadFailed'))
       }
     } catch {
-      toast.error('上传失败')
+      toast.error(t('settings.uploadFailed'))
     } finally {
       setUploadingLog(false)
     }
@@ -131,40 +145,36 @@ function AccountTab() {
   return (
     <div className="space-y-3">
       <div className="flex flex-col space-y-2">
-        <div className="text-[15px] font-medium">账户设置</div>
+        <div className="text-[15px] font-medium">{t('settings.accountTitle')}</div>
         <div className="flex items-center justify-between w-full bg-setting rounded-xl px-3 py-3">
-          <Label>邮箱</Label>
-          <Input
-            className="w-fit h-[21px] border-none bg-transparent! p-0"
-            disabled
-            type="email"
-            placeholder="Email"
-            value={user?.email || '未设置'}
-          />
+          <Label>{t('settings.email')}</Label>
+          <span className="text-sm text-muted-foreground">
+            {user?.email || t('settings.emailNotSet')}
+          </span>
         </div>
 
         <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
-          <Label>主题</Label>
+          <Label>{t('settings.theme')}</Label>
           <Select value={theme} onValueChange={setTheme}>
             <SelectTrigger>
-              <SelectValue placeholder="选择主题" />
+              <SelectValue placeholder={t('settings.themeSelect')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="light">浅色</SelectItem>
-              <SelectItem value="dark">深色</SelectItem>
-              <SelectItem value="system">跟随系统</SelectItem>
+              <SelectItem value="light">{t('settings.themeLight')}</SelectItem>
+              <SelectItem value="dark">{t('settings.themeDark')}</SelectItem>
+              <SelectItem value="system">{t('settings.themeSystem')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
           <div className="flex flex-col space-y-1">
-            <Label>订阅</Label>
-            <span className="text-muted-foreground text-sm">试用版专业会员</span>
+            <Label>{t('settings.subscription')}</Label>
+            <span className="text-muted-foreground text-sm">{t('settings.trialPro')}</span>
           </div>
           <Button variant="outline" className="" size="sm">
             <IconGitBranch />
-            升级
+            {t('settings.upgrade')}
           </Button>
         </div>
       </div>
@@ -177,14 +187,43 @@ function AccountTab() {
           disabled={mutation.isPending}
         >
           {mutation.isPending ? <Spinner /> : null}
-          退出登录
+          {t('settings.logout')}
         </Button>
       </div>
     </div>
   )
 }
 
-function SettingsTab() {
+function GeneralTab() {
+  const { t } = useTranslation()
+
+  return (
+    <div className="space-y-3">
+      <div className="text-[15px] font-medium">{t('settings.generalTitle')}</div>
+      <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
+        <Label>{t('settings.language')}</Label>
+        <Select
+          value={i18n.language}
+          onValueChange={(v) => {
+            i18n.changeLanguage(v)
+            localStorage.setItem('lang', v)
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="zh">{t('settings.lang.zh')}</SelectItem>
+            <SelectItem value="en">{t('settings.lang.en')}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  )
+}
+
+function ShortcutsTab() {
+  const { t } = useTranslation()
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
   const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
   const shortcutFreeKeys = useUserConfigStore((state) => state.shortcutFreeKeys)
@@ -226,7 +265,7 @@ function SettingsTab() {
         setEditingMode(null)
         const { is_conflict } = holdIPCMessage.data.data
         if (is_conflict) {
-          loadUserConfig().then(() => toast.warning('快捷键设置冲突，请重新设置'))
+          loadUserConfig().then(() => toast.warning(t('settings.conflictWarning')))
         }
       }
     }
@@ -291,13 +330,11 @@ function SettingsTab() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* 简易模式 */}
+      {/* 普通模式 */}
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <span className="text-[15px] font-medium">普通模式</span>
-          <span className="text-sm text-muted-foreground">
-            按住该快捷键会进入普通识别模式，双击进入薯片模式
-          </span>
+          <span className="text-[15px] font-medium">{t('settings.normalMode')}</span>
+          <span className="text-sm text-muted-foreground">{t('settings.normalModeDesc')}</span>
         </div>
         <div
           ref={normalInputRef}
@@ -317,7 +354,7 @@ function SettingsTab() {
                   transition={{ duration: 0.2 }}
                   className="text-muted-foreground text-sm"
                 >
-                  等待按键...
+                  {t('settings.waitingKey')}
                 </motion.span>
               ) : (
                 <motion.div
@@ -341,7 +378,7 @@ function SettingsTab() {
                 transition={{ duration: 0.15 }}
                 className="text-muted-foreground text-sm ml-auto"
               >
-                修改
+                {t('settings.modify')}
               </motion.span>
             )}
           </AnimatePresence>
@@ -351,10 +388,8 @@ function SettingsTab() {
       {/* 智能模式 */}
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <span className="text-[15px] font-medium">智能模式</span>
-          <span className="text-sm text-muted-foreground">
-            按住该快捷键会进入命令识别和智能交互模式
-          </span>
+          <span className="text-[15px] font-medium">{t('settings.commandMode')}</span>
+          <span className="text-sm text-muted-foreground">{t('settings.commandModeDesc')}</span>
         </div>
         <div
           ref={commandInputRef}
@@ -376,7 +411,7 @@ function SettingsTab() {
                   transition={{ duration: 0.2 }}
                   className="text-muted-foreground text-sm"
                 >
-                  等待按键...
+                  {t('settings.waitingKey')}
                 </motion.span>
               ) : (
                 <motion.div
@@ -400,20 +435,18 @@ function SettingsTab() {
                 transition={{ duration: 0.15 }}
                 className="text-muted-foreground text-sm ml-auto"
               >
-                修改
+                {t('settings.modify')}
               </motion.span>
             )}
           </AnimatePresence>
         </div>
       </div>
 
-      {/* 免提模式 */}
+      {/* 薯片模式 */}
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <span className="text-[15px] font-medium">薯片模式</span>
-          <span className="text-sm text-muted-foreground">
-            按一次开始说话，无需持续按住，再按一次结束录音
-          </span>
+          <span className="text-[15px] font-medium">{t('settings.freeMode')}</span>
+          <span className="text-sm text-muted-foreground">{t('settings.freeModeDesc')}</span>
         </div>
         <div
           ref={freeInputRef}
@@ -433,7 +466,7 @@ function SettingsTab() {
                   transition={{ duration: 0.2 }}
                   className="text-muted-foreground text-sm"
                 >
-                  等待按键...
+                  {t('settings.waitingKey')}
                 </motion.span>
               ) : (
                 <motion.div
@@ -457,22 +490,18 @@ function SettingsTab() {
                 transition={{ duration: 0.15 }}
                 className="text-muted-foreground text-sm ml-auto"
               >
-                修改
+                {t('settings.modify')}
               </motion.span>
             )}
           </AnimatePresence>
         </div>
       </div>
-
-      {/*<div className="border-none text-ripple-brand-text flex h-9 w-full justify-center items-center gap-2 rounded-md bg-ripple-brand-text/10 px-3 transition-colors duration-300">*/}
-      {/*  <PopcornIcon size={16} />*/}
-      {/*  <span>单次录音限时 5 分钟，超时自动结束并上传</span>*/}
-      {/*</div>*/}
     </div>
   )
 }
 
 function AboutTab() {
+  const { t } = useTranslation()
   const [appVersion, setAppVersion] = useState<string>('')
 
   useEffect(() => {
@@ -480,24 +509,24 @@ function AboutTab() {
   }, [])
 
   const links = [
-    { label: '隐私政策', url: 'https://sayso.ai/privacy' },
-    { label: '服务条款', url: 'https://sayso.ai/terms' },
+    { label: t('settings.privacy'), url: 'https://sayso.ai/privacy' },
+    { label: t('settings.terms'), url: 'https://sayso.ai/terms' },
   ]
 
   return (
     <div className="space-y-2">
-      <div className="text-[15px] font-medium">关于</div>
+      <div className="text-[15px] font-medium">{t('settings.aboutTitle')}</div>
       <div className="flex flex-col space-y-2">
         <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
           <div className="flex flex-col space-y-1">
-            <Label>版本</Label>
+            <Label>{t('settings.version')}</Label>
             <span className="text-muted-foreground text-sm">
               {appVersion ? `v${appVersion}` : '—'}
             </span>
           </div>
           <Button variant="outline" className="" size="sm">
             <IconRefresh />
-            检查更新
+            {t('settings.checkUpdate')}
           </Button>
         </div>
         {links.map((link) => (

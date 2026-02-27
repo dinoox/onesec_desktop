@@ -18,7 +18,7 @@ export default function DashboardLayout() {
           <div className="flex-none app-drag-region">
             <Header />
           </div>
-          <div className="flex-1 overflow-y-auto rounded-xl bg-white dark:bg-zinc-900">
+          <div className="flex-1 overflow-y-auto rounded-xl bg-white dark:bg-[#171717]">
             <div className="py-7 px-8 flex-1 flex flex-col relative">
               {isNavigating && <PageLoading />}
               <Suspense fallback={<PageLoading />}>

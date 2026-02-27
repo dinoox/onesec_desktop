@@ -16,24 +16,24 @@ export type NavItem = {
 
 export const navMain: NavItem[] = [
   {
-    title: '首页',
+    title: 'nav.home',
     url: '/content',
     icon: LucideHome,
   },
   {
-    title: '历史记录',
+    title: 'nav.history',
     url: '/content/history',
     icon: History,
   },
   {
-    title: '常用词',
+    title: 'nav.hotWords',
     url: '/content/hot-words',
     icon: BookA,
   },
 ]
 
 export const settingsNav: NavItem = {
-  title: '设置',
+  title: 'nav.settings',
   url: '/content/settings',
   icon: Settings,
 }
