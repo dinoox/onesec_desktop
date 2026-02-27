@@ -1,72 +1,67 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  getHotWordList,
-  createHotWord,
-  updateHotWord,
-  deleteHotWord,
+  getDictionaryEntries,
+  createDictionaryEntry,
+  updateDictionaryEntry,
+  deleteDictionaryEntry,
 } from '@/services/api/hotword-api'
 import { toast } from 'sonner'
 
-// 获取热词列表
 export const useHotWordListQuery = () => {
   return useQuery({
     queryKey: ['hotWordList'],
     queryFn: async () => {
-      const resp = await getHotWordList()
-      return resp.result || []
+      const resp = await getDictionaryEntries()
+      return resp.result?.entries || []
     },
   })
 }
 
-// 创建热词
 export const useCreateHotWordQuery = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: createHotWord,
+    mutationFn: (content: string) => createDictionaryEntry(content),
     onSuccess: async (resp) => {
       if (resp.code === 200) {
-        toast.success('热词创建成功')
+        toast.success('条目创建成功')
         await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
         return
       }
-
-      toast.error(resp.message || '创建热词失败，请重试')
+      toast.error(resp.message || '创建条目失败，请重试')
     },
   })
 }
 
-// 更新热词
 export const useUpdateHotWordQuery = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ hotword_id, hotword }: { hotword_id: number; hotword: string }) =>
-      updateHotWord(hotword_id, hotword),
+    mutationFn: ({ id, content }: { id: number; content: string }) =>
+      updateDictionaryEntry(id, content),
     onSuccess: async (resp) => {
       if (resp.code === 200) {
-        toast.success(resp.message)
+        toast.success(resp.message || '条目更新成功')
         await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
         return
       }
-      toast.error(resp.message || '更新热词失败，请重试')
+      toast.error(resp.message || '更新条目失败，请重试')
     },
   })
 }
 
-// 删除热词
 export const useDeleteHotWordQuery = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: deleteHotWord,
+    mutationFn: (id: number) => deleteDictionaryEntry(id),
     onSuccess: async (resp) => {
       if (resp.code === 200) {
-        toast.success(resp.message)
+        toast.success(resp.message || '条目删除成功')
         await queryClient.invalidateQueries({ queryKey: ['hotWordList'] })
         return
       }
-      toast.error(resp.message || '删除热词失败，请重试')
+      toast.error(resp.message || '删除条目失败，请重试')
     },
   })
 }

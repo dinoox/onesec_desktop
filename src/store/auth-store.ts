@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { User, LoginData } from '@/types/user'
 import { UserService } from '@/services/user-service.ts'
+import useStatusStore from '@/store/status-store.ts'
 
 interface AuthStore {
   user: User | null
@@ -44,6 +45,8 @@ const useAuthStore = create<AuthStore>((set) => ({
         refreshToken: loginData.refresh_token,
         isAuthed: true,
       })
+
+      useStatusStore.getState().actions.setAuthTokenInvalid(false)
 
       await UserService.claimLogin()
     },

@@ -37,7 +37,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win: BrowserWindow | null = null
 let pendingLoginData: Record<string, any> | null = null
 
-// Register sayso:// protocol
+log('[protocol] registering sayso://, defaultApp:', process.defaultApp)
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
     app.setAsDefaultProtocolClient('sayso', process.execPath, [
@@ -49,14 +49,21 @@ if (process.defaultApp) {
 }
 
 function handleDeepLink(url: string) {
+  log('[deep-link] received:', url)
   try {
     const parsed = new URL(url)
+    log('[deep-link] hostname:', parsed.hostname)
     if (parsed.hostname === 'login') {
       const info = parsed.searchParams.get('info')
-      if (!info) return
+      if (!info) {
+        log('[deep-link] no info param, ignoring')
+        return
+      }
 
       const data = JSON.parse(decodeURIComponent(info))
+      log('[deep-link] parsed login data, keys:', Object.keys(data))
       const contentWindow = windowManager.getWindow(WINDOW_CONTENT_ID)
+      log('[deep-link] contentWindow exists:', !!contentWindow)
 
       if (contentWindow && !contentWindow.isDestroyed()) {
         contentWindow.show()
@@ -67,20 +74,86 @@ function handleDeepLink(url: string) {
             data,
           }),
         )
+        log('[deep-link] broadcast LOGIN_DATA_RECEIVED to renderer')
       } else {
         pendingLoginData = data
+        log('[deep-link] window not ready, stored as pendingLoginData')
       }
     }
   } catch (e) {
-    log('Failed to handle deep link:', e)
+    log('[deep-link] failed to handle:', e)
   }
 }
 
-// macOS: open-url event
-app.on('open-url', (event, url) => {
-  event.preventDefault()
-  handleDeepLink(url)
-})
+const gotTheLock = app.requestSingleInstanceLock()
+log('[single-instance] lock acquired:', gotTheLock)
+
+if (!gotTheLock) {
+  log('[single-instance] another instance running, quitting')
+  app.quit()
+} else {
+  app.on('second-instance', (_event, argv) => {
+    log('[second-instance] argv:', argv)
+    const url = argv.find((arg) => arg.startsWith('sayso://'))
+    if (url) {
+      log('[second-instance] found deep link:', url)
+      handleDeepLink(url)
+    }
+    const contentWindow = windowManager.getWindow(WINDOW_CONTENT_ID)
+    log('[second-instance] contentWindow exists:', !!contentWindow)
+    if (contentWindow && !contentWindow.isDestroyed()) {
+      if (contentWindow.isMinimized()) contentWindow.restore()
+      contentWindow.show()
+      contentWindow.focus()
+    }
+  })
+
+  app.on('open-url', (event, url) => {
+    log('[open-url] received:', url)
+    event.preventDefault()
+    handleDeepLink(url)
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
+      win = null
+    }
+  })
+
+  app.on('before-quit', async (_) => {
+    await processManager.destroy()
+    app.quit()
+  })
+
+  app.on('browser-window-focus', () => {
+    throttle(checkForUpdates, 5 * 60 * 1000)
+  })
+
+  app.on('activate', () => {
+    const contentWindow = windowManager.getWindow(WINDOW_CONTENT_ID)
+    if (!contentWindow || contentWindow.isDestroyed()) {
+      createWindow()
+    } else {
+      contentWindow.show()
+    }
+  })
+
+  app.whenReady().then(async () => {
+    app.setAboutPanelOptions({
+      applicationName: 'SaySo',
+      applicationVersion: version,
+      copyright: `© Lunalabs`,
+      credits:
+        'SaySo 是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
+      website: 'https://sayso.ai',
+    })
+
+    createWindow()
+    await processManager.initialize()
+    await startPeriodicUpdateCheck()
+  })
+}
 
 function createWindow(onWebLoaded: Function = () => {}) {
   const theme = userConfigManager.getConfig().theme
@@ -111,8 +184,8 @@ function createWindow(onWebLoaded: Function = () => {}) {
     menuService.initialize()
     await onWebLoaded()
 
-    // Send pending login data if available
     if (pendingLoginData) {
+      log('[deep-link] sending pendingLoginData to renderer')
       windowManager.broadcast(
         DEFAULT_IPC_CHANNEL,
         buildIPCMessage(MessageTypes.LOGIN_DATA_RECEIVED, {
@@ -130,50 +203,5 @@ function createWindow(onWebLoaded: Function = () => {}) {
     win.loadFile(path.join(RENDERER_DIST, 'index.html')).then()
   }
 }
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-    win = null
-  }
-})
-
-app.on('before-quit', async (_) => {
-  await processManager.destroy()
-  app.quit()
-})
-
-app.on('browser-window-focus', () => {
-  throttle(checkForUpdates, 5 * 60 * 1000)
-})
-
-app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  const contentWindow = windowManager.getWindow(WINDOW_CONTENT_ID)
-  if (!contentWindow || contentWindow.isDestroyed()) {
-    createWindow()
-  } else {
-    contentWindow.show()
-  }
-})
-
-app.whenReady().then(async () => {
-  app.setAboutPanelOptions({
-    applicationName: 'SaySo',
-    applicationVersion: version,
-    copyright: `© 杭州点动星河科技有限公司`,
-    credits:
-      'SaySo 是一款基于语音识别的智能输入工具，支持快捷键触发、实时语音转文字等功能。',
-    website: 'https://miaoyan.cn',
-  })
-
-  createWindow()
-  await processManager.initialize()
-  await startPeriodicUpdateCheck()
-})
 
 export { createWindow }

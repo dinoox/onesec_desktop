@@ -25,7 +25,7 @@ import { useClickOutside } from '@/hooks/use-click-outside.ts'
 import { MessageTypes } from '../../main/types/message.ts'
 import { KeyMapper } from '@/utils/key.ts'
 import { KeyDisplay } from '@/components/ui/key-display.tsx'
-import { IconGitBranch } from '@tabler/icons-react'
+import { IconGitBranch, IconRefresh } from '@tabler/icons-react'
 
 type Tab = 'account' | 'settings' | 'about'
 
@@ -67,7 +67,7 @@ export const SettingsDialog: React.FC = () => {
             </button>
 
             {/* 左侧导航 */}
-            <div className="w-46 flex-none border-r border-border border-dashed flex flex-col pt-10 pb-4 px-2">
+            <div className="w-46 flex-none border-r border-border  flex flex-col pt-10 pb-4 px-2">
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
@@ -85,7 +85,7 @@ export const SettingsDialog: React.FC = () => {
             </div>
 
             {/* 右侧内容 */}
-            <div className="flex-1 overflow-y-auto px-6 py-5">
+            <div className="flex-1 overflow-y-auto px-6 py-5 mt-1">
               {activeTab === 'account' && <AccountTab />}
               {activeTab === 'settings' && <SettingsTab />}
               {activeTab === 'about' && <AboutTab />}
@@ -491,10 +491,12 @@ function AboutTab() {
         <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
           <div className="flex flex-col space-y-1">
             <Label>版本</Label>
-            <span className="text-muted-foreground text-sm">{appVersion ? `v${appVersion}` : '—'}</span>
+            <span className="text-muted-foreground text-sm">
+              {appVersion ? `v${appVersion}` : '—'}
+            </span>
           </div>
           <Button variant="outline" className="" size="sm">
-            <IconGitBranch />
+            <IconRefresh />
             检查更新
           </Button>
         </div>

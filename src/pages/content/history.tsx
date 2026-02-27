@@ -103,8 +103,8 @@ const HistoryPage: React.FC = () => {
       const audioData = await ipcService.readAudioFile(filename)
       const result = await reconvertAudio(audioData)
 
-      if (result.success) {
-        const content = (result.data as any)?.text || ''
+      if (result.code == 200) {
+        const content = (result.result as any)?.text || ''
         await ipcService.updateAudio(id, content, null)
       } else {
         const error = result.message || '转录失败'
@@ -523,9 +523,9 @@ const HistoryPage: React.FC = () => {
 
   return (
     <div className="max-w-2xl h-full flex flex-col">
-      <div className="flex-shrink-0 space-y-3 pb-3">
+      <div className="flex-shrink-0 space-y-4 pb-3">
         <div className="flex items-center justify-between">
-          <span className="text-[15px] font-medium">历史记录</span>
+          <span className="text-2xl font-semibold">历史记录</span>
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -576,7 +576,7 @@ const HistoryPage: React.FC = () => {
       {/* Content */}
       <div className="flex-1 min-h-0 mt-4 relative flex flex-col">
         {/* 固定的分组标题 */}
-        <div className="flex-shrink-0 text-xs text-muted-foreground pb-2 bg-background min-h-[24px]">
+        <div className="flex-shrink-0 text-xs text-muted-foreground pb-2  min-h-[24px]">
           {groupedRecords.length > 0 && !isLoading && currentGroupLabel}
         </div>
 

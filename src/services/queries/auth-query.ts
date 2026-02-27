@@ -9,7 +9,6 @@ export const useLogoutQuery = () =>
     mutationFn: logout,
     onSuccess: async (resp) => {
       authStore.getState().actions.logout().then()
-      useStatusStore.getState().actions.setAuthTokenInvalid(true)
       if (resp.code === 200) {
         toast.success('退出成功')
         return

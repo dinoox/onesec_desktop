@@ -98,7 +98,7 @@
 
   --ripple-brand-text: #5AB23EFF;
 
-  --selection: oklch(0.703 0.143 167.842 / 0.3);
+  --selection: oklch(0.90 0 0);
   --setting: oklch(0.98 0 0);
 }
 

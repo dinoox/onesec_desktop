@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Paperclip, SendHorizonal, X } from 'lucide-react'
-import { IconMessageChatbot } from '@tabler/icons-react'
+import { Textarea } from '@/components/ui/textarea'
+import { ChevronDown, Info, Paperclip, X } from 'lucide-react'
 import { useCreateFeedback, useUsageStatistics } from '@/services/queries/dashboard-query'
 import { Spinner } from '@/components/ui/spinner'
 import useUserConfigStore from '@/store/user-config-store'
@@ -12,18 +11,23 @@ import { throttledUpdateDeviceInfo } from '@/utils/device'
 import { KeyDisplay } from '@/components/ui/key-display.tsx'
 import { type AttachmentItem, getAttachmentKind } from '@/utils/oss-upload'
 import { toast } from 'sonner'
+import ipcService from '@/services/ipc-service'
+import { Audios } from '../../../main/services/database-service'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 const ContentPage: React.FC = () => {
   const [feedbackContent, setFeedbackContent] = useState('')
-  const [isFeedbackFocused, setIsFeedbackFocused] = useState(false)
   const [attachments, setAttachments] = useState<AttachmentItem[]>([])
+  const [lastRecord, setLastRecord] = useState<Audios | null>(null)
+  const [showTranscription, setShowTranscription] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const {
-    data: stats,
-    isLoading: statsLoading,
-    isFetching: statsFetching,
-    refetch: refetchStats,
-  } = useUsageStatistics()
+  const { refetch: refetchStats } = useUsageStatistics()
   const createFeedback = useCreateFeedback()
 
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
@@ -32,14 +36,21 @@ const ContentPage: React.FC = () => {
 
   const formattedKeys = useMemo(() => KeyMapper.formatKeys(shortcutKeys), [shortcutKeys])
 
+  const loadLastRecord = async () => {
+    const audios = await ipcService.getAudios()
+    setLastRecord(audios[0] ?? null)
+  }
+
   useEffect(() => {
     loadUserConfig()
     throttledUpdateDeviceInfo()
+    loadLastRecord()
   }, [])
 
   useEffect(() => {
     if (holdIPCMessage?.action === 'user_audio_saved') {
       refetchStats()
+      loadLastRecord()
     }
   }, [holdIPCMessage])
 
@@ -49,9 +60,16 @@ const ContentPage: React.FC = () => {
     const newItems: AttachmentItem[] = []
     for (const file of files) {
       const kind = getAttachmentKind(file)
-      if (!kind) { toast.warning(`不支持的文件类型: ${file.name}`); continue }
+      if (!kind) {
+        toast.warning(`不支持的文件类型: ${file.name}`)
+        continue
+      }
       if (existingKeys.has(`${file.name}|${file.size}`)) continue
-      newItems.push({ id: `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, file, kind })
+      newItems.push({
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        file,
+        kind,
+      })
     }
     setAttachments((prev) => [...prev, ...newItems].slice(0, 10))
     e.target.value = ''
@@ -89,31 +107,114 @@ const ContentPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 反馈与建议 */}
+      {/* 反馈区域 */}
       <div className="flex-1 min-h-0 mt-4 flex flex-col">
-        <div className="flex items-center justify-between mb-3 flex-shrink-0">
-          <span className="text-[15px] font-medium">反馈与建议</span>
-        </div>
+        <div className="rounded-xl border border-border/60 bg-card shadow-sm flex flex-col overflow-hidden">
+          {/* 最后转录展示区（可关闭） */}
+          {showTranscription && (
+            <div className="mx-3 mt-3 rounded-lg bg-muted/50 border border-border/30 overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[13px] font-semibold text-foreground">
+                    最后的转录
+                  </span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-3 w-3 text-muted-foreground/60 cursor-default" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        此转录及其对应的音频文件将与您的反馈一起提交，以帮助我们提高转录质量。此信息不会用于模型训练
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <div className="flex items-center gap-0.5">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground gap-0.5"
+                      >
+                        更多
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="text-sm">
+                      <DropdownMenuItem
+                        onClick={() => setFeedbackContent(lastRecord?.content ?? '')}
+                      >
+                        引用转录内容
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={loadLastRecord}>
+                        刷新转录记录
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowTranscription(false)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="px-3 pb-2.5">
+                {lastRecord?.content ? (
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 select-text">
+                    {lastRecord.content}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground/40 italic">暂无转录记录</p>
+                )}
+              </div>
+            </div>
+          )}
 
-        <div
-          className={`rounded-lg border text-card-foreground px-3 py-2 flex-shrink-0 shadow-black/10 transition-colors ${isFeedbackFocused ? 'border-black/30' : ''}`}
-        >
-          <div className="flex items-center gap-3">
-            <IconMessageChatbot className="h-4.5 w-4.5 text-muted-foreground flex-shrink-0" />
-            <Input
-              placeholder="遇到问题或有新想法？告诉我们..."
+          {/* 反馈输入区 */}
+          <div className="px-4 pt-2 pb-1 flex-1">
+            <Textarea
+              placeholder="你可以反馈任何意见！有效反馈可以获得3天奖励！"
               value={feedbackContent}
               onChange={(e) => setFeedbackContent(e.target.value)}
-              onFocus={() => setIsFeedbackFocused(true)}
-              onBlur={() => setIsFeedbackFocused(false)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                if (e.key === 'Enter' && e.metaKey && !e.nativeEvent.isComposing) {
                   e.preventDefault()
                   handleSubmitFeedback()
                 }
               }}
-              className="flex-1 border-none text-sm shadow-none focus-visible:ring-0 px-0 h-8 bg-transparent!"
+              className="min-h-[80px] resize-none border-none shadow-none focus-visible:ring-0 px-0 text-sm bg-transparent! placeholder:text-muted-foreground/50"
             />
+          </div>
+
+          {/* 附件预览 */}
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 px-4 pb-2">
+              {attachments.map((item) => (
+                <span
+                  key={item.id}
+                  className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground max-w-40"
+                >
+                  <span className="truncate">{item.file.name}</span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setAttachments((prev) => prev.filter((a) => a.id !== item.id))
+                    }
+                    className="flex-shrink-0 hover:text-foreground transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* 底部操作栏 */}
+          <div className="flex items-center justify-between px-3 py-2 border-t border-border/40">
             <input
               ref={fileInputRef}
               type="file"
@@ -124,46 +225,25 @@ const ContentPage: React.FC = () => {
             />
             <Button
               type="button"
-              size="icon-sm"
               variant="ghost"
+              size="icon"
               onClick={() => fileInputRef.current?.click()}
               disabled={createFeedback.isPending}
-              className="h-8 rounded-full"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
             >
-              <Paperclip className="h-4 w-4 text-muted-foreground" />
+              <Paperclip className="h-4 w-4" />
             </Button>
             <Button
               onClick={handleSubmitFeedback}
-              size="icon-sm"
-              variant="ghost"
+              size="sm"
+              variant="default"
               disabled={!feedbackContent.trim() || createFeedback.isPending}
-              className="h-8 text-sm rounded-full"
+              className="h-8 px-4 text-sm"
             >
-              {createFeedback.isPending ? (
-                <Spinner className="mr-1 text-muted-foreground" />
-              ) : null}
-              <SendHorizonal className="text-muted-foreground" />
+              {createFeedback.isPending && <Spinner className="mr-1.5 h-3.5 w-3.5" />}
+              发送反馈
             </Button>
           </div>
-          {attachments.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-border/50">
-              {attachments.map((item) => (
-                <span
-                  key={item.id}
-                  className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground max-w-40"
-                >
-                  <span className="truncate">{item.file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setAttachments((prev) => prev.filter((a) => a.id !== item.id))}
-                    className="flex-shrink-0 hover:text-foreground transition-colors"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>

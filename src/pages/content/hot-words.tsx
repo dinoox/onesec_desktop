@@ -19,13 +19,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
+  AlertCircle,
+  BookA,
+  Edit,
   Loader2,
+  Menu,
+  Plus,
   PopcornIcon,
   Search,
-  Plus,
-  AlertCircle,
-  Menu,
-  Edit,
   Trash2,
 } from 'lucide-react'
 import {
@@ -34,8 +35,15 @@ import {
   useHotWordListQuery,
   useUpdateHotWordQuery,
 } from '@/services/queries/hotword-query'
-import { HotWord } from '@/services/api/hotword-api'
-import { Empty, EmptyDescription } from '@/components/ui/empty'
+import { DictionaryEntry } from '@/services/api/hotword-api'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -44,7 +52,7 @@ const ContentPage: React.FC = () => {
   const [editOpen, setEditOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
   const [newHotWords, setNewHotWords] = useState('')
-  const [editingHotWord, setEditingHotWord] = useState<HotWord | null>(null)
+  const [editingHotWord, setEditingHotWord] = useState<DictionaryEntry | null>(null)
   const [editValue, setEditValue] = useState('')
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
 
@@ -58,7 +66,7 @@ const ContentPage: React.FC = () => {
   const filteredHotWords = useMemo(() => {
     if (!searchValue.trim()) return hotWords
     return hotWords.filter((item) =>
-      item.hotword.toLowerCase().includes(searchValue.toLowerCase()),
+      item.content.toLowerCase().includes(searchValue.toLowerCase()),
     )
   }, [hotWords, searchValue])
 
@@ -99,8 +107,8 @@ const ContentPage: React.FC = () => {
       return
     }
     await updateHotWordMutation.mutateAsync({
-      hotword_id: editingHotWord.id,
-      hotword: editValue.trim(),
+      id: editingHotWord.id,
+      content: editValue.trim(),
     })
     setEditValue('')
     setEditingHotWord(null)
@@ -114,18 +122,18 @@ const ContentPage: React.FC = () => {
   }
 
   // 打开编辑对话框
-  const openEditDialog = (hotWord: HotWord) => {
+  const openEditDialog = (hotWord: DictionaryEntry) => {
     setOpenMenuId(null)
     setEditingHotWord(hotWord)
-    setEditValue(hotWord.hotword)
+    setEditValue(hotWord.content)
     setEditOpen(true)
   }
 
   return (
     <div className="max-w-2xl h-full flex flex-col">
-      <div className="flex-shrink-0 space-y-3 pb-3">
+      <div className="flex-shrink-0 space-y-4 pb-3">
         <div className="flex items-center justify-between">
-          <span className="text-[15px] font-medium">常用词</span>
+          <span className="text-2xl font-semibold">常用词</span>
 
           {/* 搜索框 */}
           <div className="flex items-center gap-2">
@@ -227,7 +235,7 @@ const ContentPage: React.FC = () => {
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="mt-4">
-          <div className="flex-shrink-0 text-xs text-muted-foreground pb-2 bg-background min-h-[24px]">
+          <div className="flex-shrink-0 text-xs text-muted-foreground pb-2  min-h-[24px]">
             {filteredHotWords.length > 0 && !isLoading ? '常用词' : '搜索词'}
           </div>
 
@@ -268,9 +276,25 @@ const ContentPage: React.FC = () => {
                 transition={{ duration: 0.1 }}
               >
                 <Empty>
-                  <EmptyDescription>
-                    {searchValue ? '未找到匹配的常用词' : '还没有添加常用词'}
-                  </EmptyDescription>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <BookA />
+                    </EmptyMedia>
+                    <EmptyTitle>{searchValue ? '未找到匹配的常用词' : '暂无条目'}</EmptyTitle>
+                    <EmptyDescription>
+                      {searchValue
+                        ? '请尝试其他关键词'
+                        : '点击添加按钮创建您的第一个条目'}
+                    </EmptyDescription>
+                  </EmptyHeader>
+                  {!searchValue && (
+                    <EmptyContent className="flex-row justify-center">
+                      <Button size="sm" onClick={() => setOpen(true)}>
+                        <Plus className="h-4 w-4" />
+                        添加常用词
+                      </Button>
+                    </EmptyContent>
+                  )}
                 </Empty>
               </motion.div>
             ) : (
@@ -301,7 +325,7 @@ const ContentPage: React.FC = () => {
                       className="group flex items-center gap-3 border-b pl-4 pr-5 py-3 hover:bg-muted/50 transition-colors last:border-b-0"
                     >
                       <div className="flex-1 min-w-0 text-sm">
-                        <span className="line-clamp-2">{item.hotword}</span>
+                        <span className="line-clamp-2">{item.content}</span>
                       </div>
                       <div className="flex items-center gap-4.5 text-muted-foreground opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
                         <DropdownMenu

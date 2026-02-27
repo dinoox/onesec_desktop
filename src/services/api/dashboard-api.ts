@@ -36,5 +36,5 @@ export const createFeedback = (params: {
   video_urls?: string[]
   audio_urls?: string[]
 }) => {
-  return request.post('/api/v1/users-feedbacks', { params })
+  return request.post('/v1/users-feedbacks', { params })
 }
