@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { ChevronDown, Info, Paperclip, X } from 'lucide-react'
+import { ChevronDown, Info, Paperclip, X, MessageCircleMore } from 'lucide-react'
 import { useCreateFeedback, useUsageStatistics } from '@/services/queries/dashboard-query'
 import { Spinner } from '@/components/ui/spinner'
 import useUserConfigStore from '@/store/user-config-store'
@@ -15,15 +16,15 @@ import { toast } from 'sonner'
 import ipcService from '@/services/ipc-service'
 import { Audios } from '../../../main/services/database-service'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 const ContentPage: React.FC = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [feedbackContent, setFeedbackContent] = useState('')
   const [attachments, setAttachments] = useState<AttachmentItem[]>([])
   const [lastRecord, setLastRecord] = useState<Audios | null>(null)
@@ -129,28 +130,57 @@ const ContentPage: React.FC = () => {
                   </Tooltip>
                 </div>
                 <div className="flex items-center gap-0.5">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                  <HoverCard openDelay={200} closeDelay={100}>
+                    <HoverCardTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground gap-0.5"
+                        className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground gap-0.5 group/more"
+                        onClick={() => navigate('/content/history')}
                       >
                         {t('home.more')}
-                        <ChevronDown className="h-3 w-3" />
+                        <ChevronDown className="h-3 w-3 transition-transform duration-200 group-data-[state=open]/more:rotate-180" />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="text-sm">
-                      <DropdownMenuItem
-                        onClick={() => setFeedbackContent(lastRecord?.content ?? '')}
-                      >
-                        {t('home.quoteTranscript')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={loadLastRecord}>
-                        {t('home.refreshTranscript')}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    </HoverCardTrigger>
+                    <HoverCardContent side="left" className="w-74 p-4">
+                      <div className="rounded-lg border p-3">
+                        <p className="text-sm font-medium mb-2">
+                          {t('home.hoverCardToday')}
+                        </p>
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                              <span className="whitespace-nowrap">01:00 PM</span>
+                              <span>The transcription was dismissed.</span>
+                            </div>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="cursor-pointer flex-shrink-0">
+                                  <MessageCircleMore className="h-3.5 w-3.5 text-muted-foreground" />
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t('home.feedbackTooltip')}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                            <span className="whitespace-nowrap">02:00 PM</span>
+                            <span>Audio is silent.</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+                        {t('home.hoverGuide1')}
+                        <span className="font-medium text-foreground">
+                          {t('nav.history')}
+                        </span>
+                        {t('home.hoverGuide2')}
+                        <MessageCircleMore className="inline h-3 w-3 mx-0.5 align-text-bottom" />
+                        {t('home.hoverGuide3')}
+                      </p>
+                    </HoverCardContent>
+                  </HoverCard>
                   <Button
                     variant="ghost"
                     size="icon"

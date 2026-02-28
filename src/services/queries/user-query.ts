@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { updateUserInfo, getUserInfo } from '@/services/api/user-api'
+import {
+  updateUserInfo,
+  getUserInfo,
+  getEntitlementStatus,
+} from '@/services/api/user-api'
 import useAuthStore from '@/store/auth-store'
 import { toast } from 'sonner'
 
@@ -15,6 +19,17 @@ export const useGetUserInfo = () => {
         await updateUser(resp.result)
       }
       return resp
+    },
+  })
+}
+
+export const useEntitlementStatus = () => {
+  return useQuery({
+    queryKey: ['entitlement-status'],
+    queryFn: async () => {
+      const resp = await getEntitlementStatus()
+      if (resp.code === 200) return resp.result?.data ?? null
+      return null
     },
   })
 }

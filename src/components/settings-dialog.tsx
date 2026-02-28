@@ -79,7 +79,7 @@ export const SettingsDialog: React.FC = () => {
             </button>
 
             {/* 左侧导航 */}
-            <div className="w-46 flex-none border-r border-border  flex flex-col pt-10 pb-4 px-2">
+            <div className="w-46 flex-none border-r border-border flex flex-col pt-4 pb-4 px-2">
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
@@ -97,7 +97,7 @@ export const SettingsDialog: React.FC = () => {
             </div>
 
             {/* 右侧内容 */}
-            <div className="flex-1 overflow-y-auto px-6 py-5 mt-1">
+            <div className="flex-1 overflow-y-auto px-6 py-5 mt-1 flex flex-col">
               {activeTab === 'account' && <AccountTab />}
               {activeTab === 'general' && <GeneralTab />}
               {activeTab === 'shortcuts' && <ShortcutsTab />}
@@ -143,43 +143,45 @@ function AccountTab() {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-col space-y-2">
-        <div className="text-[15px] font-medium">{t('settings.accountTitle')}</div>
-        <div className="flex items-center justify-between w-full bg-setting rounded-xl px-3 py-3">
-          <Label>{t('settings.email')}</Label>
-          <span className="text-sm text-muted-foreground">
-            {user?.email || t('settings.emailNotSet')}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
-          <Label>{t('settings.theme')}</Label>
-          <Select value={theme} onValueChange={setTheme}>
-            <SelectTrigger>
-              <SelectValue placeholder={t('settings.themeSelect')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">{t('settings.themeLight')}</SelectItem>
-              <SelectItem value="dark">{t('settings.themeDark')}</SelectItem>
-              <SelectItem value="system">{t('settings.themeSystem')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
-          <div className="flex flex-col space-y-1">
-            <Label>{t('settings.subscription')}</Label>
-            <span className="text-muted-foreground text-sm">{t('settings.trialPro')}</span>
+    <div className="flex flex-col h-full">
+      <div className="space-y-3">
+        <div className="flex flex-col space-y-2">
+          <div className="text-[15px] font-medium">{t('settings.accountTitle')}</div>
+          <div className="flex items-center justify-between w-full bg-setting rounded-xl px-3 py-3">
+            <Label>{t('settings.email')}</Label>
+            <span className="text-sm text-muted-foreground">
+              {user?.email || t('settings.emailNotSet')}
+            </span>
           </div>
-          <Button variant="outline" className="" size="sm">
-            <IconGitBranch />
-            {t('settings.upgrade')}
-          </Button>
+
+          <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
+            <Label>{t('settings.theme')}</Label>
+            <Select value={theme} onValueChange={setTheme}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('settings.themeSelect')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">{t('settings.themeLight')}</SelectItem>
+                <SelectItem value="dark">{t('settings.themeDark')}</SelectItem>
+                <SelectItem value="system">{t('settings.themeSystem')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
+            <div className="flex flex-col space-y-1">
+              <Label>{t('settings.subscription')}</Label>
+              <span className="text-muted-foreground text-sm">{t('settings.trialPro')}</span>
+            </div>
+            <Button variant="outline" className="" size="sm">
+              <IconGitBranch />
+              {t('settings.upgrade')}
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-2 pt-2">
+      <div className="mt-auto flex justify-end">
         <Button
           type="button"
           variant="secondary"
