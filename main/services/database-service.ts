@@ -176,10 +176,15 @@ class DatabaseService {
     const user = userConfigManager.getConfig().user
     if (!user) return []
 
+    // const stmt = db.prepare(
+    //   'SELECT id, session_id, created_at, filename, error, content, user_id, version FROM audios WHERE user_id = ? ORDER BY created_at DESC',
+    // )
+
     const stmt = db.prepare(
       'SELECT id, session_id, created_at, filename, error, content, user_id, version FROM audios WHERE user_id = ? ORDER BY created_at DESC',
     )
-    const rows = stmt.all(user.id) as any[]
+
+    const rows = stmt.all(String(user.id)) as any[]
     return rows.map((row) => this.normalize(row))
   }
 
@@ -189,7 +194,7 @@ class DatabaseService {
     if (!user) return false
 
     const stmt = db.prepare('DELETE FROM audios WHERE filename = ? AND user_id = ?')
-    let result = stmt.run(filename, user.id)
+    let result = stmt.run(filename, String(user.id))
     return result.changes > 0
   }
 
@@ -201,7 +206,7 @@ class DatabaseService {
     const stmt = db.prepare(
       'UPDATE audios SET content = ?, error = ? WHERE id = ? AND user_id = ?',
     )
-    const result = stmt.run(content, error, id, user.id)
+    const result = stmt.run(content, error, id, String(user.id))
     return result.changes > 0
   }
 
@@ -216,24 +221,24 @@ class DatabaseService {
     switch (retention) {
       case 'never':
         stmt = db.prepare('DELETE FROM audios WHERE user_id = ?')
-        result = stmt.run(user.id)
+        result = stmt.run(String(user.id))
         break
       case '24hours': {
         const cutoffTime = Math.floor((Date.now() - 24 * 60 * 60 * 1000) / 1000)
         stmt = db.prepare('DELETE FROM audios WHERE created_at < ? AND user_id = ?')
-        result = stmt.run(cutoffTime, user.id)
+        result = stmt.run(cutoffTime, String(user.id))
         break
       }
       case '1week': {
         const cutoffTime = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000)
         stmt = db.prepare('DELETE FROM audios WHERE created_at < ? AND user_id = ?')
-        result = stmt.run(cutoffTime, user.id)
+        result = stmt.run(cutoffTime, String(user.id))
         break
       }
       case '1month': {
         const cutoffTime = Math.floor((Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000)
         stmt = db.prepare('DELETE FROM audios WHERE created_at < ? AND user_id = ?')
-        result = stmt.run(cutoffTime, user.id)
+        result = stmt.run(cutoffTime, String(user.id))
         break
       }
       case 'forever':
@@ -304,7 +309,7 @@ class DatabaseService {
             filename,
             error,
             content,
-            user.id,
+            String(user.id),
             version,
           )
           totalInserted++
@@ -323,7 +328,7 @@ class DatabaseService {
     if (!user) return 0
 
     const stmt = db.prepare('DELETE FROM audios WHERE user_id = ?')
-    const result = stmt.run(user.id)
+    const result = stmt.run(String(user.id))
     return result.changes
   }
 

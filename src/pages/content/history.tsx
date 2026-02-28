@@ -11,6 +11,7 @@ import {
   Trash2,
   BadgeAlert,
   Database,
+  MessageCircleMore,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { List } from 'react-window'
@@ -25,7 +26,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
@@ -39,9 +42,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { Spinner } from '@/components/ui/spinner'
 import { Audios } from '../../../main/services/database-service'
 import ipcService from '@/services/ipc-service'
 import { reconvertAudio } from '@/services/api/audio-api'
+import { useCreateFeedback } from '@/services/queries/dashboard-query'
 import { toast } from 'sonner'
 import useStatusStore from '@/store/status-store'
 import useUserConfigStore, { useUserConfigActions } from '@/store/user-config-store'
@@ -66,6 +80,9 @@ const HistoryPage: React.FC = () => {
   const prevMessageIdRef = useRef<string | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [containerHeight, setContainerHeight] = useState(500)
+  const [feedbackRecord, setFeedbackRecord] = useState<Audios | null>(null)
+  const [feedbackContent, setFeedbackContent] = useState('')
+  const createFeedback = useCreateFeedback()
 
   const loadAudios = async () => {
     try {
@@ -192,6 +209,15 @@ const HistoryPage: React.FC = () => {
     } finally {
       setShowRetentionDialog(false)
     }
+  }
+
+  const handleSubmitFeedback = async () => {
+    if (!feedbackContent.trim() || !feedbackRecord) return
+    await createFeedback.mutateAsync({
+      content: feedbackContent.trim(),
+    })
+    setFeedbackRecord(null)
+    setFeedbackContent('')
   }
 
   const getRetentionTitleMessage = (value: string) => {
@@ -418,6 +444,20 @@ const HistoryPage: React.FC = () => {
                 </TooltipContent>
               </Tooltip>
 
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-3 w-3 text-muted-foreground/80"
+                    onClick={() => setFeedbackRecord(record)}
+                  >
+                    <MessageCircleMore className="h-2 w-2" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{t('history.feedback')}</TooltipContent>
+              </Tooltip>
+
               <DropdownMenu
                 modal={false}
                 open={openMenuId === record.id}
@@ -524,7 +564,7 @@ const HistoryPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl h-full flex flex-col">
+    <div className="h-full flex flex-col">
       <div className="flex-shrink-0 space-y-4 pb-3">
         <div className="flex items-center justify-between">
           <span className="text-2xl font-semibold">{t('history.title')}</span>
@@ -561,15 +601,18 @@ const HistoryPage: React.FC = () => {
             </div>
           </div>
           <Select value={historyRetention} onValueChange={handleRetentionChange}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[100px]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="never">{t('history.never')}</SelectItem>
-              <SelectItem value="24hours">{t('history.hours24')}</SelectItem>
-              <SelectItem value="1week">{t('history.week1')}</SelectItem>
-              <SelectItem value="1month">{t('history.month1')}</SelectItem>
-              <SelectItem value="forever">{t('history.forever')}</SelectItem>
+            <SelectContent position="popper" sideOffset={4}>
+              <SelectGroup>
+                <SelectLabel>Retention</SelectLabel>
+                <SelectItem value="never">{t('history.never')}</SelectItem>
+                <SelectItem value="24hours">{t('history.hours24')}</SelectItem>
+                <SelectItem value="1week">{t('history.week1')}</SelectItem>
+                <SelectItem value="1month">{t('history.month1')}</SelectItem>
+                <SelectItem value="forever">{t('history.forever')}</SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
@@ -609,7 +652,9 @@ const HistoryPage: React.FC = () => {
                 />
               </div>
             ) : (
-              <div className="text-center py-12 text-muted-foreground">{t('history.noHistory')}</div>
+              <div className="text-center py-12 text-muted-foreground">
+                {t('history.noHistory')}
+              </div>
             )}
           </div>
         </div>
@@ -638,16 +683,66 @@ const HistoryPage: React.FC = () => {
         <AlertDialogContent className="max-w-[400px]!">
           <AlertDialogHeader>
             <AlertDialogTitle>{t('history.deleteAllTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('history.deleteAllDesc')}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t('history.deleteAllDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('history.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteAll}>{t('history.confirm')}</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDeleteAll}>
+              {t('history.confirm')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={!!feedbackRecord}
+        onOpenChange={(open) => {
+          if (!open) {
+            setFeedbackRecord(null)
+            setFeedbackContent('')
+          }
+        }}
+      >
+        <DialogContent className="max-w-[420px]!">
+          <DialogHeader>
+            <DialogTitle>{t('history.feedbackDialogTitle')}</DialogTitle>
+            <DialogDescription>
+              {t('history.feedbackDialogDesc')}
+            </DialogDescription>
+          </DialogHeader>
+          {feedbackRecord?.content && (
+            <div className="rounded-lg bg-muted/50 border border-border/50 px-3 py-2.5">
+              <p className="text-sm text-muted-foreground line-clamp-3 select-text">
+                {feedbackRecord.content}
+              </p>
+            </div>
+          )}
+          <Textarea
+            placeholder={t('history.feedbackPlaceholder')}
+            value={feedbackContent}
+            onChange={(e) => setFeedbackContent(e.target.value)}
+            className="min-h-[100px] text-sm"
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFeedbackRecord(null)
+                setFeedbackContent('')
+              }}
+            >
+              {t('history.cancel')}
+            </Button>
+            <Button
+              onClick={handleSubmitFeedback}
+              disabled={!feedbackContent.trim() || createFeedback.isPending}
+            >
+              {createFeedback.isPending && <Spinner className="mr-1.5 h-3.5 w-3.5" />}
+              {t('history.feedbackSubmit')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

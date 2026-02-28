@@ -2,9 +2,15 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { ChevronDown, Info, Paperclip, X, MessageCircleMore } from 'lucide-react'
-import { useCreateFeedback, useUsageStatistics } from '@/services/queries/dashboard-query'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupTextarea,
+} from '@/components/ui/input-group'
+import { ChevronDown, Info, MessageCircleMore, Paperclip, X } from 'lucide-react'
+import { useCreateFeedback } from '@/services/queries/dashboard-query'
 import { Spinner } from '@/components/ui/spinner'
 import useUserConfigStore from '@/store/user-config-store'
 import { KeyMapper } from '@/utils/key'
@@ -15,12 +21,14 @@ import { type AttachmentItem, getAttachmentKind } from '@/utils/oss-upload'
 import { toast } from 'sonner'
 import ipcService from '@/services/ipc-service'
 import { Audios } from '../../../main/services/database-service'
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  IconBrandJavascript,
+  IconCopy,
+  IconCornerDownLeft,
+  IconRefresh,
+} from "@tabler/icons-react"
 
 const ContentPage: React.FC = () => {
   const { t } = useTranslation()
@@ -30,7 +38,6 @@ const ContentPage: React.FC = () => {
   const [lastRecord, setLastRecord] = useState<Audios | null>(null)
   const [showTranscription, setShowTranscription] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { refetch: refetchStats } = useUsageStatistics()
   const createFeedback = useCreateFeedback()
 
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
@@ -52,7 +59,6 @@ const ContentPage: React.FC = () => {
 
   useEffect(() => {
     if (holdIPCMessage?.action === 'user_audio_saved') {
-      refetchStats()
       loadLastRecord()
     }
   }, [holdIPCMessage])
@@ -86,7 +92,7 @@ const ContentPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       <div className="flex-shrink-0 space-y-4 pb-3">
         <div className="flex items-center justify-between">
           <span className="text-2xl font-semibold">{t('home.welcome')}</span>
@@ -97,9 +103,9 @@ const ContentPage: React.FC = () => {
           <div className="flex items-center">
             <div className="flex flex-col gap-1">
               <span className="font-medium">{t('home.tagline')}</span>
-              <div className="text-sm text-muted-foreground space-x-1">
+              <div className="text-sm text-muted-foreground space-x-1.5">
                 <span>{t('home.holdKey')}</span>
-                <KeyDisplay keys={formattedKeys} />
+                <KeyDisplay keys={formattedKeys} className="bg-gray-200" />
                 <span>{t('home.thenSpeak')}</span>
               </div>
             </div>
@@ -109,119 +115,121 @@ const ContentPage: React.FC = () => {
       </div>
 
       {/* 反馈区域 */}
-      <div className="flex-1 min-h-0 mt-4 flex flex-col">
-        <div className="rounded-xl border border-border/60 bg-card shadow-sm flex flex-col overflow-hidden">
+      <div className="mt-4 flex flex-col">
+        <InputGroup className="overflow-hidden has-disabled:bg-transparent has-disabled:opacity-100 dark:has-disabled:bg-transparent border-border/50 has-[[data-slot=input-group-control]:focus-visible]:border-border/50">
           {/* 最后转录展示区（可关闭） */}
           {showTranscription && (
-            <div className="mx-3 mt-3 rounded-lg bg-muted/50 border border-border/30 overflow-hidden">
-              <div className="flex items-center justify-between px-3 py-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[13px] font-semibold text-foreground">
-                    {t('home.lastTranscript')}
-                  </span>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-3 w-3 mt-0.5 font-bold text-muted-foreground cursor-default" />
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-68">
-                      <p>{t('home.tooltipLine1')}</p>
-                      <p>{t('home.tooltipLine2')}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <div className="flex items-center gap-0.5">
-                  <HoverCard openDelay={200} closeDelay={100}>
-                    <HoverCardTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground gap-0.5 group/more"
-                        onClick={() => navigate('/content/history')}
-                      >
-                        {t('home.more')}
-                        <ChevronDown className="h-3 w-3 transition-transform duration-200 group-data-[state=open]/more:rotate-180" />
-                      </Button>
-                    </HoverCardTrigger>
-                    <HoverCardContent side="left" className="w-74 p-4">
-                      <div className="rounded-lg border p-3">
-                        <p className="text-sm font-medium mb-2">
-                          {t('home.hoverCardToday')}
-                        </p>
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                              <span className="whitespace-nowrap">01:00 PM</span>
-                              <span>The transcription was dismissed.</span>
+            <InputGroupAddon
+              align="block-start"
+              className="flex-col! items-stretch! gap-0! p-3! pb-1!"
+            >
+              <div className="rounded-lg bg-muted/50 border border-border/50">
+                <div className="flex items-center justify-between px-3 pt-2 pb-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[14px] text-foreground">
+                      {t('home.lastTranscript')}
+                    </span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3.5 w-3.5 font-bold cursor-default" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-68">
+                        <p>{t('home.tooltip')}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="flex items-center gap-0.5">
+                    <HoverCard openDelay={200} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground gap-0.5 group/more"
+                          onClick={() => navigate('/content/history')}
+                        >
+                          {t('home.more')}
+                          <ChevronDown className="h-3 w-3 transition-transform duration-200 group-data-[state=open]/more:rotate-180" />
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent side="left" className="w-74 p-4">
+                        <div className="rounded-lg border p-3">
+                          <p className="text-sm font-medium mb-2">
+                            {t('home.hoverCardToday')}
+                          </p>
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                                <span className="whitespace-nowrap">01:00 PM</span>
+                                <span>The transcription was dismissed.</span>
+                              </div>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="cursor-pointer flex-shrink-0">
+                                    <MessageCircleMore className="h-3.5 w-3.5 text-muted-foreground" />
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>{t('home.feedbackTooltip')}</TooltipContent>
+                              </Tooltip>
                             </div>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="cursor-pointer flex-shrink-0">
-                                  <MessageCircleMore className="h-3.5 w-3.5 text-muted-foreground" />
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {t('home.feedbackTooltip')}
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                            <span className="whitespace-nowrap">02:00 PM</span>
-                            <span>Audio is silent.</span>
+                            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                              <span className="whitespace-nowrap">02:00 PM</span>
+                              <span>Audio is silent.</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-                        {t('home.hoverGuide1')}
-                        <span className="font-medium text-foreground">
-                          {t('nav.history')}
-                        </span>
-                        {t('home.hoverGuide2')}
-                        <MessageCircleMore className="inline h-3 w-3 mx-0.5 align-text-bottom" />
-                        {t('home.hoverGuide3')}
-                      </p>
-                    </HoverCardContent>
-                  </HoverCard>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                    onClick={() => setShowTranscription(false)}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
+                        <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+                          {t('home.hoverGuide1')}
+                          <span className="font-medium text-foreground">
+                            {t('nav.history')}
+                          </span>
+                          {t('home.hoverGuide2')}
+                          <MessageCircleMore className="inline h-3 w-3 mx-0.5 align-text-bottom" />
+                          {t('home.hoverGuide3')}
+                        </p>
+                      </HoverCardContent>
+                    </HoverCard>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowTranscription(false)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="px-3 pb-2.5">
+                  {lastRecord?.content ? (
+                    <p className="text-sm font-normal text-muted-foreground  line-clamp-2 select-text">
+                      {lastRecord.content}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground/40">
+                      {t('home.noTranscript')}
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="px-3 pb-2.5">
-                {lastRecord?.content ? (
-                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 select-text">
-                    {lastRecord.content}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground/40 italic">{t('home.noTranscript')}</p>
-                )}
-              </div>
-            </div>
+            </InputGroupAddon>
           )}
 
           {/* 反馈输入区 */}
-          <div className="px-4 pt-2 pb-1 flex-1">
-            <Textarea
-              placeholder={t('home.feedbackPlaceholder')}
-              value={feedbackContent}
-              onChange={(e) => setFeedbackContent(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && e.metaKey && !e.nativeEvent.isComposing) {
-                  e.preventDefault()
-                  handleSubmitFeedback()
-                }
-              }}
-              className="min-h-[80px] resize-none border-none shadow-none focus-visible:ring-0 px-0 text-sm bg-transparent! placeholder:text-muted-foreground/50"
-            />
-          </div>
+          <InputGroupTextarea
+            placeholder={t('home.feedbackPlaceholder')}
+            value={feedbackContent}
+            onChange={(e) => setFeedbackContent(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.metaKey && !e.nativeEvent.isComposing) {
+                e.preventDefault()
+                handleSubmitFeedback()
+              }
+            }}
+            className="min-h-[105px] px-4 text-sm placeholder:text-muted-foreground/50"
+          />
 
           {/* 附件预览 */}
           {attachments.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 px-4 pb-2">
+            <div className="flex w-full flex-wrap gap-1.5 px-4 pb-2">
               {attachments.map((item) => (
                 <span
                   key={item.id}
@@ -243,7 +251,7 @@ const ContentPage: React.FC = () => {
           )}
 
           {/* 底部操作栏 */}
-          <div className="flex items-center justify-between px-3 py-2 border-t border-border/40">
+          <InputGroupAddon align="block-end" className="border-t border-border/50">
             <input
               ref={fileInputRef}
               type="file"
@@ -262,18 +270,19 @@ const ContentPage: React.FC = () => {
             >
               <Paperclip className="h-4 w-4" />
             </Button>
-            <Button
+            <InputGroupButton
               onClick={handleSubmitFeedback}
               size="sm"
               variant="default"
               disabled={!feedbackContent.trim() || createFeedback.isPending}
-              className="h-8 px-4 text-sm"
+              className="ml-auto"
             >
               {createFeedback.isPending && <Spinner className="mr-1.5 h-3.5 w-3.5" />}
               {t('home.sendFeedback')}
-            </Button>
-          </div>
-        </div>
+              <IconCornerDownLeft />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
       </div>
     </div>
   )

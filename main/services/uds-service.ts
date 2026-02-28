@@ -9,7 +9,7 @@ import log from 'electron-log'
  * 实现 SaySo Electron 主进程与 Native 进程之间的 UDS 通信协议
  */
 class UDSService extends EventEmitter {
-  readonly socketPath: string = '/tmp/ai.sayso.app.uds'
+  readonly socketPath: string = '/tmp/ai.sayso.uds'
   private server: net.Server | null = null
   private clients: Map<string, ClientInfo> = new Map()
 

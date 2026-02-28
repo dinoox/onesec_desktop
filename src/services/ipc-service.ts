@@ -133,7 +133,7 @@ class IPCService {
       if (!info) return
 
       const user = {
-        id: info.id,
+        id: String(info.id),
         email: info.email,
         display_name: info.display_name,
       }

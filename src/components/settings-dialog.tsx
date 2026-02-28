@@ -227,17 +227,17 @@ function GeneralTab() {
 function ShortcutsTab() {
   const { t } = useTranslation()
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
-  const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
+  const shortcutSmartKeys = useUserConfigStore((state) => state.shortcutSmartKeys)
   const shortcutFreeKeys = useUserConfigStore((state) => state.shortcutFreeKeys)
-  const { setShortcutKeys, setShortcutCommandKeys, setShortcutFreeKeys, loadUserConfig } =
+  const { setShortcutKeys, setShortcutSmartKeys, setShortcutFreeKeys, loadUserConfig } =
     useUserConfigStore((state) => state.actions)
 
-  const [editingMode, setEditingMode] = useState<'normal' | 'command' | 'free' | null>(
+  const [editingMode, setEditingMode] = useState<'normal' | 'smart' | 'free' | null>(
     null,
   )
 
   const normalInputRef = useRef<HTMLDivElement>(null)
-  const commandInputRef = useRef<HTMLDivElement>(null)
+  const smartInputRef = useRef<HTMLDivElement>(null)
   const freeInputRef = useRef<HTMLDivElement>(null)
 
   const hotkeySettingStatus = useStatusStore((state) => state.hotKeySettingStatus)
@@ -259,7 +259,7 @@ function ShortcutsTab() {
 
       if (hotkey_combination && Array.isArray(hotkey_combination)) {
         if (mode === 'normal') setShortcutKeys(hotkey_combination)
-        else if (mode === 'command') setShortcutCommandKeys(hotkey_combination)
+        else if (mode === 'smart') setShortcutSmartKeys(hotkey_combination)
         else if (mode === 'free') setShortcutFreeKeys(hotkey_combination)
       }
 
@@ -273,7 +273,7 @@ function ShortcutsTab() {
     }
   }, [holdIPCMessage])
 
-  const startHotKeySetting = async (mode: 'normal' | 'command' | 'free') => {
+  const startHotKeySetting = async (mode: 'normal' | 'smart' | 'free') => {
     setEditingMode(mode)
     await ipcService.startHotkeySetting(mode)
     setHotkeySettingStatus('hotkey_setting')
@@ -296,8 +296,8 @@ function ShortcutsTab() {
     editingMode === 'normal' &&
     (hotkeySettingStatus === 'hotkey_setting' ||
       hotkeySettingStatus === 'hotkey_setting_update')
-  const isEditingCommand =
-    editingMode === 'command' &&
+  const isEditingSmart =
+    editingMode === 'smart' &&
     (hotkeySettingStatus === 'hotkey_setting' ||
       hotkeySettingStatus === 'hotkey_setting_update')
   const isEditingFree =
@@ -307,12 +307,12 @@ function ShortcutsTab() {
 
   const isWaitingNormal =
     editingMode === 'normal' && hotkeySettingStatus === 'hotkey_setting'
-  const isWaitingCommand =
-    editingMode === 'command' && hotkeySettingStatus === 'hotkey_setting'
+  const isWaitingSmart =
+    editingMode === 'smart' && hotkeySettingStatus === 'hotkey_setting'
   const isWaitingFree = editingMode === 'free' && hotkeySettingStatus === 'hotkey_setting'
 
   useClickOutside(
-    [normalInputRef, commandInputRef, freeInputRef],
+    [normalInputRef, smartInputRef, freeInputRef],
     endHotKeySetting,
     !!editingMode,
   )
@@ -321,9 +321,9 @@ function ShortcutsTab() {
     () => KeyMapper.formatKeys(shortcutKeys),
     [shortcutKeys],
   )
-  const formattedCommandKeys = useMemo(
-    () => KeyMapper.formatKeys(shortcutCommandKeys),
-    [shortcutCommandKeys],
+  const formattedSmartKeys = useMemo(
+    () => KeyMapper.formatKeys(shortcutSmartKeys),
+    [shortcutSmartKeys],
   )
   const formattedFreeKeys = useMemo(
     () => KeyMapper.formatKeys(shortcutFreeKeys),
@@ -390,23 +390,23 @@ function ShortcutsTab() {
       {/* 智能模式 */}
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <span className="text-[15px] font-medium">{t('settings.commandMode')}</span>
-          <span className="text-sm text-muted-foreground">{t('settings.commandModeDesc')}</span>
+          <span className="text-[15px] font-medium">{t('settings.smartMode')}</span>
+          <span className="text-sm text-muted-foreground">{t('settings.smartModeDesc')}</span>
         </div>
         <div
-          ref={commandInputRef}
+          ref={smartInputRef}
           className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
           style={
-            isEditingCommand ? { borderColor: 'var(--color-ripple-yellow-text)' } : {}
+            isEditingSmart ? { borderColor: 'var(--color-ripple-yellow-text)' } : {}
           }
           tabIndex={0}
-          onClick={() => startHotKeySetting('command')}
+          onClick={() => startHotKeySetting('smart')}
         >
           <div className="grid [&>*]:col-start-1 [&>*]:row-start-1 items-center">
             <AnimatePresence initial={false}>
-              {isWaitingCommand ? (
+              {isWaitingSmart ? (
                 <motion.span
-                  key="waiting-command"
+                  key="waiting-smart"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -417,19 +417,19 @@ function ShortcutsTab() {
                 </motion.span>
               ) : (
                 <motion.div
-                  key="keys-command"
+                  key="keys-smart"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <KeyDisplay keys={formattedCommandKeys} />
+                  <KeyDisplay keys={formattedSmartKeys} />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           <AnimatePresence>
-            {!isWaitingCommand && (
+            {!isWaitingSmart && (
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

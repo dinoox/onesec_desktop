@@ -51,11 +51,12 @@
   --color-ripple-brand-text: var(--ripple-brand-text);
   --color-setting: var(--setting);
   --color-selection: var(--selection);
+  --color-placeholder: var(--placeholder);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: #F6F6F6;
+  --background: #fff;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -97,10 +98,11 @@
   --ripple-error-text: oklch(0.578 0.203 24.8);
 
   --ripple-brand-text: oklch(0.7 0 0);
-  
+
 
   --selection: oklch(0.90 0 0);
   --setting: oklch(0.98 0 0);
+  --placeholder: #B4B4B4;
 }
 
 .dark {
@@ -148,6 +150,7 @@
 
   --selection: oklch(0.832 0.165 86.343 / 0.3);
   --setting: oklch(0.244 0 89.876 / 0.6);
+  --placeholder: #B4B4B4;
 }
 
 @layer base {

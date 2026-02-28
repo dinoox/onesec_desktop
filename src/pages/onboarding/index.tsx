@@ -682,7 +682,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
   const [sampleTextIndex, setSampleTextIndex] = useState(0)
   const [sampleText, setSampleText] = useState(SAMPLE_TEXTS[0])
 
-  const [showCommandHotkeyDialog, setShowCommandHotkeyDialog] = useState(false)
+  const [showSmartHotkeyDialog, setShowSmartHotkeyDialog] = useState(false)
   const [isTextSelected, setIsTextSelected] = useState(false)
   const [hasReceivedAudio, setHasReceivedAudio] = useState(false)
 
@@ -698,22 +698,22 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
   const { setHotkeySettingStatus } = useStatusStore.getState().actions
 
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
-  const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
-  const { setShortcutCommandKeys, loadUserConfig } = useUserConfigStore.getState().actions
+  const shortcutSmartKeys = useUserConfigStore((state) => state.shortcutSmartKeys)
+  const { setShortcutSmartKeys, loadUserConfig } = useUserConfigStore.getState().actions
 
   const formattedShortcutKeys = useMemo(
     () => KeyMapper.formatKeys(shortcutKeys),
     [shortcutKeys],
   )
 
-  const formattedShortcutCommandKeys = useMemo(
-    () => KeyMapper.formatKeys(shortcutCommandKeys),
-    [shortcutCommandKeys],
+  const formattedShortcutSmartKeys = useMemo(
+    () => KeyMapper.formatKeys(shortcutSmartKeys),
+    [shortcutSmartKeys],
   )
 
-  const formattedShortcutCommandKeysString = useMemo(
-    () => KeyMapper.formatKeysAsString(shortcutCommandKeys),
-    [shortcutCommandKeys],
+  const formattedShortcutSmartKeysString = useMemo(
+    () => KeyMapper.formatKeysAsString(shortcutSmartKeys),
+    [shortcutSmartKeys],
   )
 
   useEffect(() => {
@@ -742,8 +742,8 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
         return
       }
 
-      if (subStep === 3 && mode && mode !== 'command') {
-        toast.error(`请按住 ${formattedShortcutCommandKeysString} 使用命令模式重新录音`, {
+      if (subStep === 3 && mode && mode !== 'smart') {
+        toast.error(`请按住 ${formattedShortcutSmartKeysString} 使用智能模式重新录音`, {
           duration: 5000,
         })
         delay(1000).then(() => {
@@ -752,8 +752,8 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
         return
       }
 
-      if (mode && mode !== 'command') {
-        toast.error(`请按住 ${formattedShortcutCommandKeysString} 使用命令模式重新录音`, {
+      if (mode && mode !== 'smart') {
+        toast.error(`请按住 ${formattedShortcutSmartKeysString} 使用智能模式重新录音`, {
           duration: 5000,
         })
         if (subStep === 3) {
@@ -765,7 +765,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
     }
   }, [holdIPCMessage])
 
-  // 处理快捷键设置的 IPC 消息（针对command模式）
+  // 处理快捷键设置的 IPC 消息（针对smart模式）
   useEffect(() => {
     const action = holdIPCMessage?.action
     const isHotkeyUpdate =
@@ -774,11 +774,11 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
 
     if (isHotkeyUpdate && holdIPCMessage?.data?.data) {
       const { mode, hotkey_combination } = holdIPCMessage.data.data
-      if (mode === 'command' && hotkey_combination && Array.isArray(hotkey_combination)) {
-        setShortcutCommandKeys(hotkey_combination)
+      if (mode === 'smart' && hotkey_combination && Array.isArray(hotkey_combination)) {
+        setShortcutSmartKeys(hotkey_combination)
       }
       if (action === 'hotkey_setting_result') {
-        setShowCommandHotkeyDialog(false)
+        setShowSmartHotkeyDialog(false)
         setHotkeySettingStatus('idle')
 
         const { is_conflict } = holdIPCMessage.data.data
@@ -789,16 +789,16 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
     }
   }, [holdIPCMessage])
 
-  const openCommandHotkeyDialog = async () => {
-    setShowCommandHotkeyDialog(true)
-    await IPCService.startHotkeySetting('command')
+  const openSmartHotkeyDialog = async () => {
+    setShowSmartHotkeyDialog(true)
+    await IPCService.startHotkeySetting('smart')
     setHotkeySettingStatus('hotkey_setting')
   }
 
-  const closeCommandHotkeyDialog = async () => {
+  const closeSmartHotkeyDialog = async () => {
     await loadUserConfig()
-    await IPCService.endHotkeySetting('command')
-    setShowCommandHotkeyDialog(false)
+    await IPCService.endHotkeySetting('smart')
+    setShowSmartHotkeyDialog(false)
     setHotkeySettingStatus('idle')
   }
 
@@ -972,7 +972,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
                 <div className="text-center flex flex-col gap-3 items-center justify-center">
                   <div className="mb-6 flex items-center justify-center">
                     <KbdGroup className="gap-12">
-                      {formattedShortcutCommandKeys.map((key, index) => (
+                      {formattedShortcutSmartKeys.map((key, index) => (
                         <Kbd
                           key={`${key}-${index}`}
                           className={cn(
@@ -992,7 +992,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
 
                   <Button
                     variant="outline"
-                    onClick={openCommandHotkeyDialog}
+                    onClick={openSmartHotkeyDialog}
                     className="w-fit text-muted-foreground"
                   >
                     换个快捷键
@@ -1102,7 +1102,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
                             className="flex items-center gap-2"
                           >
                             <div className="flex gap-1">
-                              {formattedShortcutCommandKeys.map((key, index) => (
+                              {formattedShortcutSmartKeys.map((key, index) => (
                                 <Kbd
                                   key={`${key}-${index}`}
                                   className="text-xs bg-ripple-brand text-foreground"
@@ -1167,7 +1167,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
                 <div className="text-center flex flex-col gap-3 items-center justify-center">
                   <div className="mb-6 flex items-center justify-center">
                     <KbdGroup className="gap-12">
-                      {formattedShortcutCommandKeys.map((key, index) => (
+                      {formattedShortcutSmartKeys.map((key, index) => (
                         <Kbd
                           key={`${key}-${index}`}
                           className={cn(
@@ -1187,7 +1187,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
 
                   <Button
                     variant="outline"
-                    onClick={openCommandHotkeyDialog}
+                    onClick={openSmartHotkeyDialog}
                     className="w-fit text-muted-foreground"
                   >
                     换个快捷键
@@ -1199,18 +1199,18 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
         )}
       </AnimatePresence>
 
-      {/* 命令模式快捷键设置 Dialog */}
+      {/* 智能模式快捷键设置 Dialog */}
       <Dialog
-        open={showCommandHotkeyDialog}
-        onOpenChange={(open) => !open && closeCommandHotkeyDialog()}
+        open={showSmartHotkeyDialog}
+        onOpenChange={(open) => !open && closeSmartHotkeyDialog()}
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>设置命令快捷键</DialogTitle>
+            <DialogTitle>设置智能快捷键</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col space-y-4">
             <span className="text-sm text-muted-foreground">
-              按住该快捷键触发命令模式, 至少包含一个修饰键
+              按住该快捷键触发智能模式, 至少包含一个修饰键
             </span>
             <div
               className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300"
@@ -1238,7 +1238,7 @@ function TryItStep({ onFinish }: { onFinish: () => void }) {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <KeyDisplay keys={formattedShortcutCommandKeys} />
+                      <KeyDisplay keys={formattedShortcutSmartKeys} />
                     </motion.div>
                   )}
                 </AnimatePresence>

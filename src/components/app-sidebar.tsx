@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { type NavItem, navMain, settingsNav } from '@/configs/navigation'
 import { useUIActions } from '@/store/ui-store'
 import { useEntitlementStatus } from '@/services/queries/user-query'
+import { Button } from '@/components/ui/button'
 import logo from '@/assets/images/logo.png'
 
 function checkIsActive(href: string, item: NavItem) {
@@ -31,13 +32,10 @@ const AppSidebar: React.FC = () => {
   const isTrial = snapshot?.subscription_source === 'trial'
   const daysUsed = snapshot?.trial_days_used ?? 0
   const totalDays = snapshot?.total_trial_duration_days ?? 30
-  const progressPercent = Math.min(
-    Math.round((daysUsed / totalDays) * 100),
-    100,
-  )
+  const progressPercent = Math.min(Math.round((daysUsed / totalDays) * 100), 100)
 
   return (
-    <div className="bg-background flex w-54 flex-col flex-none overflow-y-auto">
+    <div className="flex w-54 flex-col flex-none overflow-y-auto">
       {/* Sidebar Header - Logo */}
       <div className="app-drag-region p-3 pt-14 transition-colors duration-300">
         <div className="flex items-center gap-2 px-2 py-2">
@@ -69,9 +67,7 @@ const AppSidebar: React.FC = () => {
               {item.icon && (
                 <item.icon className={`w-4 h-4 ${isActive && 'flash-icon'}`} />
               )}
-              <span className={`text-sm ${isActive && ''}`}>
-                {t(item.title)}
-              </span>
+              <span className={`text-sm ${isActive && ''}`}>{t(item.title)}</span>
             </Link>
           )
         })}
@@ -81,10 +77,8 @@ const AppSidebar: React.FC = () => {
       <div className="mt-auto px-3 pb-3">
         {/* Trial Card */}
         {isTrial && (
-          <div className="mb-2 rounded-lg bg-white px-3 py-4">
-            <p className="text-xs text-muted-foreground">
-              {t('sidebar.trialPlan')}
-            </p>
+          <div className="mb-2 animate-in fade-in-0 zoom-in-95 duration-300 rounded-lg bg-white px-3 py-4">
+            <p className="text-xs text-muted-foreground">{t('sidebar.trialPlan')}</p>
             <p className="mt-1 text-sm font-semibold">
               {t('sidebar.daysUsed', { used: daysUsed, total: totalDays })}
             </p>
@@ -99,9 +93,9 @@ const AppSidebar: React.FC = () => {
             <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground">
               {t('sidebar.upgradeHint')}
             </p>
-            <button className="mt-2 w-full rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background transition-opacity hover:opacity-90">
+            <Button size="sm" className="mt-2 w-full">
               {t('sidebar.upgrade')}
-            </button>
+            </Button>
           </div>
         )}
 
@@ -119,9 +113,7 @@ const AppSidebar: React.FC = () => {
           }`}
         >
           {settingsNav.icon && (
-            <settingsNav.icon
-              className={`w-4 h-4 ${settingsActive && 'flash-icon'}`}
-            />
+            <settingsNav.icon className={`w-4 h-4 ${settingsActive && 'flash-icon'}`} />
           )}
           <span className={`text-sm ${settingsActive && ''}`}>
             {t(settingsNav.title)}

@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Prettier: no semicolons, single quotes, 90 char width, trailing commas
 - Path alias: `@/*` maps to `./src/*`
+- UI 框架: shadcn/ui (基于 Radix UI + Tailwind CSS), 组件已安装在 `src/components/ui/`, 直接引用即可无需再安装
 - Provide concise implementations without generating documentation (per cursor rules)
 
 ## Architecture Overview
@@ -63,11 +64,6 @@ Four Zustand stores, each with an exported `useXxxActions()` hook:
 - **User config**: electron-store at `~/.config/ai.sayso.app/config.json`
 - **Database**: SQLite3 (better-sqlite3) at `~/.config/ai.sayso.app/db.sqlite3` with `audios` and `personas` tables
 - **Audio files**: `~/.config/ai.sayso.app/audios/*.wav`
-
-### Multi-Window Architecture
-
-- **Content window**: 1024x700, hidden title bar, custom traffic light position — main app UI
-- **Status window**: ~90x30, frameless, transparent, always-on-top — floating recording indicator
 
 ### API Layer
 

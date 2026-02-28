@@ -52,7 +52,7 @@ export interface ServerResultOptions {
 }
 //
 
-export type HotkeyMode = 'normal' | 'command' | 'free' | 'persona'
+export type HotkeyMode = 'normal' | 'smart' | 'free' | 'persona'
 
 export interface HotkeyConfig {
   mode: HotkeyMode

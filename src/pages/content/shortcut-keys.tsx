@@ -13,17 +13,17 @@ import { PopcornIcon } from 'lucide-react'
 
 const ContentPage: React.FC = () => {
   const shortcutKeys = useUserConfigStore((state) => state.shortcutKeys)
-  const shortcutCommandKeys = useUserConfigStore((state) => state.shortcutCommandKeys)
+  const shortcutSmartKeys = useUserConfigStore((state) => state.shortcutSmartKeys)
   const shortcutFreeKeys = useUserConfigStore((state) => state.shortcutFreeKeys)
-  const { setShortcutKeys, setShortcutCommandKeys, setShortcutFreeKeys, loadUserConfig } =
+  const { setShortcutKeys, setShortcutSmartKeys, setShortcutFreeKeys, loadUserConfig } =
     useUserConfigStore((state) => state.actions)
 
   const [editingMode, setEditingMode] = useState<
-    'normal' | 'command' | 'free' | 'persona' | null
+    'normal' | 'smart' | 'free' | 'persona' | null
   >(null)
 
   const normalInputRef = useRef<HTMLDivElement>(null)
-  const commandInputRef = useRef<HTMLDivElement>(null)
+  const smartInputRef = useRef<HTMLDivElement>(null)
   const freeInputRef = useRef<HTMLDivElement>(null)
 
   const hotkeySettingStatus = useStatusStore((state) => state.hotKeySettingStatus)
@@ -46,8 +46,8 @@ const ContentPage: React.FC = () => {
       if (hotkey_combination && Array.isArray(hotkey_combination)) {
         if (mode === 'normal') {
           setShortcutKeys(hotkey_combination)
-        } else if (mode === 'command') {
-          setShortcutCommandKeys(hotkey_combination)
+        } else if (mode === 'smart') {
+          setShortcutSmartKeys(hotkey_combination)
         } else if (mode === 'free') {
           setShortcutFreeKeys(hotkey_combination)
         }
@@ -88,8 +88,8 @@ const ContentPage: React.FC = () => {
     editingMode === 'normal' &&
     (hotkeySettingStatus === 'hotkey_setting' ||
       hotkeySettingStatus === 'hotkey_setting_update')
-  const isEditingCommand =
-    editingMode === 'command' &&
+  const isEditingSmart =
+    editingMode === 'smart' &&
     (hotkeySettingStatus === 'hotkey_setting' ||
       hotkeySettingStatus === 'hotkey_setting_update')
   const isEditingFree =
@@ -100,12 +100,12 @@ const ContentPage: React.FC = () => {
   // 判断是否等待按键（刚开始设置，还没有按键）
   const isWaitingNormal =
     editingMode === 'normal' && hotkeySettingStatus === 'hotkey_setting'
-  const isWaitingCommand =
-    editingMode === 'command' && hotkeySettingStatus === 'hotkey_setting'
+  const isWaitingSmart =
+    editingMode === 'smart' && hotkeySettingStatus === 'hotkey_setting'
   const isWaitingFree = editingMode === 'free' && hotkeySettingStatus === 'hotkey_setting'
 
   useClickOutside(
-    [normalInputRef, commandInputRef, freeInputRef],
+    [normalInputRef, smartInputRef, freeInputRef],
     endHotKeySetting,
     !!editingMode,
   )
@@ -114,9 +114,9 @@ const ContentPage: React.FC = () => {
     () => KeyMapper.formatKeys(shortcutKeys),
     [shortcutKeys],
   )
-  const formattedCommandKeys = useMemo(
-    () => KeyMapper.formatKeys(shortcutCommandKeys),
-    [shortcutCommandKeys],
+  const formattedSmartKeys = useMemo(
+    () => KeyMapper.formatKeys(shortcutSmartKeys),
+    [shortcutSmartKeys],
   )
   const formattedFreeKeys = useMemo(
     () => KeyMapper.formatKeys(shortcutFreeKeys),
@@ -186,27 +186,27 @@ const ContentPage: React.FC = () => {
 
       <div className="mb-3 flex flex-col justify-between space-y-2 gap-x-4">
         <div className="flex flex-col justify-center  space-y-1">
-          <span className="text-[15px] font-medium">命令模式</span>
+          <span className="text-[15px] font-medium">智能模式</span>
           <span className="text-sm text-muted-foreground">
-            按住该快捷键会进入命令识别和智能交互模式
+            按住该快捷键会进入智能识别和智能交互模式
           </span>
         </div>
         <div
-          ref={commandInputRef}
+          ref={smartInputRef}
           className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
           style={
-            isEditingCommand ? { borderColor: 'var(--color-ripple-yellow-text)' } : {}
+            isEditingSmart ? { borderColor: 'var(--color-ripple-yellow-text)' } : {}
           }
           tabIndex={0}
           onClick={async () => {
-            await startHotKeySetting('command')
+            await startHotKeySetting('smart')
           }}
         >
           <div className="grid [&>*]:col-start-1 [&>*]:row-start-1 items-center">
             <AnimatePresence initial={false}>
-              {isWaitingCommand && (
+              {isWaitingSmart && (
                 <motion.span
-                  key="waiting-command"
+                  key="waiting-smart"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -216,21 +216,21 @@ const ContentPage: React.FC = () => {
                   等待按键...
                 </motion.span>
               )}
-              {!isWaitingCommand && (
+              {!isWaitingSmart && (
                 <motion.div
-                  key="keys-command"
+                  key="keys-smart"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <KeyDisplay keys={formattedCommandKeys} />
+                  <KeyDisplay keys={formattedSmartKeys} />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           <AnimatePresence>
-            {!isWaitingCommand && (
+            {!isWaitingSmart && (
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

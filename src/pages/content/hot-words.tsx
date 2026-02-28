@@ -86,7 +86,9 @@ const ContentPage: React.FC = () => {
       .filter(({ line }) => line.length > 50)
 
     if (overLengthLines.length > 0) {
-      const preview = overLengthLines.slice(0, 3).map((l) => t('hotWords.lineNumber', { n: l.index }))
+      const preview = overLengthLines
+        .slice(0, 3)
+        .map((l) => t('hotWords.lineNumber', { n: l.index }))
       errors.push(
         t('hotWords.overLength', { count: overLengthLines.length }) +
           preview.join(t('hotWords.separator')) +
@@ -134,7 +136,7 @@ const ContentPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl h-full flex flex-col">
+    <div className="h-full flex flex-col">
       <div className="flex-shrink-0 space-y-4 pb-3">
         <div className="flex items-center justify-between">
           <span className="text-2xl font-semibold">{t('hotWords.title')}</span>
@@ -142,7 +144,7 @@ const ContentPage: React.FC = () => {
           {/* 搜索框 */}
           <div className="flex items-center gap-2">
             <div className="flex-shrink-0 ">
-              <InputGroup className="max-w-md h-[32px] w-[212px]">
+              <InputGroup className="h-[32px] w-[212px]">
                 <InputGroupInput
                   placeholder={t('hotWords.searchPlaceholder')}
                   value={searchValue}
@@ -171,16 +173,14 @@ const ContentPage: React.FC = () => {
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button variant="secondary" size="sm" className="px-2!">
+                <Button variant="secondary" size="sm" className="px-2!  h-[32px]">
                   <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>{t('hotWords.addTitle')}</DialogTitle>
-                  <DialogDescription>
-                    {t('hotWords.addDesc')}
-                  </DialogDescription>
+                  <DialogDescription>{t('hotWords.addDesc')}</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-3">
                   <Textarea
@@ -230,9 +230,7 @@ const ContentPage: React.FC = () => {
           <PopcornIcon className="w-4 h-4 mr-3" />
           <div className="flex flex-col gap-1">
             <span>{t('hotWords.tagline')}</span>
-            <p className="text-sm text-muted-foreground">
-              {t('hotWords.taglineDesc')}
-            </p>
+            <p className="text-sm text-muted-foreground">{t('hotWords.taglineDesc')}</p>
           </div>
         </div>
       </div>
@@ -240,7 +238,9 @@ const ContentPage: React.FC = () => {
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="mt-4">
           <div className="flex-shrink-0 text-xs text-muted-foreground pb-2  min-h-[24px]">
-            {filteredHotWords.length > 0 && !isLoading ? t('hotWords.listLabel') : t('hotWords.searchLabel')}
+            {filteredHotWords.length > 0 && !isLoading
+              ? t('hotWords.listLabel')
+              : t('hotWords.searchLabel')}
           </div>
 
           <AnimatePresence mode="wait">
@@ -284,7 +284,9 @@ const ContentPage: React.FC = () => {
                     <EmptyMedia variant="icon">
                       <BookA />
                     </EmptyMedia>
-                    <EmptyTitle>{searchValue ? t('hotWords.notFound') : t('hotWords.empty')}</EmptyTitle>
+                    <EmptyTitle>
+                      {searchValue ? t('hotWords.notFound') : t('hotWords.empty')}
+                    </EmptyTitle>
                     <EmptyDescription>
                       {searchValue
                         ? t('hotWords.tryOtherKeyword')

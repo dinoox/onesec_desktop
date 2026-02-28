@@ -16,7 +16,7 @@ export const useGetUserInfo = () => {
     queryFn: async () => {
       const resp = await getUserInfo()
       if (resp.code === 200) {
-        await updateUser(resp.result)
+        await updateUser({ ...resp.result, id: String(resp.result.id) })
       }
       return resp
     },
@@ -42,7 +42,7 @@ export const useUpdateUserInfo = () => {
     mutationFn: updateUserInfo,
     onSuccess: async (resp) => {
       if (resp.code === 200) {
-        await updateUser(resp.result)
+        await updateUser({ ...resp.result, id: String(resp.result.id) })
         queryClient.invalidateQueries({ queryKey: ['user'] })
         toast.success('更新成功')
         return

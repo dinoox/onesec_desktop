@@ -17,9 +17,8 @@ const en = {
     holdKey: 'Hold',
     thenSpeak: 'key, speak in any text field, release to finish',
     lastTranscript: 'Last Transcript',
-    tooltipLine1: 'This transcript and its audio file will be submitted with your feedback',
-    tooltipLine2:
-      'to help us improve transcription quality. This information will not be used for model training.',
+    tooltip:
+      'This transcript and its audio file will be submitted with your feedback to help us improve transcription quality. This information will not be used for model training.',
     more: 'More',
     quoteTranscript: 'Quote transcript',
     refreshTranscript: 'Refresh transcript',
@@ -74,6 +73,11 @@ const en = {
     settingSaved: 'Settings saved',
     settingFailed: 'Settings failed',
     deletedCount: 'Deleted {{count}} records',
+    feedback: 'Feedback',
+    feedbackDialogTitle: 'Feedback',
+    feedbackDialogDesc: 'Share your feedback about this transcription',
+    feedbackPlaceholder: 'Describe the issue or suggestion...',
+    feedbackSubmit: 'Submit',
   },
   hotWords: {
     title: 'Hot Words',
@@ -140,8 +144,8 @@ const en = {
     normalMode: 'Normal Mode',
     normalModeDesc:
       'Hold to enter normal recognition mode; double-click to enter Hands-free mode',
-    commandMode: 'Smart Mode',
-    commandModeDesc: 'Hold to enter command recognition and smart interaction mode',
+    smartMode: 'Smart Mode',
+    smartModeDesc: 'Hold to enter smart recognition and smart interaction mode',
     freeMode: 'Hands-free Mode',
     freeModeDesc: 'Press once to start, press again to stop. No need to hold.',
     waitingKey: 'Waiting for key...',

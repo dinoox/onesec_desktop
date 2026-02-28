@@ -1,13 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import useAuthStore from '@/store/auth-store.ts'
 import { Navigate } from 'react-router'
 import ipcService from '@/services/ipc-service.ts'
 import logoImg from '@/assets/images/logo.png'
+import loginGuideImg from '@/assets/images/login-guide.png'
+import { isCN, regionConfig } from '@/configs/region'
+import { phoneLogin, sendCode } from '@/services/api/auth-api'
+import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button.tsx'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Field, FieldLabel } from '@/components/ui/field'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 
 const LOGIN_SERVER_URL = import.meta.env.VITE_LOGIN_SERVER_URL
 
 const LoginPage: React.FC = () => {
   const isAuthed = useAuthStore((s) => s.isAuthed)
+  const { setAuthed } = useAuthStore((s) => s.actions)
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -20,30 +38,249 @@ const LoginPage: React.FC = () => {
 
   if (isFirstLaunch === null) return null
 
+  return (
+    <div className="relative flex min-h-svh w-full bg-white">
+      <div className="fixed top-0 left-0 right-0 h-[60px] app-drag-region z-10" />
+      {isCN ? <CNLoginForm /> : <GlobalLoginForm />}
+    </div>
+  )
+}
+
+/* ─── 国内手机号登录 ─── */
+const CNLoginForm: React.FC = () => {
+  const { setAuthed } = useAuthStore((s) => s.actions)
+  const [phone, setPhone] = useState('')
+  const [code, setCode] = useState('')
+  const [agreed, setAgreed] = useState(false)
+  const [countdown, setCountdown] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [showAgreement, setShowAgreement] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setInterval>>()
+
+  useEffect(() => () => clearInterval(timerRef.current), [])
+
+  const startCountdown = useCallback(() => {
+    setCountdown(60)
+    timerRef.current = setInterval(() => {
+      setCountdown((v) => {
+        if (v <= 1) {
+          clearInterval(timerRef.current)
+          return 0
+        }
+        return v - 1
+      })
+    }, 1000)
+  }, [])
+
+  const handleSendCode = async () => {
+    if (!phone.trim()) {
+      toast.error('请输入手机号')
+      return
+    }
+    try {
+      const res = await sendCode(phone.trim())
+      if (res.code === 200) {
+        toast.success('验证码已发送')
+        startCountdown()
+      } else {
+        toast.error(res.message || '发送失败')
+      }
+    } catch {
+      toast.error('发送失败，请稍后重试')
+    }
+  }
+
+  const doLogin = async () => {
+    setLoading(true)
+    try {
+      const res = await phoneLogin(phone.trim(), code.trim())
+      if (res.code === 200 && res.result) {
+        const { user, ...loginData } = res.result
+        await setAuthed(user, loginData)
+      } else {
+        toast.error(res.message || '登录失败')
+      }
+    } catch {
+      toast.error('登录失败，请稍后重试')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogin = async () => {
+    if (!agreed) {
+      setShowAgreement(true)
+      return
+    }
+    await doLogin()
+  }
+
+  const handleAgree = async () => {
+    setAgreed(true)
+    setShowAgreement(false)
+    await doLogin()
+  }
+
+  const openUrl = (url: string) => ipcService.openExternalUrl(url)
+
+  return (
+    <div className="flex w-full min-h-svh">
+      {/* 左侧图片 */}
+      <div className="hidden md:flex w-1/2 items-center justify-center p-4 pt-9">
+        <img
+          src={loginGuideImg}
+          alt="SaySo"
+          className="max-w-full h-full object-cover"
+          style={{ borderRadius: '16px' }}
+        />
+      </div>
+
+      {/* 右侧表单 */}
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-[360px] flex flex-col">
+          <h1 className="text-[27px] font-semibold mb-2 flex items-center justify-center gap-2">
+            欢迎登入
+            <img src={logoImg} alt="SaySo" className="h-7 mt-1.5" />
+          </h1>
+          <p className="text-muted-foreground text-sm mb-10 text-center">
+            登录以体验更多功能
+          </p>
+
+          {/* 手机号 */}
+          <Field className="mb-6">
+            <FieldLabel className="text-[13px]">手机号</FieldLabel>
+            <InputGroup className="h-12 rounded-xl px-1.5">
+              <InputGroupAddon className="text-placeholder font-normal">+86</InputGroupAddon>
+              <InputGroupInput
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="请输入手机号"
+                className="placeholder:text-placeholder"
+                maxLength={11}
+              />
+            </InputGroup>
+          </Field>
+
+          {/* 验证码 */}
+          <Field className="mb-8">
+            <FieldLabel className="text-[13px]">验证码</FieldLabel>
+            <InputGroup className="h-12 rounded-xl pl-1.5">
+              <InputGroupInput
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="验证码"
+                className="placeholder:text-placeholder"
+                maxLength={6}
+              />
+              <InputGroupAddon align="inline-end" className="text-placeholder">
+                <Button
+                  type="button"
+                  variant="link"
+                  disabled={countdown > 0}
+                  onClick={handleSendCode}
+                >
+                  {countdown > 0 ? `${countdown}s` : '获取验证码'}
+                </Button>
+              </InputGroupAddon>
+            </InputGroup>
+          </Field>
+
+          {/* 登录按钮 */}
+          <Button
+            onClick={handleLogin}
+            disabled={loading || !phone.trim() || !code.trim()}
+            className="w-full h-12 rounded-xl bg-[#1a1a1a] dark:bg-white dark:text-black text-white text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity"
+          >
+            {loading ? '登录中...' : '登录'}
+          </Button>
+
+          {/* 协议 */}
+          <div className="flex items-start gap-2 mt-6">
+            <Checkbox
+              checked={agreed}
+              onCheckedChange={(v) => setAgreed(v === true)}
+              className="mt-0.5 shrink-0 cursor-pointer"
+            />
+            <p className="text-xs text-[#B4B4B4] leading-5">
+              您已阅读并同意
+              <button
+                type="button"
+                onClick={() => openUrl(regionConfig.termsUrl)}
+                className="text-foreground hover:text-primary cursor-pointer bg-transparent border-none p-0"
+              >
+                《用户协议》
+              </button>
+              和
+              <button
+                type="button"
+                onClick={() => openUrl(regionConfig.privacyUrl)}
+                className="text-foreground hover:text-primary cursor-pointer bg-transparent border-none p-0"
+              >
+                《隐私政策》
+              </button>
+              。如您手机号未注册，点击登录即视为您授权系统自动为您创建新账号。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <Dialog open={showAgreement} onOpenChange={setShowAgreement}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>服务协议与隐私政策</DialogTitle>
+            <DialogDescription>
+              请阅读并同意
+              <button
+                type="button"
+                onClick={() => openUrl(regionConfig.termsUrl)}
+                className="text-foreground hover:text-primary cursor-pointer bg-transparent border-none p-0"
+              >
+                《用户协议》
+              </button>
+              和
+              <button
+                type="button"
+                onClick={() => openUrl(regionConfig.privacyUrl)}
+                className="text-foreground hover:text-primary cursor-pointer bg-transparent border-none p-0"
+              >
+                《隐私政策》
+              </button>
+              ，以继续使用我们的服务。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" onClick={() => setShowAgreement(false)}>
+                不同意
+              </Button>
+            </DialogClose>
+            <Button type="submit" onClick={handleAgree}>
+              同意
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
+/* ─── 国际版 OAuth 登录 ─── */
+const GlobalLoginForm: React.FC = () => {
   const handleLogin = async (provider: 'google' | 'email') => {
     const url = `${LOGIN_SERVER_URL}/login/${provider}`
     await ipcService.openExternalUrl(url)
   }
 
-  const handleOpenExternalUrl = async (url: string) => {
-    await ipcService.openExternalUrl(url)
-  }
+  const openUrl = (url: string) => ipcService.openExternalUrl(url)
 
   return (
-    <div className="relative flex min-h-svh w-full items-center justify-center p-6">
-      <div className="fixed top-0 left-0 right-0 h-[60px] app-drag-region z-10" />
-
+    <div className="flex w-full items-center justify-center p-6">
       <div className="flex flex-col items-center w-full max-w-[480px]">
-        {/* Logo */}
         <img src={logoImg} alt="SaySo" className="h-12 mb-6" />
-
-        {/* Title */}
         <h1 className="text-[30px] font-semibold mb-3">欢迎使用 SaySo</h1>
-
-        {/* Subtitle */}
         <p className="text-[#ff9818] mb-10">限时注册：免费获得 30 天试用专业会员资格！</p>
 
-        {/* Google Button */}
         <button
           onClick={() => handleLogin('google')}
           className="w-full h-[60px] rounded-full bg-[#2a2a2a] dark:bg-[#333] text-white text-[16px] font-medium flex items-center justify-center gap-3 cursor-pointer hover:opacity-90 transition-opacity"
@@ -69,14 +306,12 @@ const LoginPage: React.FC = () => {
           使用 Google 邮箱继续
         </button>
 
-        {/* Divider */}
         <div className="flex items-center gap-4 w-full my-6">
           <div className="flex-1 h-px bg-border" />
           <span className="text-sm text-muted-foreground">或</span>
           <div className="flex-1 h-px bg-border" />
         </div>
 
-        {/* Email Button */}
         <button
           onClick={() => handleLogin('email')}
           className="w-full h-[60px] rounded-full border border-border bg-transparent text-foreground text-[16px] font-medium flex items-center justify-center gap-3 cursor-pointer hover:bg-accent transition-colors"
@@ -96,12 +331,11 @@ const LoginPage: React.FC = () => {
           使用其他邮箱继续
         </button>
 
-        {/* Terms */}
         <p className="text-sm text-muted-foreground mt-8">
           登录即表示您同意我们的
           <button
             type="button"
-            onClick={() => handleOpenExternalUrl('https://www.sayso.ai/terms-of-service')}
+            onClick={() => openUrl(regionConfig.termsUrl)}
             className="underline underline-offset-4 mx-1 hover:text-primary cursor-pointer bg-transparent border-none p-0 text-foreground"
           >
             服务条款
@@ -109,7 +343,7 @@ const LoginPage: React.FC = () => {
           和
           <button
             type="button"
-            onClick={() => handleOpenExternalUrl('https://www.sayso.ai/privacy-policy')}
+            onClick={() => openUrl(regionConfig.privacyUrl)}
             className="underline underline-offset-4 mx-1 hover:text-primary cursor-pointer bg-transparent border-none p-0 text-foreground"
           >
             隐私政策

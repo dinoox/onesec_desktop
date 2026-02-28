@@ -5,7 +5,7 @@ import { HotkeyMode } from '../../main/types/message.ts'
 
 interface UserConfigStore {
   shortcutKeys: string[]
-  shortcutCommandKeys: string[]
+  shortcutSmartKeys: string[]
   shortcutFreeKeys: string[]
   shortcutPersonaKeys: string[]
   showComparison: boolean
@@ -17,7 +17,7 @@ interface UserConfigStore {
     setHideStatusPanel: (hideStatusPanel: boolean) => Promise<void>
     setHistoryRetention: (historyRetention: string) => Promise<void>
     setShortcutKeys: (keys: string[]) => void
-    setShortcutCommandKeys: (keys: string[]) => void
+    setShortcutSmartKeys: (keys: string[]) => void
     setShortcutFreeKeys: (keys: string[]) => void
     setShortcutPersonaKeys: (keys: string[]) => void
   }
@@ -25,7 +25,7 @@ interface UserConfigStore {
 
 const useUserConfigStore = create<UserConfigStore>((set, get) => ({
   shortcutKeys: [],
-  shortcutCommandKeys: [],
+  shortcutSmartKeys: [],
   shortcutFreeKeys: [],
   shortcutPersonaKeys: [],
   showComparison: true,
@@ -38,8 +38,8 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
       const normalConfig = config.hotkey_configs?.find(
         (item: any) => item.mode === 'normal',
       )
-      const commandConfig = config.hotkey_configs?.find(
-        (item: any) => item.mode === 'command',
+      const smartConfig = config.hotkey_configs?.find(
+        (item: any) => item.mode === 'smart',
       )
       const freeConfig = config.hotkey_configs?.find((item: any) => item.mode === 'free')
       const personaConfig = config.hotkey_configs?.find(
@@ -47,7 +47,7 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
       )
       set({
         shortcutKeys: normalConfig?.hotkey_combination || ['Fn'],
-        shortcutCommandKeys: commandConfig?.hotkey_combination || ['Fn', 'LCmd'],
+        shortcutSmartKeys: smartConfig?.hotkey_combination || ['Fn', 'LCmd'],
         shortcutFreeKeys: freeConfig?.hotkey_combination || ['Fn', 'Space'],
         shortcutPersonaKeys: personaConfig?.hotkey_combination || [],
         showComparison: settings?.show_comparison ?? true,
@@ -86,7 +86,7 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
       set({ historyRetention })
     },
     setShortcutKeys: (keys: string[]) => set({ shortcutKeys: keys }),
-    setShortcutCommandKeys: (keys: string[]) => set({ shortcutCommandKeys: keys }),
+    setShortcutSmartKeys: (keys: string[]) => set({ shortcutSmartKeys: keys }),
     setShortcutFreeKeys: (keys: string[]) => set({ shortcutFreeKeys: keys }),
     setShortcutPersonaKeys: (keys: string[]) => set({ shortcutPersonaKeys: keys }),
   },
