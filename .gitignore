@@ -11,3 +11,5 @@ package-lock.json
 dist-electron/
 release/
 .env
+
+dist/
