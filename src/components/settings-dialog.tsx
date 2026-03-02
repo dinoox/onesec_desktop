@@ -116,8 +116,7 @@ function AccountTab() {
   const mutation = useLogoutQuery()
   const { theme, setTheme } = useTheme()
   const showComparison = useUserConfigStore((state) => state.showComparison)
-  const hideStatusPanel = useUserConfigStore((state) => state.hideStatusPanel)
-  const { setShowComparison, setHideStatusPanel } = useUserConfigActions()
+  const { setShowComparison } = useUserConfigActions()
   const [uploadingLog, setUploadingLog] = useState(false)
   const { setSettingsDialogOpen } = useUIActions()
 

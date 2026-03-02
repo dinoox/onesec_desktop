@@ -8,7 +8,6 @@ interface StoreSchema {
   user: User | null
   setting: {
     show_comparison: boolean
-    hide_status_panel: boolean
     history_retention: string
   }
   theme: Theme
@@ -29,7 +28,6 @@ const USER_DEFAULT_CONFIG: StoreSchema = {
   user: null,
   setting: {
     show_comparison: true,
-    hide_status_panel: false,
     history_retention: 'forever',
   },
   theme: 'system',

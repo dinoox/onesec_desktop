@@ -9,12 +9,10 @@ interface UserConfigStore {
   shortcutFreeKeys: string[]
   shortcutPersonaKeys: string[]
   showComparison: boolean
-  hideStatusPanel: boolean
   historyRetention: string
   actions: {
     loadUserConfig: () => Promise<void>
     setShowComparison: (showComparison: boolean) => Promise<void>
-    setHideStatusPanel: (hideStatusPanel: boolean) => Promise<void>
     setHistoryRetention: (historyRetention: string) => Promise<void>
     setShortcutKeys: (keys: string[]) => void
     setShortcutSmartKeys: (keys: string[]) => void
@@ -29,7 +27,6 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
   shortcutFreeKeys: [],
   shortcutPersonaKeys: [],
   showComparison: true,
-  hideStatusPanel: false,
   historyRetention: 'forever',
   actions: {
     loadUserConfig: async () => {
@@ -51,7 +48,6 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
         shortcutFreeKeys: freeConfig?.hotkey_combination || ['Fn', 'Space'],
         shortcutPersonaKeys: personaConfig?.hotkey_combination || [],
         showComparison: settings?.show_comparison ?? true,
-        hideStatusPanel: settings?.hide_status_panel ?? false,
         historyRetention: settings?.history_retention ?? 'forever',
       })
     },
@@ -59,27 +55,15 @@ const useUserConfigStore = create<UserConfigStore>((set, get) => ({
       await UserService.setPartialConfig({
         setting: {
           show_comparison: showComparison,
-          hide_status_panel: get().hideStatusPanel,
           history_retention: get().historyRetention,
         },
       })
       set({ showComparison })
     },
-    setHideStatusPanel: async (hideStatusPanel: boolean) => {
-      await UserService.setPartialConfig({
-        setting: {
-          show_comparison: get().showComparison,
-          hide_status_panel: hideStatusPanel,
-          history_retention: get().historyRetention,
-        },
-      })
-      set({ hideStatusPanel })
-    },
     setHistoryRetention: async (historyRetention: string) => {
       await UserService.setPartialConfig({
         setting: {
           show_comparison: get().showComparison,
-          hide_status_panel: get().hideStatusPanel,
           history_retention: historyRetention,
         },
       })
