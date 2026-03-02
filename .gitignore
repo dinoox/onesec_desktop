@@ -10,6 +10,7 @@ env/.env.local
 package-lock.json
 dist-electron/
 release/
-.env
 
 dist/
+
+.env.production
