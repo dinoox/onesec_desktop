@@ -120,10 +120,11 @@ const HistoryPage: React.FC = () => {
 
     try {
       const audioData = await ipcService.readAudioFile(filename)
-      const result = await reconvertAudio(audioData)
+      const result = await reconvertAudio(audioData, filename)
 
       if (result.code == 200) {
-        const content = (result.result as any)?.text || ''
+        const r = result.result as any
+        const content = r?.optimized_text || r?.transcription || ''
         await ipcService.updateAudio(id, content, null)
       } else {
         const error = result.message || t('history.reconvertFailed')
@@ -606,7 +607,7 @@ const HistoryPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent position="popper" sideOffset={4}>
               <SelectGroup>
-                <SelectLabel>Retention</SelectLabel>
+                <SelectLabel>{t('history.retentionLabel')}</SelectLabel>
                 <SelectItem value="never">{t('history.never')}</SelectItem>
                 <SelectItem value="24hours">{t('history.hours24')}</SelectItem>
                 <SelectItem value="1week">{t('history.week1')}</SelectItem>

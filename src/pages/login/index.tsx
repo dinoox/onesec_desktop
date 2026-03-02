@@ -55,7 +55,7 @@ const CNLoginForm: React.FC = () => {
   const [countdown, setCountdown] = useState(0)
   const [loading, setLoading] = useState(false)
   const [showAgreement, setShowAgreement] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval>>()
+  const timerRef = useRef<ReturnType<typeof setInterval>>(undefined)
 
   useEffect(() => () => clearInterval(timerRef.current), [])
 
@@ -137,51 +137,53 @@ const CNLoginForm: React.FC = () => {
 
       {/* 右侧表单 */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-[360px] flex flex-col">
-          <h1 className="text-[27px] font-semibold mb-2 flex items-center justify-center gap-2">
+        <div className="w-full max-w-[312px] flex flex-col">
+          <h1 className="text-[22px] font-semibold mb-2 flex items-center justify-center gap-1.5">
             欢迎登入
-            <img src={logoImg} alt="SaySo" className="h-7 mt-1.5" />
+            <img src={logoImg} alt="SaySo" className="h-[25px] mt-1.5" />
           </h1>
-          <p className="text-muted-foreground text-sm mb-10 text-center">
+          <p className="text-muted-foreground text-[12.6px] mb-10 text-center">
             登录以体验更多功能
           </p>
 
           {/* 手机号 */}
-          <Field className="mb-6">
+          <Field className="mb-5 gap-1.5 ">
             <FieldLabel className="text-[13px]">手机号</FieldLabel>
-            <InputGroup className="h-12 rounded-xl px-1.5">
-              <InputGroupAddon className="text-placeholder font-normal">+86</InputGroupAddon>
+            <InputGroup className="h-[41px] rounded-xl px-1.5 bg-[#F5F5F5]">
+              <InputGroupAddon className="text-placeholder font-normal text-[13px]">
+                +86
+              </InputGroupAddon>
               <InputGroupInput
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="请输入手机号"
-                className="placeholder:text-placeholder"
+                className="placeholder:text-placeholder text-[13px]!"
                 maxLength={11}
               />
             </InputGroup>
           </Field>
 
           {/* 验证码 */}
-          <Field className="mb-8">
+          <Field className="mb-6 gap-1.5">
             <FieldLabel className="text-[13px]">验证码</FieldLabel>
-            <InputGroup className="h-12 rounded-xl pl-1.5">
+            <InputGroup className="h-[41px] rounded-xl pl-1.5 bg-[#F5F5F5]">
               <InputGroupInput
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="验证码"
-                className="placeholder:text-placeholder"
+                className="placeholder:text-placeholder text-[13px]!"
                 maxLength={6}
               />
-              <InputGroupAddon align="inline-end" className="text-placeholder">
-                <Button
+              <InputGroupAddon align="inline-end" className="pr-4">
+                <button
                   type="button"
-                  variant="link"
                   disabled={countdown > 0}
                   onClick={handleSendCode}
+                  className="text-[13px] text-placeholder font-normal hover:text-foreground transition-colors cursor-pointer disabled:cursor-default disabled:hover:text-muted-foreground"
                 >
                   {countdown > 0 ? `${countdown}s` : '获取验证码'}
-                </Button>
+                </button>
               </InputGroupAddon>
             </InputGroup>
           </Field>
@@ -190,19 +192,19 @@ const CNLoginForm: React.FC = () => {
           <Button
             onClick={handleLogin}
             disabled={loading || !phone.trim() || !code.trim()}
-            className="w-full h-12 rounded-xl bg-[#1a1a1a] dark:bg-white dark:text-black text-white text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity"
+            className="w-full h-[42px] rounded-[14px] bg-[#1a1a1a] dark:bg-white dark:text-black text-white text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity"
           >
             {loading ? '登录中...' : '登录'}
           </Button>
 
           {/* 协议 */}
-          <div className="flex items-start gap-2 mt-6">
+          <div className="flex items-start gap-2 mt-6 text-[11px] ">
             <Checkbox
               checked={agreed}
               onCheckedChange={(v) => setAgreed(v === true)}
-              className="mt-0.5 shrink-0 cursor-pointer"
+              className="mt-0.5 shrink-0 cursor-pointer size-3 [&_svg]:size-2.5"
             />
-            <p className="text-xs text-[#B4B4B4] leading-5">
+            <p className=" text-[#B4B4B4]">
               您已阅读并同意
               <button
                 type="button"

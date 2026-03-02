@@ -36,6 +36,7 @@ const zh = {
     deleteAll: '删除所有',
     retention: '历史记录保存',
     retentionDesc: '设置语音输入记录在本地的保存时长',
+    retentionLabel: '时限',
     never: '永不保存',
     hours24: '24 小时',
     week1: '一周',

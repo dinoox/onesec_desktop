@@ -391,7 +391,7 @@ const ContentPage: React.FC = () => {
 
       {/* 编辑对话框 */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t('hotWords.editTitle')}</DialogTitle>
             <DialogDescription>{t('hotWords.editDesc')}</DialogDescription>

@@ -6,6 +6,8 @@ import { useUIActions } from '@/store/ui-store'
 import { useEntitlementStatus } from '@/services/queries/user-query'
 import { Button } from '@/components/ui/button'
 import logo from '@/assets/images/logo.png'
+import logoDark from '@/assets/images/logo-dark.png'
+import { Badge } from './ui/badge'
 
 function checkIsActive(href: string, item: NavItem) {
   if (matchPath({ path: item.url, end: true }, href)) return true
@@ -39,11 +41,12 @@ const AppSidebar: React.FC = () => {
       {/* Sidebar Header - Logo */}
       <div className="app-drag-region p-3 pt-14 transition-colors duration-300">
         <div className="flex items-center gap-2 px-2 py-2">
-          <img src={logo} alt="SaySo" className="w-18" />
+          <img src={logo} alt="SaySo" className="w-18 dark:hidden" />
+          <img src={logoDark} alt="SaySo" className="w-18 hidden dark:block" />
           {isTrial && (
-            <span className="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+            <Badge className="bg-blue-50 shadow-xs text-blue-700 dark:bg-blue-950 dark:text-blue-300">
               Trial
-            </span>
+            </Badge>
           )}
         </div>
       </div>
@@ -77,7 +80,7 @@ const AppSidebar: React.FC = () => {
       <div className="mt-auto px-3 pb-3">
         {/* Trial Card */}
         {isTrial && (
-          <div className="mb-2 animate-in fade-in-0 zoom-in-95 duration-300 rounded-lg bg-white px-3 py-4">
+          <div className="mb-2 animate-in fade-in-0 zoom-in-95 duration-300 rounded-lg bg-white dark:bg-muted/50 px-3 py-4">
             <p className="text-xs text-muted-foreground">{t('sidebar.trialPlan')}</p>
             <p className="mt-1 text-sm font-semibold">
               {t('sidebar.daysUsed', { used: daysUsed, total: totalDays })}

@@ -37,6 +37,7 @@ const en = {
     deleteAll: 'Delete All',
     retention: 'History Retention',
     retentionDesc: 'Set how long voice input records are saved locally',
+    retentionLabel: 'Retention',
     never: 'Never',
     hours24: '24 Hours',
     week1: '1 Week',

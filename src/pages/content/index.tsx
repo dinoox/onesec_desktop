@@ -21,6 +21,7 @@ import { type AttachmentItem, getAttachmentKind } from '@/utils/oss-upload'
 import { toast } from 'sonner'
 import ipcService from '@/services/ipc-service'
 import { Audios } from '../../../main/services/database-service'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
@@ -99,19 +100,14 @@ const ContentPage: React.FC = () => {
           <div className="h-8 w-8"></div>
         </div>
         {/* 快捷提示 */}
-        <div className="flex items-center justify-between bg-setting rounded-xl px-5 py-4">
-          <div className="flex items-center">
-            <div className="flex flex-col gap-1">
-              <span className="font-medium">{t('home.tagline')}</span>
-              <div className="text-sm text-muted-foreground space-x-1.5">
-                <span>{t('home.holdKey')}</span>
-                <KeyDisplay keys={formattedKeys} className="bg-gray-200" />
-                <span>{t('home.thenSpeak')}</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3"></div>
-        </div>
+        <Alert className="rounded-xl bg-setting px-4.5 py-3.5 border-none gap-1">
+          <AlertTitle>{t('home.tagline')}</AlertTitle>
+          <AlertDescription className="space-x-1.5">
+            <span>{t('home.holdKey')}</span>
+            <KeyDisplay keys={formattedKeys} className="bg-gray-200" />
+            <span>{t('home.thenSpeak')}</span>
+          </AlertDescription>
+        </Alert>
       </div>
 
       {/* 反馈区域 */}
@@ -224,7 +220,7 @@ const ContentPage: React.FC = () => {
                 handleSubmitFeedback()
               }
             }}
-            className="min-h-[105px] px-4 text-sm placeholder:text-muted-foreground/50"
+            className="min-h-[105px] px-4  placeholder:text-placeholder"
           />
 
           {/* 附件预览 */}

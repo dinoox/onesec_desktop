@@ -12,7 +12,7 @@ export default function DashboardLayout() {
 
   return (
     <AuthGuardContainer>
-      <div className="flex h-screen overflow-hidden bg-[#F6F6F6]">
+      <div className="flex h-screen overflow-hidden bg-[#F6F6F6] dark:bg-background">
         <AppSidebar />
         <div className="flex-1 flex flex-col overflow-hidden pr-4 pb-4">
           <div className="flex-none app-drag-region">

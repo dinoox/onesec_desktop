@@ -7,7 +7,7 @@ import { useEffect, RefObject } from 'react'
  * @param enabled - 是否启用监听（默认为 true）
  */
 export function useClickOutside(
-  ref: RefObject<HTMLElement> | RefObject<HTMLElement>[],
+  ref: RefObject<HTMLElement | null> | RefObject<HTMLElement | null>[],
   handler: (event: MouseEvent | TouchEvent) => void,
   enabled: boolean = true,
 ) {

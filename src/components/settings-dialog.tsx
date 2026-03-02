@@ -86,8 +86,8 @@ export const SettingsDialog: React.FC = () => {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex items-center gap-3 text-left px-3 py-2 rounded-md text-sm transition-colors mb-0.5 ${
                     activeTab === tab.key
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                      : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
+                      ? 'bg-sidebar-accent/80 text-sidebar-accent-foreground font-medium'
+                      : 'text-muted-foreground hover:bg-sidebar-accent/40 hover:text-foreground'
                   }`}
                 >
                   {tab.icon}
@@ -171,7 +171,9 @@ function AccountTab() {
           <div className="flex items-center justify-between w-full bg-setting rounded-xl p-3">
             <div className="flex flex-col space-y-1">
               <Label>{t('settings.subscription')}</Label>
-              <span className="text-muted-foreground text-sm">{t('settings.trialPro')}</span>
+              <span className="text-muted-foreground text-sm">
+                {t('settings.trialPro')}
+              </span>
             </div>
             <Button variant="outline" className="" size="sm">
               <IconGitBranch />
@@ -184,7 +186,7 @@ function AccountTab() {
       <div className="mt-auto flex justify-end">
         <Button
           type="button"
-          variant="secondary"
+          variant="destructive"
           onClick={logout}
           disabled={mutation.isPending}
         >
@@ -341,7 +343,7 @@ function ShortcutsTab() {
         <div
           ref={normalInputRef}
           onClick={() => startHotKeySetting('normal')}
-          className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
+          className="border-input flex h-9 w-full items-center gap-2 rounded-[10px] border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
           style={isEditingNormal ? { borderColor: 'var(--color-ripple-green-text)' } : {}}
           tabIndex={0}
         >
@@ -395,7 +397,7 @@ function ShortcutsTab() {
         </div>
         <div
           ref={smartInputRef}
-          className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
+          className="border-input flex h-9 w-full items-center gap-2 rounded-[10px] border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
           style={
             isEditingSmart ? { borderColor: 'var(--color-ripple-yellow-text)' } : {}
           }
@@ -453,7 +455,7 @@ function ShortcutsTab() {
         <div
           ref={freeInputRef}
           onClick={() => startHotKeySetting('free')}
-          className="border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
+          className="border-input flex h-9 w-full items-center gap-2 rounded-[10px] border bg-transparent px-3 shadow-xs transition-colors duration-300 cursor-pointer"
           style={isEditingFree ? { borderColor: 'var(--color-ripple-green-text)' } : {}}
           tabIndex={0}
         >
